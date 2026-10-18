@@ -1,0 +1,10 @@
+# Linux (GitHub Actions) ke liye LF normalize karo
+* text=auto eol=lf
+
+# Binary files — koi conversion nahi
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.mp3 binary
+*.ttf binary
+*.mp4 binary
