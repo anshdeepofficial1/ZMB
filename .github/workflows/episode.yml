@@ -36,10 +36,10 @@ jobs:
       GITHUB_REPOSITORY: ${{ github.repository }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Python setup
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -48,11 +48,13 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: FFmpeg + fonts check
+      - name: System deps (ffmpeg + fonts)
         run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
           ffmpeg -version | head -n 1
-          ls /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf \
-            || sudo apt-get update -qq && sudo apt-get install -y -qq fonts-dejavu-core
+          ffprobe -version | head -n 1
 
       - name: Run cycle
         env:
@@ -66,7 +68,7 @@ jobs:
 
       - name: Upload reel artifact (debug)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: reel-debug
           path: |
