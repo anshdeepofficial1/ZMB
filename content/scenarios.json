@@ -1,0 +1,432 @@
+{
+  "arcs": {
+    "farmhouse": {
+      "title": "Farmhouse — Season ka Pehla Thikana",
+      "start": "intro",
+      "nodes": {
+        "intro": {
+          "kind": "story",
+          "subtitle": "Zombie Apocalypse: Tum Decide Karo",
+          "hook": "Apocalypse shuru ho chuka hai. Tum phanse ho ek sunsaan farmhouse mein. Aur ab story SIRF tum decide karoge.",
+          "narration": [
+            "Shaam 6 baje. {location}. Phone dead hai. Road block hai. Aur bahar... bahar kuch bahut galat chal raha hai.",
+            "Gate ki taraf se wahi awaazein aa rahi hain jo news mein suni thi. Tum andar ho. Aaj raat tum yahin rahoge.",
+            "Ab suno rule: har din tumhe do raste milenge. Tum comment mein 1 ya 2 likhoge. Sabse zyada votes wala rasta jeetega. Koi undo button nahi hai.",
+            "Kal raat pehli asli raat hai. Better ho jaao."
+          ],
+          "images": [
+            "isolated indian farmhouse at dusk, dirt driveway, dark fields all around, one window lit, ominous",
+            "hands boarding up a wooden farmhouse door with planks, dim lantern light, tense",
+            "dead smartphone on a wooden table, candle flame nearby, dusk light through window"
+          ],
+          "next": "garage_sound"
+        },
+        "garage_sound": {
+          "kind": "vote",
+          "subtitle": "Garage Ki Awaaz",
+          "hook": "Raat 2 baje farmhouse ke garage se awaaz aayi. Andar gaadi, tools aur kal ka ration hai. Tum kya karoge?",
+          "narration": [
+            "Raat 2 baje. Neend mein tumhe awaaz sunai deti hai. Awaaz tumhare farm ke garage se aa rahi hai. Kuch bhaari gira hai. Phir silence.",
+            "Garage mein gaadi hai, tools hain, aur kal ka saara ration. Par us darwaze ke us taraf wala andhera tumne 3 din se khola nahi.",
+            "Ab batao: RUN — chupke se peeche ke darwaze se bhaag jao, jaan bachao. Ya CHECK — jaake dekho andar kya hai?"
+          ],
+          "images": [
+            "dark garage exterior of an indian farmhouse at night, half open metal door, moonlight, fog",
+            "flashlight beam cutting through a dark garage interior, dust particles floating, tool rack silhouette",
+            "close up of a trembling hand reaching for a wooden door handle, dark, cinematic horror"
+          ],
+          "choices": [
+            {
+              "key": "run",
+              "text": "RUN - bhaag jao",
+              "labels": ["run", "bhaago", "bhago", "bhag", "1"],
+              "next": "run_fields",
+              "effects": {"noise": -5, "supplies": -10}
+            },
+            {
+              "key": "check",
+              "text": "CHECK - jaake dekho",
+              "labels": ["check", "dekho", "dekh", "dekhna", "2"],
+              "next": "check_garage",
+              "effects": {"noise": 10}
+            }
+          ],
+          "default": "check"
+        },
+        "run_fields": {
+          "kind": "vote",
+          "subtitle": "Khet Ke Andhere Mein",
+          "hook": "Tum bhaage. Par khet mein kuch khada hai... jo tumhe dekh raha hai.",
+          "narration": [
+            "Tum peeche ke darwaze se nikle. Khet tak bhage. Sans phool rahi hai. Peeche se wahi awaaz aayi. Bhaari. Tedhi.",
+            "Aage do cheezein dikh rahi hain: purana borewell ka platform, jiske pipe mein chhup sakte ho. Aur aage tube light ke neeche... koi khada hai.",
+            "Chhup jao, ya dekho kaun hai?"
+          ],
+          "images": [
+            "running through tall dark crops at night, flashlight dropped on ground, motion blur, panic",
+            "old concrete tube well platform in a dark field, narrow opening, moonlight",
+            "distant human silhouette standing under a flickering tubelight, fog, eerie"
+          ],
+          "choices": [
+            {
+              "key": "pipe",
+              "text": "PIPE MEIN CHHUPO",
+              "labels": ["pipe", "tanki", "well", "borewell", "1"],
+              "next": "pipe_hide",
+              "effects": {"noise": -10}
+            },
+            {
+              "key": "figure",
+              "text": "FIGURE KO DEKHO",
+              "labels": ["figure", "insaan", "dekho", "2"],
+              "next": "figure_meet",
+              "effects": {"hp": -5}
+            }
+          ],
+          "default": "pipe"
+        },
+        "pipe_hide": {
+          "kind": "story",
+          "subtitle": "Pipe Ke Andar",
+          "hook": "Tum pipe mein chhupe. Aur bahar wala saaya... ruk gaya. Usne tumhe dekh liya hai.",
+          "narration": [
+            "Tum pipe mein utar gaye. Dhadkan kaanon mein. Bahar kadam ruke. Kisi ne dhool mein paer ghumaye.",
+            "Phir awaaz aayi. Dheemi. Insaani. Kaun hai andar? Main insaan hoon. Raj.",
+            "Ye awaaz tumhare dost Raj ki hai. Jo kal shehar ke raste nikla tha. Par kya tum bharosa karoge?",
+            "Dheere se upar jhanko."
+          ],
+          "images": [
+            "narrow dark well pipe interior looking up at a circle of night sky, claustrophobic",
+            "a hand reaching down into a dark opening, moonlight silhouette from above",
+            "two human eyes reflected in a flashlight beam at night, fear and caution"
+          ],
+          "effects": {"noise": -5, "trust": 10},
+          "next": "figure_meet"
+        },
+        "figure_meet": {
+          "kind": "vote",
+          "subtitle": "Wo Kaun Hai?",
+          "hook": "Flashlight tumhari taraf aa rahi hai. Awaaz dena hai... ya chupke nikal jaana hai?",
+          "narration": [
+            "Woh keh raha hai: Raj hoon, shehar se. Gaadi ne dhoka diya. Teen din se isi khet mein hoon. Flashlight tumhari taraf badh rahi hai.",
+            "Bharosa karna hai? Ya abhi bhi time hai, chupke se nikal jaane ka?",
+            "Ek galat kadam... aur kuch bhi ho sakta hai."
+          ],
+          "images": [
+            "flashlight glow approaching through fog in dark fields, tense, cinematic",
+            "two men facing each other at a distance in a dark field, moonlight, wary expressions",
+            "footprints in mud beside dark crops at night, horror atmosphere"
+          ],
+          "choices": [
+            {
+              "key": "reply",
+              "text": "JAWAB DO - bharosa karo",
+              "labels": ["reply", "jawab", "bolo", "hello", "1"],
+              "next": "friend_found",
+              "effects": {"trust": 20}
+            },
+            {
+              "key": "sneak",
+              "text": "CHUPKE NIKLO",
+              "labels": ["sneak", "chupke", "niklo", "bhaago", "2"],
+              "next": "solo_escape",
+              "effects": {"trust": -20, "noise": -5}
+            }
+          ],
+          "default": "reply"
+        },
+        "friend_found": {
+          "kind": "story",
+          "subtitle": "Asli Raj, Asli Radio",
+          "hook": "Wo Raj hai. Asli Raj. Aur uske jhole mein pakka chamakta hua ek radio hai.",
+          "narration": [
+            "Wo Raj hai. Kamzor, bhookha, par asli. Usne tumhe khet ke kinare bulaya. Uske jhole se crackling awaaz aa rahi hai.",
+            "Kehta hai: roz 4 baje bus depot ke survivors signal bhejte hain. Par humein power chahiye. Farmhouse ke basement mein purana generator aur radio set pada hai.",
+            "Wapas farmhouse jaana padega. Garage wale saaye ke paas se guzarna padega. Plan ready hai?",
+            "Chalo. Aur is baar chupchaap."
+          ],
+          "images": [
+            "two exhausted men sitting in a dark field, one holding a vintage radio transceiver, faint light",
+            "vintage radio crackling on a wooden table, flashlight glow, dust in air",
+            "dark basement stairs of an indian farmhouse with old generator silhouettes"
+          ],
+          "effects": {"trust": 10},
+          "next": "radio_room"
+        },
+        "solo_escape": {
+          "kind": "story",
+          "subtitle": "Akelа Rasta",
+          "hook": "Tum chupke nikle. Khet ke kinare par tractor hai... aur uske paas ek gaadi. Jisme kuch hila.",
+          "narration": [
+            "Tumne chupke se kadam badhaye. Raj ki awaaz peeche dheemi pad gayi. Khet ke kinare par ek tractor khada hai. Aur uske bagal mein chhoti si gaadi.",
+            "Chabi nahi hai. Par tool box khula hai. Aur gaadi ke engine ke under kuch hila. Dheere dheere. Bilkul jinda kutta ho.",
+            "Gaadi ke andar ek charger aur purana radio rakha hai. Ek chhota kadam sab badal deta hai."
+          ],
+          "images": [
+            "tractor and a small car at the edge of a dark field at night, tools scattered, fog",
+            "car engine bay close up in darkness, moving silhouette blur, horror",
+            "vintage car radio glowing faintly on a dashboard at night"
+          ],
+          "effects": {"hp": -5},
+          "next": "truck_problem"
+        },
+        "check_garage": {
+          "kind": "vote",
+          "subtitle": "Garage Ke Andar",
+          "hook": "Tumne darwaza khola. Garage khaali hai... almost. Basement ki seedhi se awaaz aa rahi hai.",
+          "narration": [
+            "Tum darwaze tak gaye. Dheere se khola. Gaadi wahi khadi hai. Farsh par ek dabba gira hai. Bas itna sa shor. Phir seedhi se awaaz aayi. Neeche se.",
+            "Ya phir gaadi ka dikki kholo. Usme petrol can, chabi aur purana radio tumne khud rakhha tha.",
+            "Neeche utro, ya dikki kholkar plan B banao?"
+          ],
+          "images": [
+            "opening a farmhouse garage door at night, flashlight, junk scattered inside, car silhouette",
+            "dark wooden stairs going down to a basement, cobwebs, faint light from below",
+            "car trunk open in a dark garage, fuel can and toolbox inside, flashlight glow"
+          ],
+          "choices": [
+            {
+              "key": "basement",
+              "text": "BASEMENT - neeche utro",
+              "labels": ["basement", "neeche", "seedhi", "1"],
+              "next": "basement_dark",
+              "effects": {"hp": -10, "noise": -5}
+            },
+            {
+              "key": "trunk",
+              "text": "TRUNK KHO LO - tools nikalo",
+              "labels": ["trunk", "dikki", "gaadi", "keys", "2"],
+              "next": "trunk_keys",
+              "effects": {"supplies": 10}
+            }
+          ],
+          "default": "basement"
+        },
+        "basement_dark": {
+          "kind": "story",
+          "subtitle": "Basement Ka Raaz",
+          "hook": "Basement mein generator zinda hai... aur deewar par kisi ne kuch likha hai.",
+          "narration": [
+            "Neeche andhera tha, par ek purana generator dhak dhak kar raha tha. Bijli zinda hai. Matlab radio chal sakta hai.",
+            "Deewar par ungli se likha hai: bus depot, roz 4 baje, aa jao. Zinda log.",
+            "Aur tab upar se awaaz aayi. Koi dhoond raha hai. Gaon ki taraf se aawaz tumhara naam le rahi hai?",
+            "Kaise? Tumne to kisi ko bataya nahi tha."
+          ],
+          "images": [
+            "old diesel generator humming in a dark indian basement, cables, one flickering bulb",
+            "handwritten message on a concrete basement wall, chalk, eerie shadows",
+            "old ham radio set on a shelf in a basement, dial lit, layers of dust"
+          ],
+          "effects": {"noise": -5},
+          "next": "radio_room"
+        },
+        "trunk_keys": {
+          "kind": "story",
+          "subtitle": "Chabi Mil Gayi",
+          "hook": "Chabi mil gayi. Petrol bhi. Par gaadi start hone se pehle... engine ke andar se awaaz.",
+          "narration": [
+            "Dikki khuli. Petrol can, tool box aur wahi purani chabi. Sab mila. Gaadi ke andar charger bhi hai.",
+            "Tumne chabi ghumai. Engine khamosh. Battery dead. Aur petrol sirf do liter. Gaon tak pahunchega. Aage nahi.",
+            "Tab radio par awaaz aayi: bus depot. Char baje. Zinda log aa jao.",
+            "Do raste. Ek chhota sa petrol. Ek paidal chaudah kilometer."
+          ],
+          "images": [
+            "open car trunk at night with fuel can, toolbox and an old key, garage interior",
+            "car key turning in ignition, dark dashboard, night, tension",
+            "car radio crackling inside a dark car interior, faint green light"
+          ],
+          "effects": {"supplies": -5},
+          "next": "truck_problem"
+        },
+        "truck_problem": {
+          "kind": "vote",
+          "subtitle": "Petrol Ya Depot",
+          "hook": "Do liter petrol, ya chaudah kilometer paidal. Ek hi rasta pakad sakte ho.",
+          "narration": [
+            "Decision time. Do liter petrol se tum das kilometer nikal sakte ho. Shayad gaon. Shayad kuch aur.",
+            "Ya bus depot. Chaudah kilometer. Char ghante paidal. Par wahan zinda log hain, paani hai, deewar hai.",
+            "Petrol gaadi mein daalo, ya depot ke liye nikal pado?"
+          ],
+          "images": [
+            "fuel can and car keys on a car hood at night, decision moment, cinematic",
+            "long empty foggy road at night with distant town lights, india",
+            "bus depot gate in darkness with survivor silhouettes on the wall, tense hope"
+          ],
+          "choices": [
+            {
+              "key": "petrol",
+              "text": "PETROL DALO - gaadi se niklo",
+              "labels": ["petrol", "gaadi", "drive", "1"],
+              "next": "truck_ready",
+              "effects": {"supplies": -20}
+            },
+            {
+              "key": "depot",
+              "text": "DEPOT CHALO - paidal",
+              "labels": ["depot", "paidal", "walk", "2"],
+              "next": "depot_run",
+              "effects": {"hp": -15, "noise": 10}
+            }
+          ],
+          "default": "petrol"
+        },
+        "radio_room": {
+          "kind": "vote",
+          "subtitle": "Radio Ki Awaz",
+          "hook": "Radio set zinda ho gaya. Do jagah se signal aa raha hai. Kisi ek ko chunna hai.",
+          "narration": [
+            "Radio clear hua. Pehli awaaz: bus depot. Paani, deewar, log. Roz char baje.",
+            "Doosri frequency dheemi thi: radio tower, ek sau barah meter, transmitter zinda hai. Utha lo, aur pura shehar sun sakta hai.",
+            "Depot means log aur safety. Tower means aawaz aur umeed. Kahan jaoge?"
+          ],
+          "images": [
+            "old ham radio set glowing in a dark room, hands tuning the dial, warm light",
+            "high radio tower silhouette against a night sky full of stars, fog at base",
+            "bus depot entrance with barrier and faded sign, darkness, cautious silhouettes"
+          ],
+          "choices": [
+            {
+              "key": "depot",
+              "text": "BUS DEPOT - logon ke paas",
+              "labels": ["depot", "bus", "1"],
+              "next": "depot_run",
+              "effects": {"trust": 10}
+            },
+            {
+              "key": "tower",
+              "text": "RADIO TOWER - signal uthao",
+              "labels": ["tower", "signal", "2"],
+              "next": "tower_run",
+              "effects": {"hp": -5}
+            }
+          ],
+          "default": "depot"
+        },
+        "truck_ready": {
+          "kind": "vote",
+          "subtitle": "Raat Ya Subah",
+          "hook": "Gaadi taiyar hai. Raat ke andhere mein niklo... ya subah ka intezaar karo?",
+          "narration": [
+            "Petrol dala. Battery charger lagaya. Gaadi chalegi, bas ek baar. Raat ki sadak khaali hai. Par andhere mein cheezein bhi active hain.",
+            "Subah tak rukо, to dhoop mein sab dikh jata hai. Par tum bhi dikhte ho.",
+            "Raat ya subah? Ye tumhari aakhri choice hai is farm se nikalne ki."
+          ],
+          "images": [
+            "car headlights in dark foggy village road, india, night, tension",
+            "first morning light over an abandoned indian highway, mist, hope",
+            "hand on a gear lever of an old car, night, dashboard glow, close up"
+          ],
+          "choices": [
+            {
+              "key": "night",
+              "text": "RAAT KO NIKLO",
+              "labels": ["raat", "night", "abhi", "1"],
+              "next": "night_drive",
+              "effects": {"noise": 20}
+            },
+            {
+              "key": "dawn",
+              "text": "SUBAH NIKLO",
+              "labels": ["subah", "dawn", "morning", "2"],
+              "next": "dawn_drive",
+              "effects": {"hp": 5}
+            }
+          ],
+          "default": "dawn"
+        },
+        "night_drive": {
+          "kind": "ending",
+          "subtitle": "ENDING: Raat Ki Sawari",
+          "hook": "Andhere mein gaadi, headlights, aur sadak par chalees log. Ye final run hai.",
+          "narration": [
+            "Tum nikal pade. Headlights sirf bees meter dikhati hain. Horn phir horn. Kuch bhaage. Koi nahi. Aath kilometer.",
+            "Depot ke gate apne aap khul gaye. Andar teis zinda log. Tumhari gaadi ki battery se unka pura radio system chala.",
+            "Subah unki team ne convoy ke saath tumhe aage bheja. Ek bada safe zone. Tum bach gaye.",
+            "Season ek khatam. Ab batao season do kahan? Comment karo: 1 pahad, 2 gaon, 3 shehar."
+          ],
+          "images": [
+            "car headlights cutting through dark foggy road, silhouettes scattering, headlights glare",
+            "gates of a bus depot at night with warm light and people opening them",
+            "convoy of old cars and trucks driving at dawn on an indian highway"
+          ],
+          "effects": {"hp": 10},
+          "choices": [
+            {"key": "pahad", "text": "SEASON 2: PAHAD", "labels": ["1", "pahad", "mountain"], "next_arc": "farmhouse", "location_text": "Himachal ke pahadon mein ek sunsaan rest stop", "effects": {}},
+            {"key": "gaon", "text": "SEASON 2: GAON", "labels": ["2", "gaon", "village"], "next_arc": "farmhouse", "location_text": "UP ke ek veeran gaon mein ek purana ghar", "effects": {}},
+            {"key": "shehar", "text": "SEASON 2: SHEHAR", "labels": ["3", "shehar", "city"], "next_arc": "farmhouse", "location_text": "shehar ke khaali mall ke parking mein", "effects": {}}
+          ],
+          "default": "pahad"
+        },
+        "dawn_drive": {
+          "kind": "ending",
+          "subtitle": "ENDING: Subah Ki Roshni",
+          "hook": "Subah ki roshni. Sadak saaf. Foolproof? Kuch cheezein roshni mein bhi nahi dikhati.",
+          "narration": [
+            "Subah nikle. Dhoop ne zameen par pade chalees logon ko pathar bana diya. Engine zinda tha. Tum zinda the.",
+            "Pandrah kilometer baad ek checkpost. Asli log. Asli gun. Unke saath do raste the: aage convoy, ya wapas.",
+            "Tumne aage chuna. Naye shehar ki taraf. Naya chapter.",
+            "Season ek khatam. Season do kahan? Comment: 1 pahad, 2 gaon, 3 shehar."
+          ],
+          "images": [
+            "morning sunlight over an abandoned indian highway, mist clearing, stillness",
+            "checkpoint barrier on a highway with armed survivors at dawn",
+            "convoy of vehicles driving toward a distant city skyline at sunrise"
+          ],
+          "effects": {"hp": 5},
+          "choices": [
+            {"key": "pahad", "text": "SEASON 2: PAHAD", "labels": ["1", "pahad", "mountain"], "next_arc": "farmhouse", "location_text": "Himachal ke pahadon mein ek sunsaan rest stop", "effects": {}},
+            {"key": "gaon", "text": "SEASON 2: GAON", "labels": ["2", "gaon", "village"], "next_arc": "farmhouse", "location_text": "UP ke ek veeran gaon mein ek purana ghar", "effects": {}},
+            {"key": "shehar", "text": "SEASON 2: SHEHAR", "labels": ["3", "shehar", "city"], "next_arc": "farmhouse", "location_text": "shehar ke khaali mall ke parking mein", "effects": {}}
+          ],
+          "default": "pahad"
+        },
+        "depot_run": {
+          "kind": "ending",
+          "subtitle": "ENDING: Bus Depot",
+          "hook": "Chaudah kilometer paidal. Char ghante. Aur samne bus depot ki deewar.",
+          "narration": [
+            "Tum paidal nikle. Chhe ghante lage. Depot ke gate par log mile. Chaalees zinda log. Paani. Khaana. Deewar.",
+            "Andar aane se pehle ek shart: yahan sab kaam karte hain. Aaj se tum guards ki team mein ho.",
+            "Kamzor nahi ho tum. Tum bach gaye.",
+            "Season ek khatam. Season do kahan? Comment: 1 pahad, 2 gaon, 3 shehar."
+          ],
+          "images": [
+            "walking alone on a foggy indian road at night with a backpack, determination",
+            "bus depot wall with a gate, survivors keeping watch from the roof, dawn light",
+            "community of survivors around a small fire in a depot yard, cautious hope"
+          ],
+          "effects": {"hp": -5, "trust": 10},
+          "choices": [
+            {"key": "pahad", "text": "SEASON 2: PAHAD", "labels": ["1", "pahad", "mountain"], "next_arc": "farmhouse", "location_text": "Himachal ke pahadon mein ek sunsaan rest stop", "effects": {}},
+            {"key": "gaon", "text": "SEASON 2: GAON", "labels": ["2", "gaon", "village"], "next_arc": "farmhouse", "location_text": "UP ke ek veeran gaon mein ek purana ghar", "effects": {}},
+            {"key": "shehar", "text": "SEASON 2: SHEHAR", "labels": ["3", "shehar", "city"], "next_arc": "farmhouse", "location_text": "shehar ke khaali mall ke parking mein", "effects": {}}
+          ],
+          "default": "pahad"
+        },
+        "tower_run": {
+          "kind": "ending",
+          "subtitle": "ENDING: Awaaz Ki Tower",
+          "hook": "Ek sau barah meter upar. Ek transmitter. Agar ye chala... pura shehar sunega.",
+          "narration": [
+            "Tower tak pahunchne mein poori raat lagi. Seedhiyaan zang lagi thi. Har qadam par awaaz. Par tum chadhte gaye.",
+            "Transmitter room mein bijli ka ek chhota sa jhatka... aur red light blink karne lagi. Signal live. Pura shehar tumhari awaaz sun raha hai.",
+            "Subah tak teen gaadiyaan tower ke base par aa chuki thi. Log aa rahe hain. Tumne apna safe zone khud banaya.",
+            "Season ek khatam. Season do kahan? Comment: 1 pahad, 2 gaon, 3 shehar."
+          ],
+          "images": [
+            "climbing a rusty radio tower at night, fog below, stars above, vertigo",
+            "radio transmitter room with old panels and a blinking red signal light",
+            "city skyline at dawn seen from a radio tower platform, hopeful horizon"
+          ],
+          "effects": {"hp": -10, "trust": 20},
+          "choices": [
+            {"key": "pahad", "text": "SEASON 2: PAHAD", "labels": ["1", "pahad", "mountain"], "next_arc": "farmhouse", "location_text": "Himachal ke pahadon mein ek sunsaan rest stop", "effects": {}},
+            {"key": "gaon", "text": "SEASON 2: GAON", "labels": ["2", "gaon", "village"], "next_arc": "farmhouse", "location_text": "UP ke ek veeran gaon mein ek purana ghar", "effects": {}},
+            {"key": "shehar", "text": "SEASON 2: SHEHAR", "labels": ["3", "shehar", "city"], "next_arc": "farmhouse", "location_text": "shehar ke khaali mall ke parking mein", "effects": {}}
+          ],
+          "default": "pahad"
+        }
+      }
+    }
+  }
+}

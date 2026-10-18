@@ -1,0 +1,90 @@
+name: Episode Cycle
+
+on:
+  schedule:
+    # IST slots: 08:00, 10:30, 13:00, 16:30, 19:30, 22:30 (UTC+5:30)
+    # Publish 13:00 IST ke baad pehle run par hota hai; baaki runs vote checkpoints hain.
+    - cron: "30 2,5,8,11,14,17 * * *"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (sirf video render, koi post nahi)"
+        type: boolean
+        default: false
+      force_publish:
+        description: "Force publish (time/date gate bypass)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: episode-cycle
+  cancel-in-progress: false
+
+jobs:
+  cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+      IG_USER_ID: ${{ secrets.IG_USER_ID }}
+      IG_USERNAME: ${{ secrets.IG_USERNAME }}
+      POLLINATIONS_KEY: ${{ secrets.POLLINATIONS_KEY }}
+      PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+      GITHUB_REPOSITORY: ${{ github.repository }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Python setup
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements.txt
+
+      - name: FFmpeg + fonts check
+        run: |
+          ffmpeg -version | head -n 1
+          ls /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf \
+            || sudo apt-get update -qq && sudo apt-get install -y -qq fonts-dejavu-core
+
+      - name: Run cycle
+        env:
+          DRY: ${{ github.event.inputs.dry_run }}
+          FORCE: ${{ github.event.inputs.force_publish }}
+        run: |
+          ARGS=""
+          if [ "$DRY" = "true" ]; then ARGS="$ARGS --dry-run"; fi
+          if [ "$FORCE" = "true" ]; then ARGS="$ARGS --force-publish"; fi
+          python scripts/run_cycle.py $ARGS
+
+      - name: Upload reel artifact (debug)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reel-debug
+          path: |
+            out/*.mp4
+            out/caption.txt
+            out/episode.json
+          if-no-files-found: ignore
+          retention-days: 5
+
+      - name: Commit state
+        if: ${{ always() && github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config user.name "zombie-bot"
+          git config user.email "zombie-bot@users.noreply.github.com"
+          git add state/
+          if git diff --cached --quiet; then
+            echo "No state changes"
+          else
+            git commit -m "state: update $(date -u +%FT%TZ)"
+            git push
+          fi

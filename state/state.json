@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "season": 1,
+  "day": 0,
+  "arc": "farmhouse",
+  "node": "intro",
+  "location": "shehar se 40 kilometer door ek sunsaan farmhouse",
+  "stats": {"hp": 100, "noise": 20, "supplies": 60, "trust": 50},
+  "history": [],
+  "last_episode": null,
+  "recent_hashtags": []
+}

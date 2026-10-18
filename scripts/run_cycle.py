@@ -1,0 +1,130 @@
+"""Main orchestrator — GitHub Actions isi ko chalata hai (har 3 ghante).
+
+Cycle:
+  1. Agar koi episode khuli hai (vote open) → comments se tally (checkpoint)
+  2. Agar aaj post nahi hua + publish hour aaya → votes resolve → advance
+  3. Nayi episode banao (engine) → video render (render.py)
+  4. Video host karo (GitHub media branch) → Instagram par REELS publish
+  5. State save (workflow ise commit karta hai)
+
+Local testing:
+    python scripts/run_cycle.py --dry-run          # sirf render, koi post nahi
+    python scripts/run_cycle.py --dry-run --force-publish
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import traceback
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+import engine  # noqa: E402
+import publish  # noqa: E402
+import render  # noqa: E402
+import votes as votes_mod  # noqa: E402
+from common import OUT_DIR, GraphClient, ist_now, load_config, load_state, log, save_state  # noqa: E402
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dry-run", action="store_true", help="render only — koi API call/post nahi")
+    ap.add_argument("--force-publish", action="store_true", help="time/date gate bypass karo")
+    args = ap.parse_args()
+
+    cfg = load_config()
+    state = load_state()
+    scn = engine.load_scenarios()
+
+    token = (os.environ.get("IG_ACCESS_TOKEN") or "").strip()
+    ig_user_id = (os.environ.get("IG_USER_ID") or "").strip()
+    client = GraphClient(token) if token else None
+
+    own_username = (os.environ.get("IG_USERNAME") or "").strip() or None
+    if client and not own_username:
+        try:
+            own_username = client.get("me", fields="username").get("username")
+        except Exception:
+            own_username = None
+
+    now = ist_now()
+    today = now.date().isoformat()
+    log(f"[cycle] {now.isoformat()} | dry_run={args.dry_run} force={args.force_publish}")
+
+    # --- 1) vote checkpoint (khuli episode ke naye comments padho) ---
+    last = state.get("last_episode")
+    if (not args.dry_run and client and ig_user_id
+            and last and last.get("vote") and not last.get("closed")):
+        votes_mod.tally(client, cfg, state, own_username)
+        save_state(state)
+
+    # --- 2) due check ---
+    if not args.dry_run:
+        history = state.get("history", [])
+        posted_today = bool(history) and history[-1].get("posted_ist_date") == today
+        if posted_today and not args.force_publish:
+            log("[cycle] aaj ka episode already live hai — exit")
+            return
+        if now.hour < int(cfg.get("publish_after_ist_hour", 13)) and not args.force_publish:
+            log(f"[cycle] publish hour ({cfg.get('publish_after_ist_hour', 13)} IST) se pehle — exit")
+            return
+
+    # --- 3) pichhli episode resolve karo + agla node set karo ---
+    last = state.get("last_episode")
+    recap = None
+    if last:
+        if last.get("vote") and not last.get("closed"):
+            if client and ig_user_id and not args.dry_run:
+                votes_mod.tally(client, cfg, state, own_username)
+            resolution = engine.advance(state, scn, cfg, last.get("votes"))
+        else:
+            resolution = engine.advance(state, scn, cfg, None)
+        recap = engine.recap_line(resolution)
+        if resolution:
+            log(f"[cycle] resolution → {resolution}")
+
+    # --- 4) episode banao + render ---
+    episode = engine.build_episode(state, scn, cfg, recap)
+    log(f"[cycle] episode: S{episode['season']} D{episode['day']} "
+        f"node={episode['node']} kind={episode['kind']} vote={episode['vote']}")
+    result = render.render_episode(cfg, episode)
+
+    # debug artifacts (workflow inhe artifact ke roop mein upload karta hai)
+    OUT_DIR.mkdir(parents=True, exist_ok=True)
+    (OUT_DIR / "episode.json").write_text(
+        json.dumps(episode, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    (OUT_DIR / "caption.txt").write_text(episode["caption"] + "\n", encoding="utf-8")
+
+    if args.dry_run:
+        print("\n================ CAPTION ================")
+        print(episode["caption"])
+        print("=========================================")
+        log(f"[cycle] dry-run complete: {result['video_path']}")
+        return
+
+    # --- 5) publish ---
+    if client is None or not ig_user_id:
+        raise SystemExit("[cycle] IG_ACCESS_TOKEN / IG_USER_ID missing — publish nahi ho sakta")
+
+    media_url = publish.push_media_to_github(result["video_path"], episode["video_name"], cfg)
+    if not media_url:
+        raise SystemExit("[cycle] public media URL nahi mila (repo/GITHUB_REPOSITORY check karo)")
+
+    media_id = publish.publish_reel(client, cfg, ig_user_id, episode, media_url)
+
+    # --- 6) state save ---
+    engine.commit_episode(state, episode, media_id, today)
+    save_state(state)
+    log(f"[cycle] SUCCESS: S{episode['season']} D{episode['day']} live (media_id={media_id})")
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception:
+        traceback.print_exc()
+        sys.exit(1)

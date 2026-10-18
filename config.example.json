@@ -1,0 +1,41 @@
+{
+  "handle": "@tumhara_handle",
+  "timezone": "Asia/Kolkata",
+  "publish_after_ist_hour": 13,
+
+  "voice": "en-IN-PrabhatNeural",
+  "voice_rate": "-6%",
+
+  "image_provider": "pollinations",
+  "pollinations_model": "flux",
+  "image_width": 576,
+  "image_height": 1024,
+  "image_delay_seconds": 45,
+  "image_style_prefix": "cinematic horror film still, zombie apocalypse in rural india, moody teal and orange color grade, film grain, volumetric fog, dark atmosphere, vertical 9:16 composition, ultra detailed",
+  "pixabay_queries": ["abandoned house night", "dark fog road", "old barn dark", "flashlight dark", "abandoned factory"],
+
+  "min_votes": 10,
+  "cta_vote": "Comment mein 1 ya 2 likho. Kal sabse zyada votes wala rasta jeetega. Koi undo button nahi hai!",
+  "cta_story": "Kal se tum decide karoge ki aage kya hoga. Follow karo, warna apocalypse mein kho jaoge.",
+  "fiction_disclaimer": "Ye ek fiction story hai. Koi asli zombie nahi.",
+  "hashtag_pool": [
+    "#zombieapocalypse",
+    "#survivalreels",
+    "#interactivereels",
+    "#hindireels",
+    "#chooseyourownadventure",
+    "#hindustory",
+    "#reelsindia",
+    "#apocalypse",
+    "#zombieindia"
+  ],
+  "hashtags_per_post": 5,
+
+  "music_volume": 0.12,
+  "fps": 30,
+  "max_duration_seconds": 60,
+  "ai_disclosure": true,
+  "media_branch": "media",
+
+  "stats_reset": {"hp": 100, "noise": 20, "supplies": 60, "trust": 50}
+}
