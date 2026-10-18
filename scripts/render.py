@@ -1,418 +1,267 @@
-"""Render pipeline: images -> TTS -> FFmpeg -> vertical 9:16 reel.
+"""Episode renderer: English narration (edge-tts) -> timeline -> cartoon frames -> MP4.
 
 Flow:
-  1. Har narration chunk / image prompt ke liye image (Pollinations → Pixabay → placeholder)
-  2. Puri narration ki edge-tts voice + subtitles (SRT)
-  3. Har image ka slow zoom clip (zoompan), phir concat
-  4. Final pass: subtitles burn + day-title + stats HUD + choice text + music mix
+  1. Har narration line ka TTS (word timings ke saath) → padded WAV
+  2. Timeline: 1 line = 1 shot (place/action/camera), plus title/vote/ending cards
+  3. Frames: SVG compose (animate.py) → PNG (resvg, multi-process)
+  4. FFmpeg: frames + master audio → 1080x1920 H.264/AAC reel
+
+Local:
+  python scripts/render.py --dry-run        # current state se ek episode render karo
+  python scripts/render.py --stills out/x   # sirf ek-ek still per line (fast check)
 """
 from __future__ import annotations
 
-import hashlib
+import argparse
+import asyncio
 import json
 import math
 import os
-import random
-import re
 import shutil
 import sys
-import textwrap
 import time
-import urllib.parse
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from common import ASSETS_DIR, OUT_DIR, log, run  # noqa: E402
-
-import requests  # noqa: E402
-from PIL import Image, ImageDraw, ImageFont  # noqa: E402
-
-FONT_CANDIDATES = [
-    Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"),
-    Path("C:/Windows/Fonts/arialbd.ttf"),
-    Path("/System/Library/Fonts/Supplemental/Arial Bold.ttf"),
-]
+import animate as an  # noqa: E402
+import characters as ch  # noqa: E402
+import engine  # noqa: E402
+import scenes as sc  # noqa: E402
+import svgrender  # noqa: E402
+from common import OUT_DIR, ROOT, WORK_DIR, load_config, load_state, log, run  # noqa: E402
 
 
-def pick_font_path() -> Path | None:
-    for p in FONT_CANDIDATES:
-        if p.exists():
-            return p
-    return None
+# ------------------------------------------------------------------- voice ---
 
-
-def seed_for(episode: dict, index: int) -> int:
-    raw = f"{episode['season']}-{episode['day']}-{index}"
-    return int(hashlib.md5(raw.encode()).hexdigest()[:8], 16) % 1_000_000
-
-
-# ---------------------------------------------------------------- images ----
-
-def fetch_pollinations(cfg: dict, prompt: str, seed: int, out_path: Path) -> bool:
-    key = (os.environ.get("POLLINATIONS_KEY") or "").strip()
-    quoted = urllib.parse.quote(prompt, safe="")
-    delay = int(cfg.get("image_delay_seconds", 45))
-
-    if key:
-        # gen.pollinations.ai — better models, no per-IP limit (free key)
-        url = f"https://gen.pollinations.ai/image/{quoted}"
-        params = {
-            "model": cfg.get("pollinations_model", "flux"),
-            "width": 1080, "height": 1920, "seed": seed,
-        }
-        headers = {"Authorization": f"Bearer {key}"}
-        attempts = [(url, params, headers)]
-    else:
-        # classic anonymous tier — 1 image per ~45s, 768px max area
-        url = f"https://image.pollinations.ai/prompt/{quoted}"
-        params = {
-            "model": cfg.get("pollinations_model", "flux"),
-            "width": int(cfg.get("image_width", 576)),
-            "height": int(cfg.get("image_height", 1024)),
-            "seed": seed, "nologo": "true",
-        }
-        attempts = [(url, params, {})]
-
-    for url, params, headers in attempts:
-        for attempt in range(4):
-            try:
-                r = requests.get(url, params=params, headers=headers, timeout=180)
-            except requests.RequestException as exc:
-                log(f"[render] pollinations network error: {exc}")
-                time.sleep(10)
-                continue
-            if r.status_code == 200 and len(r.content) > 5000:
-                out_path.write_bytes(r.content)
-                return True
-            if r.status_code == 402:
-                wait = min(int(r.headers.get("Retry-After", delay) or delay), 120)
-                log(f"[render] pollinations rate-limited (402), waiting {wait}s")
-                time.sleep(wait)
-                continue
-            log(f"[render] pollinations HTTP {r.status_code} (attempt {attempt + 1})")
-            time.sleep(5 + attempt * 5)
-    return False
-
-
-def fetch_pixabay(cfg: dict, index: int, out_path: Path) -> bool:
-    key = (os.environ.get("PIXABAY_API_KEY") or "").strip()
-    if not key:
-        return False
-    queries = cfg.get("pixabay_queries") or ["dark fog road"]
-    query = queries[index % len(queries)]
+def _probe_dur(path) -> float:
+    r = run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
+             "-of", "default=nw=1:nk=1", str(path)])
     try:
-        r = requests.get(
-            "https://pixabay.com/api/",
-            params={
-                "key": key, "q": query, "image_type": "photo",
-                "orientation": "vertical", "safesearch": "true", "per_page": 20,
-            },
-            timeout=60,
-        )
-        hits = r.json().get("hits", [])
-        if not hits:
-            return False
-        pick = random.choice(hits[:10])
-        img_url = pick.get("largeImageURL") or pick.get("webformatURL")
-        data = requests.get(img_url, timeout=120).content
-        if len(data) > 5000:
-            out_path.write_bytes(data)
-            return True
-    except Exception as exc:
-        log(f"[render] pixabay failed: {exc}")
-    return False
+        return float((r.stdout or "0").strip())
+    except ValueError:
+        return 0.0
 
 
-def make_placeholder(prompt: str, out_path: Path) -> None:
-    img = Image.new("RGB", (1080, 1920), (12, 14, 18))
-    draw = ImageDraw.Draw(img)
-    font = None
-    fp = pick_font_path()
-    if fp:
-        try:
-            font = ImageFont.truetype(str(fp), 44)
-        except Exception:
-            font = None
-    wrapped = "\n".join(textwrap.wrap(prompt[:280], width=40))
-    draw.multiline_text((70, 700), wrapped, fill=(190, 190, 190), font=font, spacing=14)
-    img.save(out_path, quality=88)
-
-
-def build_images(cfg: dict, episode: dict, work: Path) -> list[Path]:
-    provider = cfg.get("image_provider", "pollinations")
-    anonymous_pollinations = provider == "pollinations" and not (os.environ.get("POLLINATIONS_KEY") or "").strip()
-    images: list[Path] = []
-
-    for i, prompt in enumerate(episode["images"]):
-        out = work / f"img_{i:02d}.jpg"
-        ok = False
-        if provider == "pollinations":
-            ok = fetch_pollinations(cfg, prompt, seed_for(episode, i), out)
-            if not ok:
-                ok = fetch_pixabay(cfg, i, out)
-        else:
-            ok = fetch_pixabay(cfg, i, out)
-            if not ok:
-                ok = fetch_pollinations(cfg, prompt, seed_for(episode, i), out)
-        if not ok:
-            log(f"[render] image {i}: placeholder use ho raha hai")
-            make_placeholder(prompt, out)
-        images.append(out)
-        if anonymous_pollinations and i < len(episode["images"]) - 1:
-            time.sleep(int(cfg.get("image_delay_seconds", 45)))
-    return images
-
-
-# ------------------------------------------------------------------- tts ----
-
-def build_voice(cfg: dict, narration: list[str], work: Path) -> tuple[Path, Path]:
-    """edge-tts ki Python API se voice + subtitles. (CLI/PATH pe depend nahi karta.)"""
-    import asyncio
-
+async def _tts_line(text, voice, rate, out_mp3: Path):
     import edge_tts
 
-    text = "\n".join(narration)
-    mp3 = work / "voice.mp3"
-    srt = work / "voice.srt"
-    voice = cfg.get("voice", "en-IN-PrabhatNeural")
-    rate = str(cfg.get("voice_rate", "-6%"))
-
-    async def synth() -> None:
-        tts = edge_tts.Communicate(text, voice, rate=rate, boundary="WordBoundary")
-        submaker = edge_tts.SubMaker()
-        with open(mp3, "wb") as audio:
-            async for chunk in tts.stream():
-                if chunk["type"] == "audio":
-                    audio.write(chunk["data"])
-                elif chunk["type"] in ("WordBoundary", "SentenceBoundary"):
-                    submaker.feed(chunk)
-        srt.write_text(submaker.get_srt(), encoding="utf-8")
-
-    last_error = None
-    for attempt in range(3):
-        try:
-            asyncio.run(synth())
-            if mp3.exists() and mp3.stat().st_size > 2000:
-                merge_srt(srt)
-                return mp3, srt
-        except Exception as exc:
-            last_error = exc
-            log(f"[render] edge-tts attempt {attempt + 1} failed: {exc}")
-        time.sleep(5)
-    raise RuntimeError(f"edge-tts failed after retries: {last_error}")
+    comm = edge_tts.Communicate(text, voice, rate=rate, boundary="WordBoundary")
+    audio = bytearray()
+    words: list[dict] = []
+    async for chunk in comm.stream():
+        if chunk["type"] == "audio":
+            audio += chunk["data"]
+        elif chunk["type"] == "WordBoundary":
+            start = float(chunk["offset"]) / 1e7
+            end = (float(chunk["offset"]) + float(chunk["duration"])) / 1e7
+            words.append({"w": str(chunk["text"]).strip(), "start": start, "end": end})
+    if not audio:
+        raise RuntimeError("edge-tts returned no audio")
+    out_mp3.write_bytes(bytes(audio))
+    return [w for w in words if w["w"]]
 
 
-_TS = re.compile(r"(\d\d:\d\d:\d\d,\d\d\d) --> (\d\d:\d\d:\d\d,\d\d\d)")
+def _estimate_words(text: str, dur: float) -> list[dict]:
+    """TTS fail hone par evenly distributed fallback timings."""
+    ws = [w for w in text.split() if w]
+    if not ws:
+        return []
+    total = sum(len(w) + 1 for w in ws)
+    out, cur = [], 0.12
+    span = max(0.6, dur - 0.35)
+    for w in ws:
+        d = span * (len(w) + 1) / total
+        out.append({"w": w, "start": round(cur, 3), "end": round(cur + d, 3)})
+        cur += d
+    return out
 
 
-def merge_srt(srt_path: Path, max_words: int = 3, max_chars: int = 22) -> None:
-    """Word-level cues ko 3-3 words ke bold chunks mein merge karo (reels style)."""
-    if not srt_path.exists() or srt_path.stat().st_size == 0:
-        return
-    blocks = [b for b in re.split(r"\n\s*\n", srt_path.read_text(encoding="utf-8")) if b.strip()]
-    cues: list[tuple[str, str, str]] = []
-    for block in blocks:
-        m = _TS.search(block)
-        if not m:
-            continue
-        word = " ".join(
-            line.strip() for line in block.splitlines()
-            if not _TS.search(line) and not line.strip().isdigit()
-        ).strip()
-        if word:
-            cues.append((m.group(1), m.group(2), word))
-
-    merged: list[tuple[str, str, str]] = []
-    group: list[tuple[str, str, str]] = []
-    for cue in cues:
-        candidate = group + [cue]
-        joined = " ".join(c[2] for c in candidate)
-        if group and (len(candidate) > max_words or len(joined) > max_chars):
-            merged.append((group[0][0], group[-1][1], " ".join(c[2] for c in group)))
-            group = [cue]
-        else:
-            group = candidate
-    if group:
-        merged.append((group[0][0], group[-1][1], " ".join(c[2] for c in group)))
-
-    out = "\n".join(f"{i}\n{s} --> {e}\n{t}\n" for i, (s, e, t) in enumerate(merged, start=1))
-    srt_path.write_text(out, encoding="utf-8")
-
-
-def probe_duration(path: Path) -> float:
-    res = run(["ffprobe", "-v", "error", "-show_entries", "format=duration",
-               "-of", "default=noprint_wrappers=1:nokey=1", str(path)])
-    return float(res.stdout.strip())
+def synthesize_voices(cfg: dict, ep: dict, work: Path, Log=log) -> list[dict]:
+    voice = cfg.get("voice", "en-US-ChristopherNeural")
+    rate = cfg.get("voice_rate", "-4%")
+    gap = float(cfg.get("render", cfg).get("gap_seconds", 0.45))
+    a_dir = work / "audio"
+    a_dir.mkdir(parents=True, exist_ok=True)
+    out = []
+    for i, line in enumerate(ep["lines"]):
+        text = line["text"]
+        mp3 = a_dir / f"l{i:02d}.mp3"
+        wav = a_dir / f"l{i:02d}.wav"
+        words: list[dict] = []
+        got = False
+        for attempt in range(3):
+            try:
+                words = asyncio.run(_tts_line(text, voice, rate, mp3))
+                got = True
+                break
+            except Exception as exc:  # noqa: BLE001
+                Log(f"    tts retry {attempt + 1} for line {i}: {exc}")
+                time.sleep(1.2 + attempt)
+        if not got:
+            Log(f"    tts FAILED line {i} — silent fallback")
+            run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "lavfi",
+                 "-i", f"anullsrc=r=24000:cl=mono", "-t", "3.0", "-c:a", "pcm_s16le", str(mp3)])
+        raw = _probe_dur(mp3)
+        run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", str(mp3),
+             "-af", f"apad=pad_dur={gap}", "-ar", "24000", "-ac", "1",
+             "-c:a", "pcm_s16le", str(wav)])
+        dur = _probe_dur(wav)
+        if not words:
+            words = _estimate_words(text, dur)
+        out.append({"text": text, "shot": line.get("shot", {}), "words": words,
+                    "dur": dur, "wav": wav, "raw": raw})
+    return out
 
 
-# ----------------------------------------------------------------- clips ----
-
-def build_clips(cfg: dict, images: list[Path], weights: list[float], voice_dur: float, work: Path):
-    fps = int(cfg.get("fps", 30))
-    n = len(images)
-    total_w = sum(weights) or n
-    durations = [max(2.2, voice_dur * (weights[i] / total_w)) for i in range(n)]
-    scale = voice_dur / sum(durations)
-    durations = [d * scale for d in durations]
-    durations[-1] = max(2.0, voice_dur - sum(durations[:-1]))
-    durations = [round(d, 2) for d in durations]
-
-    clips: list[Path] = []
-    for i, (img, dur) in enumerate(zip(images, durations)):
-        clip = work / f"clip_{i:02d}.mp4"
-        zoom = "min(1+0.0012*on,1.18)" if i % 2 == 0 else "max(1.18-0.0012*on,1.0)"
-        vf = (
-            "scale=1080:1920:force_original_aspect_ratio=increase,"
-            "crop=1080:1920,"
-            f"zoompan=z='{zoom}':x='iw/2-(iw/zoom/2)':y='ih/2-(ih/zoom/2)'"
-            f":d=1:s=1080x1920:fps={fps}"
-        )
-        run([
-            "ffmpeg", "-y", "-loop", "1", "-framerate", str(fps), "-t", str(dur), "-i", str(img),
-            "-vf", vf, "-r", str(fps), "-c:v", "libx264", "-preset", "veryfast", "-crf", "21",
-            "-pix_fmt", "yuv420p", "-an", str(clip),
-        ])
-        clips.append(clip)
-    return clips, durations
+def _silence(seconds: float, path: Path) -> Path:
+    run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "lavfi",
+         "-i", "anullsrc=r=24000:cl=mono", "-t", f"{max(0.02, seconds):.3f}",
+         "-c:a", "pcm_s16le", str(path)])
+    return path
 
 
-def concat_clips(clips: list[Path], work: Path) -> Path:
-    listfile = work / "concat.txt"
-    listfile.write_text("".join(f"file '{c.name}'\n" for c in clips), encoding="utf-8")
-    silent = work / "silent.mp4"
-    run(["ffmpeg", "-y", "-f", "concat", "-safe", "0", "-i", str(listfile), "-c", "copy", str(silent)], cwd=work)
-    return silent
+def build_master_audio(voices, lead, outro, work: Path, total=None, cfg=None) -> Path:
+    a_dir = work / "audio"
+    parts: list[Path] = []
+    if lead > 0.02:
+        parts.append(_silence(lead, a_dir / "lead.wav"))
+    parts += [v["wav"] for v in voices]
+    if outro > 0.02:
+        parts.append(_silence(outro, a_dir / "outro.wav"))
+    if not parts:
+        parts = [_silence(3.0, a_dir / "empty.wav")]
+    lst = a_dir / "concat.txt"
+    lst.write_text("".join(f"file '{p.as_posix()}'\n" for p in parts), encoding="utf-8")
+    master = a_dir / "master.wav"
+    run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0",
+         "-i", str(lst), "-ar", "24000", "-ac", "1", "-c:a", "pcm_s16le", str(master)])
+
+    # optional music bed (assets/music/*.mp3) — low volume neeche narration ke
+    cfg = cfg or {}
+    vol = float(cfg.get("music_volume", 0.0) or 0.0)
+    music_dir = ROOT / "assets" / "music"
+    tracks = sorted(music_dir.glob("*.mp3")) if music_dir.exists() else []
+    if not tracks or vol <= 0.001 or not total:
+        return master
+    track = tracks[abs(hash(work.name)) % len(tracks)]
+    mixed = a_dir / "mixed.wav"
+    run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", str(master),
+         "-stream_loop", "-1", "-i", str(track), "-filter_complex",
+         f"[1:a]volume={vol:.3f},atrim=0:{total:.3f},afade=t=out:st={max(0.0, total - 2.0):.2f}:d=2[m];"
+         f"[0:a][m]amix=inputs=2:duration=first:dropout_transition=0[a]",
+         "-map", "[a]", "-ar", "24000", "-ac", "1", "-c:a", "pcm_s16le", str(mixed)])
+    return mixed
 
 
-# ---------------------------------------------------------------- compose ----
+# ------------------------------------------------------------------ render ---
 
-def wrap_text(text: str, width: int = 34) -> str:
-    return "\n".join(textwrap.wrap(text, width=width)) or text
+def render_episode(cfg: dict, ep: dict, *, jobs=None, scale=None, crf=None,
+                   keep_frames=False, Log=log) -> dict:
+    r = dict(cfg.get("render", cfg))
+    fps = int(r.get("fps", 30))
+    iw = int(r.get("width", 810))
+    ih = int(r.get("height", 1440))
+    ow = int(r.get("out_width", 1080))
+    oh = int(r.get("out_height", 1920))
+    jobs = int(jobs or r.get("jobs", 4) or 4)
+    crf = int(crf if crf is not None else r.get("crf", 20))
+    if scale:
+        iw, ih = int(ow * scale), int(oh * scale)
+        if iw % 2:
+            iw += 1
+        if ih % 2:
+            ih += 1
 
-
-def write_textfile(work: Path, name: str, text: str) -> None:
-    (work / name).write_text(text, encoding="utf-8")
-
-
-def pick_music() -> Path | None:
-    music_dir = ASSETS_DIR / "music"
-    if not music_dir.exists():
-        return None
-    tracks = sorted(music_dir.glob("*.mp3"))
-    return random.choice(tracks) if tracks else None
-
-
-def compose_final(cfg: dict, episode: dict, work: Path, silent: Path, voice: Path,
-                  srt: Path, total: float, out_path: Path) -> None:
-    fps = int(cfg.get("fps", 30))
-    stats = episode.get("stats", {})
-
-    title = f"SEASON {episode['season']} \u00b7 DIN {episode['day']}\n{episode['subtitle']}"
-    hud = f"HP {stats.get('hp', '--')} \u00b7 NOISE {stats.get('noise', '--')} \u00b7 SUPPLIES {stats.get('supplies', '--')}"
-    write_textfile(work, "title.txt", title)
-    write_textfile(work, "hud.txt", hud)
-
-    filters = []
-    if srt.exists() and srt.stat().st_size > 0:
-        filters.append(
-            "subtitles=voice.srt:force_style="
-            "'Fontname=DejaVu Sans,FontSize=13,Bold=1,PrimaryColour=&H00FFFFFF,"
-            "OutlineColour=&H00101010,BorderStyle=1,Outline=3,Shadow=0,MarginV=210,Alignment=2'"
-        )
-
-    # drawtext: ffmpeg 9 on Windows crashes without an explicit fontfile
-    # (broken fontconfig). Copy a real ttf into work/ and reference it
-    # relative to cwd, so this works identically on Windows + Ubuntu CI.
-    font = pick_font_path()
-    font_arg = ""
-    if font:
-        shutil.copy2(font, work / "font_bold.ttf")
-        font_arg = "fontfile=font_bold.ttf:"
-
-    filters += [
-        f"drawtext={font_arg}textfile=title.txt:fontcolor=white:fontsize=40:line_spacing=10:"
-        "box=1:boxcolor=black@0.55:boxborderw=16:x=(w-text_w)/2:y=70",
-        f"drawtext={font_arg}textfile=hud.txt:fontcolor=white:fontsize=30:"
-        "box=1:boxcolor=black@0.45:boxborderw=12:x=60:y=300",
-    ]
-
-    if episode.get("vote") and episode.get("choices"):
-        lines = "\n".join(
-            wrap_text(f"{i}. {c['text']}", 30) for i, c in enumerate(episode["choices"], start=1)
-        )
-        write_textfile(work, "choices.txt", lines)
-        t0 = max(4.0, total * 0.6)
-        filters.append(
-            f"drawtext={font_arg}textfile=choices.txt:fontcolor=white:fontsize=48:line_spacing=16:"
-            "box=1:boxcolor=black@0.65:boxborderw=20:x=(w-text_w)/2:y=h-660:"
-            f"enable='gte(t,{t0:.1f})'"
-        )
-
-    fc = f"[0:v]{','.join(filters)}[outv]"
-    music = pick_music()
-    cmd = ["ffmpeg", "-y", "-i", "silent.mp4", "-i", "voice.mp3"]
-    if music:
-        shutil.copy2(music, work / "music.mp3")
-        cmd += ["-stream_loop", "-1", "-i", "music.mp3"]
-        fc += (
-            ";[1:a]volume=1.0[voice];"
-            f"[2:a]volume={cfg.get('music_volume', 0.12)}[music];"
-            "[voice][music]amix=inputs=2:duration=first:normalize=0[outa]"
-        )
-    else:
-        fc += ";[1:a]volume=1.0[outa]"
-
-    cmd += [
-        "-filter_complex", fc,
-        "-map", "[outv]", "-map", "[outa]",
-        "-r", str(fps), "-c:v", "libx264", "-preset", "medium", "-crf", "20",
-        "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k",
-        "-movflags", "+faststart", "-t", str(total),
-        str(out_path),
-    ]
-    run(cmd, cwd=work)
-
-
-# ------------------------------------------------------------------ main ----
-
-def render_episode(cfg: dict, episode: dict) -> dict:
+    tag = f"s{ep['season']}_d{ep['day']:03d}"
+    work = WORK_DIR / f"render_{tag}"
+    work.mkdir(parents=True, exist_ok=True)
+    out_path = OUT_DIR / ep.get("video_name", f"reel_{tag}.mp4")
     OUT_DIR.mkdir(parents=True, exist_ok=True)
-    work = OUT_DIR / f"work_s{episode['season']}_d{episode['day']:03d}"
-    if work.exists():
-        shutil.rmtree(work)
-    work.mkdir(parents=True)
 
-    log(f"[render] episode S{episode['season']} D{episode['day']} — images ({cfg.get('image_provider')})")
-    images = build_images(cfg, episode, work)
+    t0 = time.time()
+    Log(f"[render] voice: {len(ep['lines'])} lines (voice={cfg.get('voice')})")
+    voices = synthesize_voices(cfg, ep, work, Log)
+    shots, total, lead = an.build_timeline(ep, cfg, voices)
+    outro = max(0.0, total - lead - sum(v["dur"] for v in voices))
+    Log(f"[render] timeline: {len(shots)} shots, {total:.1f}s "
+        f"({len(shots) + 1} cards incl.), fps={fps}, {iw}x{ih} -> {ow}x{oh}, jobs={jobs}")
+    audio = build_master_audio(voices, lead, outro, work, total, cfg)
 
-    log("[render] voice (edge-tts)")
-    voice, srt = build_voice(cfg, episode["narration"], work)
-    total = probe_duration(voice)
-    max_seconds = float(cfg.get("max_duration_seconds", 60))
-    if total > max_seconds:
-        log(f"[render] voice {total:.1f}s > max {max_seconds}s — cut kiya ja raha hai")
-        total = max_seconds
+    Texts = an.Texts(svgrender.font_map(ROOT))
+    cache: dict = {}
+    seed = abs(hash((ep["season"], ep["day"], ep.get("node", "")))) % 9999 + 1
+    n_frames = max(2, int(math.ceil(total * fps)))
+    Log(f"[render] composing {n_frames} frames...")
+    svgs = []
+    for i in range(n_frames):
+        svgs.append(an.frame_svg(ep, cfg, shots, i / fps, Texts, cache, seed=seed))
+    Log(f"[render] rasterising frames ({(time.time() - t0):.0f}s so far)...")
+    frames_dir = work / "frames"
+    svgrender.render_frames(svgs, frames_dir, iw, ih, svgrender.font_files(ROOT), jobs, Log)
+    svgrender.encode_video(frames_dir, out_path, fps, ow, oh, audio, total, crf=crf, log=Log)
+    if not keep_frames:
+        shutil.rmtree(frames_dir, ignore_errors=True)
+    dur = _probe_dur(out_path)
+    Log(f"[render] DONE {out_path.name}  {dur:.1f}s  {out_path.stat().st_size / 1e6:.2f} MB "
+        f"({time.time() - t0:.0f}s total)")
+    return {"video_path": str(out_path), "duration": dur, "frames": n_frames,
+            "shots": len(shots), "render_seconds": round(time.time() - t0, 1)}
 
-    narr = episode["narration"]
-    n_img = len(images)
-    weights = [0.0] * n_img
-    for j, line in enumerate(narr):
-        weights[j % n_img] += max(8, len(line.split()))
-    if sum(weights) <= 0:
-        weights = [1.0] * n_img
 
-    log("[render] clips + concat")
-    clips, durations = build_clips(cfg, images, weights, total, work)
-    silent = concat_clips(clips, work)
+def render_stills(cfg: dict, ep: dict, out_dir=None, skip_audio=True, Log=log) -> list[str]:
+    """Har line ka ek still (fast visual check / dashboard preview)."""
+    out_dir = Path(out_dir or (OUT_DIR / "stills"))
+    out_dir.mkdir(parents=True, exist_ok=True)
+    voices = []
+    for i, line in enumerate(ep["lines"]):
+        text = line["text"]
+        dur = max(2.4, len(text) / 13.5)
+        voices.append({"text": text, "shot": line.get("shot", {}),
+                       "words": _estimate_words(text, dur), "dur": dur, "wav": None})
+    shots, total, lead = an.build_timeline(ep, cfg, voices)
+    Texts = an.Texts(svgrender.font_map(ROOT))
+    cache: dict = {}
+    seed = abs(hash((ep["season"], ep["day"], ep.get("node", "")))) % 9999 + 1
+    import resvg_py
 
-    out_path = OUT_DIR / episode["video_name"]
-    log(f"[render] final compose → {out_path.name}")
-    compose_final(cfg, episode, work, silent, voice, srt, total, out_path)
+    paths = []
+    for i, s in enumerate(shots):
+        t = s.start + min(1.1, s.dur * 0.45)
+        svg = an.frame_svg(ep, cfg, shots, t, Texts, cache, seed=seed)
+        p = out_dir / f"{i:02d}_{(s.meta.get('place') or 'card')}.png"
+        p.write_bytes(resvg_py.svg_to_bytes(
+            svg_string=svg, font_files=svgrender.font_files(ROOT), skip_system_fonts=True,
+            width=540, height=960))
+        paths.append(str(p))
+    Log(f"[stills] {len(paths)} stills -> {out_dir}")
+    return paths
 
-    (OUT_DIR / "caption.txt").write_text(episode["caption"], encoding="utf-8")
-    (OUT_DIR / "episode.json").write_text(
-        json.dumps(episode, ensure_ascii=False, indent=2), encoding="utf-8"
-    )
-    log(f"[render] done ({sum(durations):.1f}s clips, voice {total:.1f}s)")
-    return {"video_path": str(out_path), "duration": total}
+
+# -------------------------------------------------------------------- main ---
+
+def main() -> None:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--dry-run", action="store_true", help="state se episode banao + render")
+    ap.add_argument("--stills", metavar="DIR", nargs="?", const="",
+                    help="sirf stills render karo (fast)")
+    ap.add_argument("--jobs", type=int, default=None)
+    ap.add_argument("--scale", type=float, default=None, help="preview scale (0.5 = 540x960)")
+    ap.add_argument("--keep-frames", action="store_true")
+    args = ap.parse_args()
+
+    cfg = load_config()
+    state = load_state()
+    scn = engine.load_scenarios()
+    ep = engine.build_episode(state, scn, cfg, None)
+    log(f"[main] S{ep['season']} D{ep['day']} {ep['node']} ({ep['kind']}) {len(ep['lines'])} lines")
+    if args.stills is not None or args.stills == "":
+        render_stills(cfg, ep, args.stills)
+    else:
+        res = render_episode(cfg, ep, jobs=args.jobs, scale=args.scale,
+                             keep_frames=args.keep_frames)
+        print(json.dumps(res, indent=2))
+
+
+if __name__ == "__main__":
+    main()

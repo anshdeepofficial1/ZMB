@@ -1,41 +1,47 @@
 {
-  "handle": "@tumhara_handle",
+  "handle": "@your_handle",
   "timezone": "Asia/Kolkata",
   "publish_after_ist_hour": 13,
 
-  "voice": "en-IN-PrabhatNeural",
-  "voice_rate": "-6%",
+  "voice": "en-US-ChristopherNeural",
+  "voice_rate": "-4%",
 
-  "image_provider": "pollinations",
-  "pollinations_model": "flux",
-  "image_width": 576,
-  "image_height": 1024,
-  "image_delay_seconds": 45,
-  "image_style_prefix": "cinematic horror film still, zombie apocalypse in rural india, moody teal and orange color grade, film grain, volumetric fog, dark atmosphere, vertical 9:16 composition, ultra detailed",
-  "pixabay_queries": ["abandoned house night", "dark fog road", "old barn dark", "flashlight dark", "abandoned factory"],
+  "render": {
+    "width": 720,
+    "height": 1280,
+    "out_width": 1080,
+    "out_height": 1920,
+    "fps": 30,
+    "jobs": 4,
+    "caption_size": 52,
+    "gap_seconds": 0.45,
+    "choice_card_seconds": 3.6,
+    "ending_card_seconds": 4.2,
+    "title_card_seconds": 3.0
+  },
 
   "min_votes": 10,
-  "cta_vote": "Comment mein 1 ya 2 likho. Kal sabse zyada votes wala rasta jeetega. Koi undo button nahi hai!",
-  "cta_story": "Kal se tum decide karoge ki aage kya hoga. Follow karo, warna apocalypse mein kho jaoge.",
-  "fiction_disclaimer": "Ye ek fiction story hai. Koi asli zombie nahi.",
+  "cta_vote": "Comment 1 or 2. The choice with the most comments wins - and tomorrow it becomes real.",
+  "cta_story": "Follow so you do not miss the next choice. The story only moves when you vote.",
+  "fiction_disclaimer": "A fictional animated story. No real zombies were harmed.",
   "hashtag_pool": [
     "#zombieapocalypse",
-    "#survivalreels",
-    "#interactivereels",
-    "#hindireels",
     "#chooseyourownadventure",
-    "#hindustory",
-    "#reelsindia",
+    "#interactivestory",
+    "#zombiesurvival",
+    "#survivalstory",
+    "#animatedstory",
+    "#cartoon",
     "#apocalypse",
-    "#zombieindia"
+    "#chooseyourownpath",
+    "#storytime"
   ],
   "hashtags_per_post": 5,
 
-  "music_volume": 0.12,
-  "fps": 30,
-  "max_duration_seconds": 60,
+  "music_volume": 0.10,
   "ai_disclosure": true,
   "media_branch": "media",
 
-  "stats_reset": {"hp": 100, "noise": 20, "supplies": 60, "trust": 50}
+  "stats_reset": { "hp": 100, "noise": 20, "food": 60, "dog": 70 },
+  "stats_labels": { "hp": "HP", "noise": "NOISE", "food": "FOOD", "dog": "BISCUIT" }
 }

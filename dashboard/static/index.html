@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZMB — Outbreak Control Room</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%230d1117'/><text x='16' y='23' font-size='17' text-anchor='middle' fill='%23ffd23f' font-family='Arial Black'>Z</text></svg>">
+</head>
+<body>
+<canvas id="embers"></canvas>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="zbadge">Z</span>
+    <div>
+      <h1>ZOMBIE SURVIVAL <b>CONTROL ROOM</b></h1>
+      <p class="sub" id="handle">@you &middot; automated reels engine</p>
+    </div>
+  </div>
+  <div class="topstats">
+    <div class="pill clock"><span class="dot live"></span><span id="clock">--:--:--</span></div>
+    <div class="pill" data-tip="Instagram publish pipeline"><span class="lbl">TOKEN</span><span id="tokenState" class="val warn">checking</span></div>
+  </div>
+</header>
+
+<main class="grid">
+
+  <!-- ── Story state ─────────────────────────────────────── -->
+  <section class="card c-state" id="cardState">
+    <div class="chead"><h2>Story State</h2><span class="tag season" id="tagSeason">S?
+
+D?</span></div>
+    <div class="bigline" id="arcTitle">—</div>
+    <div class="place" id="location">—</div>
+    <div class="gauges" id="gauges"></div>
+    <div class="nextnode">
+      <div class="nlabel">NEXT NODE</div>
+      <div class="nodechip" id="nextNode">
+        <span class="nodeid">—</span><span class="nplace">—</span>
+      </div>
+      <div class="choices" id="nodeChoices"></div>
+    </div>
+  </section>
+
+  <!-- ── Pipeline stepper ────────────────────────────────── -->
+  <section class="card c-pipeline">
+    <div class="chead"><h2>Pipeline</h2>
+      <div class="btnrow">
+        <button class="btn primary" id="btnDry">▶ Render next
+(dry)</button>
+        <button class="btn ghost" id="btnStills">🖼 Stills only</button>
+        <button class="btn ghost" id="btnFull" data-tip="Needs IG secrets">🚀 Full publish run</button>
+      </div>
+    </div>
+    <div class="stepper" id="stepper">
+      <div class="step done"><i>✓</i><span>Votes tallied</span></div>
+      <div class="step cur"><i>⚡</i><span>Story advances</span></div>
+      <div class="step"><i>✎</i><span>Episode written</span></div>
+      <div class="step"><i>🎙</i><span>Voices (edge-tts)</span></div>
+      <div class="step"><i>🎬</i><span>Frames + encode</span></div>
+      <div class="step"><i>📡</i><span>Post to IG</span></div>
+    </div>
+    <div class="runmeta" id="runMeta">idle — trigger a run to watch it work</div>
+    <pre class="log" id="runLog">[log waiting…]</pre>
+  </section>
+
+  <!-- ── Episodes ────────────────────────────────────────── -->
+  <section class="card c-episodes">
+    <div class="chead"><h2>Episodes</h2><span class="tag" id="epCount">0</span></div>
+    <div class="player" id="playerWrap">
+      <video id="player" controls playsinline></video>
+      <div class="no-video" id="noVideo">No reel rendered yet — hit “Render next (dry)”</div>
+    </div>
+    <div class="vidlist" id="vidList"></div>
+  </section>
+
+  <!-- ── Story map ──────────────────────────────────────── -->
+  <section class="card c-map">
+    <div class="chead"><h2>Story Map</h2><span class="tag" id="arcName">—</span></div>
+    <div class="map" id="map"></div>
+    <div class="legend">
+      <span><i class="lg cur"></i>current</span>
+      <span><i class="lg vote"></i>vote node</span>
+      <span><i class="lg end"></i>ending</span>
+      <span><i class="lg m"></i>route</span>
+    </div>
+  </section>
+
+  <!-- ── Settings ────────────────────────────────────────── -->
+  <section class="card c-config">
+    <div class="chead"><h2>Engine Settings</h2>
+      <button class="btn small" id="btnSaveCfg">💾 Save</button></div>
+    <p class="hint">Edit config.json fields. Secret values show as
+***set*** and are never overwritten from here.</p>
+    <div class="cfgform" id="cfgForm"></div>
+  </section>
+
+  <!-- ── Setup / IG ──────────────────────────────────────── -->
+  <section class="card c-setup">
+    <div class="chead"><h2>Publish Setup</h2></div>
+    <ol class="setuplist">
+      <li>Instagram <b>Professional (Creator)</b> account se login karo</li>
+      <li><a href="https://developers.facebook.com/apps" target="_blank">Meta for
+Developers</a> par app banao → Instagram Login product add karo</li>
+      <li><code>business_discovery</code>, <code>instagram_basic</code>, <code>content_publish</code>
+permissions grant karo</li>
+      <li>Token generate karo, phir env mein set karo:
+        <pre>setx IG_ACCESS_TOKEN "IGQV..." 
+setx IG_USER_ID "1784..."</pre></li>
+      <li>Yahan <b>Full publish run</b> dabao — first reel live 🎉</li>
+    </ol>
+    <div class="checkline" id="setupCheck">⏳ checking…</div>
+  </section>
+
+</main>
+
+<footer>
+  <span>ZMB engine</span> · fully automated
+· $0/month · <a href="/docs" target="_blank">API docs</a>
+</footer>
+
+<div class="toastbox" id="toasts"></div>
+
+<script src="app.js"></script>
+</body>
+</html>

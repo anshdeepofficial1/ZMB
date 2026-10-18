@@ -32,6 +32,7 @@ from common import OUT_DIR, GraphClient, ist_now, load_config, load_state, log, 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true", help="render only — koi API call/post nahi")
+    ap.add_argument("--stills", action="store_true", help="har line ka ek still frame (turant preview, video nahi)")
     ap.add_argument("--force-publish", action="store_true", help="time/date gate bypass karo")
     args = ap.parse_args()
 
@@ -90,6 +91,12 @@ def main() -> None:
     episode = engine.build_episode(state, scn, cfg, recap)
     log(f"[cycle] episode: S{episode['season']} D{episode['day']} "
         f"node={episode['node']} kind={episode['kind']} vote={episode['vote']}")
+    if args.stills:
+        stills = render.render_stills(cfg, episode)
+        log(f"[cycle] stills → {len(stills)} files in out/stills")
+        (OUT_DIR / "caption.txt").write_text(episode["caption"] + "\n", encoding="utf-8")
+        log("[cycle] dry-run complete: stills only")
+        return
     result = render.render_episode(cfg, episode)
 
     # debug artifacts (workflow inhe artifact ke roop mein upload karta hai)

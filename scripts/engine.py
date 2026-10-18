@@ -44,7 +44,7 @@ def find_choice(node: dict, key: str) -> dict:
 def substitute(text: str, state: dict) -> str:
     return (
         str(text)
-        .replace("{location}", state.get("location", "ek sunsaan jagah"))
+        .replace("{location}", state.get("location", "somewhere on the road"))
         .replace("{season}", str(state.get("season", 1)))
     )
 
@@ -72,6 +72,8 @@ def advance(state: dict, scn: dict, cfg: dict, votes: dict | None = None) -> dic
         if total < int(cfg.get("min_votes", 10)):
             winner = default_key
             res["fallback"] = True
+        elif len(keys) == 1:
+            winner = keys[0]
         else:
             ranked = sorted(keys, key=lambda k: (-counts.get(k, 0), k != default_key))
             winner = ranked[0] if counts.get(ranked[0], 0) > counts.get(ranked[1], 0) else default_key
@@ -86,12 +88,18 @@ def advance(state: dict, scn: dict, cfg: dict, votes: dict | None = None) -> dic
         apply_effects(state, choice.get("effects"))
 
         if choice.get("next_arc"):
-            # Ending → naya season/location
-            state["arc"] = choice["next_arc"]
+            nxt = choice["next_arc"]
+            if nxt not in scn.get("arcs", {}):
+                # Agla season abhi likha nahi gaya — ending par ruk jao
+                res["awaiting_arc"] = nxt
+                state["node"] = last["node"]
+                last["closed"] = True
+                return res
+            state["arc"] = nxt
             state["season"] = int(state.get("season", 1)) + 1
             if choice.get("location_text"):
                 state["location"] = choice["location_text"]
-            state["node"] = scn["arcs"].get(choice["next_arc"], {}).get("start", "intro")
+            state["node"] = scn["arcs"].get(nxt, {}).get("start", "intro")
             state["stats"] = {k: int(v) for k, v in cfg.get("stats_reset", state.get("stats", {})).items()}
         else:
             state["node"] = choice["next"]
@@ -109,9 +117,11 @@ def advance(state: dict, scn: dict, cfg: dict, votes: dict | None = None) -> dic
 def recap_line(res: dict | None) -> str | None:
     if not res:
         return None
+    if res.get("awaiting_arc"):
+        return "That is the end of the season. The next one is being written right now."
     if res.get("fallback") or int(res.get("total", 0)) <= 0:
-        return "Is baar comments kam aaye, to story ne khud rasta chuna. Aage vote karna zaroori hai."
-    return f"Pichhli reel mein {res['pct']}% logon ne kaha: {res['winner_text']}."
+        return "Not enough votes came in, so the story chose its own path. Comment to decide next time."
+    return f"Last time, {res['pct']} percent of you said: {res['winner_text']}."
 
 
 def pick_hashtags(cfg: dict, state: dict) -> list[str]:
@@ -137,10 +147,10 @@ def build_caption(cfg: dict, state: dict, node: dict, choices: list[dict], hasht
     if choices:
         for i, choice in enumerate(choices, start=1):
             lines.append(f"{i}\ufe0f\u20e3 {choice['text']}")
-        lines += ["", cfg.get("cta_vote", "Comment mein 1 ya 2 likho.")]
+        lines += ["", cfg.get("cta_vote", "Comment 1 or 2. Most comments wins.")]
     else:
-        lines += [cfg.get("cta_story", "Follow karo, kal ka episode tumhare vote par chalega.")]
-    lines += ["", cfg.get("fiction_disclaimer", "Ye ek fiction story hai."), "", " ".join(hashtags)]
+        lines += [cfg.get("cta_story", "Follow so you do not miss the next choice.")]
+    lines += ["", cfg.get("fiction_disclaimer", "A fictional animated story."), "", " ".join(hashtags)]
     caption = "\n".join(line for line in lines if line is not None).strip()
     return caption[:2190] + "\u2026" if len(caption) > 2200 else caption
 
@@ -149,7 +159,7 @@ def first_comment(choices: list[dict]) -> str | None:
     if not choices:
         return None
     parts = [f"{i} = {c['text']}" for i, c in enumerate(choices, start=1)]
-    return "VOTE KARO \U0001f447 " + "  |  ".join(parts)
+    return "VOTE \U0001f447 " + "  |  ".join(parts)
 
 
 def build_episode(state: dict, scn: dict, cfg: dict, recap: str | None = None) -> dict:
@@ -160,13 +170,16 @@ def build_episode(state: dict, scn: dict, cfg: dict, recap: str | None = None) -
     day = int(state.get("day", 0)) + 1
     season = int(state.get("season", 1))
 
-    narration = [substitute(x, state) for x in node["narration"]]
+    raw_lines = node.get("lines") or []
+    lines: list[dict] = []
     if recap:
-        narration = [recap] + narration
-    images = [
-        f"{cfg.get('image_style_prefix', 'cinematic horror film still')}, {substitute(p, state)}"
-        for p in node["images"]
-    ]
+        lines.append({"text": substitute(recap, state),
+                      "shot": dict((raw_lines[0].get("shot") if raw_lines else {}) or {})})
+    for ln in raw_lines:
+        lines.append({
+            "text": substitute(ln.get("text", ""), state),
+            "shot": substitute_shots(ln.get("shot", {}), state),
+        })
 
     vote = node.get("kind") in ("vote", "ending")
     choices: list[dict] = []
@@ -174,8 +187,10 @@ def build_episode(state: dict, scn: dict, cfg: dict, recap: str | None = None) -
         choices = [
             {
                 "key": c["key"],
-                "text": c.get("text", c["key"]),
+                "text": substitute(c.get("text", c["key"]), state),
                 "labels": [str(l).lower() for l in c.get("labels", [c["key"]])],
+                "next_arc": c.get("next_arc"),
+                "next": c.get("next"),
             }
             for c in node["choices"]
         ]
@@ -185,19 +200,36 @@ def build_episode(state: dict, scn: dict, cfg: dict, recap: str | None = None) -
         "season": season,
         "day": day,
         "arc": arc_id,
+        "arc_title": arc.get("title", f"Season {season}"),
         "node": node_id,
         "kind": node.get("kind", "story"),
         "subtitle": substitute(node.get("subtitle", arc.get("title", "")), state),
-        "narration": narration,
-        "images": images,
+        "hook": substitute(node.get("hook", ""), state),
+        "lines": lines,
+        "narration": [ln["text"] for ln in lines],
+        "ending": substitute_shots(node.get("ending") or {}, state) or None,
+        "title_card": bool(day == 1 or node_id == arc.get("start")),
         "vote": vote,
         "choices": choices,
         "stats": dict(state.get("stats", {})),
+        "stats_labels": dict(cfg.get("stats_labels", {})),
+        "handle": cfg.get("handle", ""),
         "video_name": f"reel_s{season}_d{day:03d}.mp4",
         "caption": build_caption(cfg, state, node, choices, hashtags, recap),
         "first_comment": first_comment(choices),
         "hashtags": hashtags,
     }
+
+
+def substitute_shots(value, state: dict):
+    """Shot trees ke andar {location} jaise placeholders replace karo."""
+    if isinstance(value, str):
+        return substitute(value, state)
+    if isinstance(value, list):
+        return [substitute_shots(v, state) for v in value]
+    if isinstance(value, dict):
+        return {k: substitute_shots(v, state) for k, v in value.items()}
+    return value
 
 
 def commit_episode(state: dict, episode: dict, media_id: str, ist_date: str) -> None:
@@ -231,11 +263,11 @@ def selftest() -> None:
     cfg = load_config()
     scn = load_scenarios()
     state = {
-        "schema": 1, "season": 1, "day": 0, "arc": "farmhouse", "node": "intro",
-        "location": "test farmhouse", "stats": dict(cfg.get("stats_reset", {})),
+        "schema": 2, "season": 1, "day": 0, "arc": "road", "node": "intro",
+        "location": "the empty highway", "stats": dict(cfg.get("stats_reset", {})),
         "history": [], "last_episode": None, "recent_hashtags": [],
     }
-    for step in range(8):
+    for step in range(14):
         ep = build_episode(state, scn, cfg, None)
         keys = [c["key"] for c in ep["choices"]]
         log(f"[selftest] S{ep['season']} D{ep['day']:>2} node={ep['node']:<16} vote={ep['vote']} choices={keys}")

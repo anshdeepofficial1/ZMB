@@ -139,3 +139,61 @@ image prompts ──► Pollinations/Pixabay ──► img_0..3.jpg
 - **Template engine (LLM optional)**: deterministic, free, no rate-limit surprises; LLM sirf flavor ke liye later.
 - **Public URL hosting (media branch)**: Instagram Login flavor resumable upload support nahi karta (verified), aur GitHub raw CDN free + fast hai.
 - **Polling (not webhooks)**: webhook ke liye public HTTPS server + verification chahiye; polling 6x/day trivial hai rate limits ke against.
+
+---
+
+## 8. Render Pipeline v2 (current — procedural cartoon engine)
+
+v1 image-API pipeline (Pollinations/Pixabay) follow-up mein badal diya gaya — uski jagah
+ab **fully-local procedural animation** hai. Image APIs ka rate-limit / broken-download
+risk class hi khatam ho gaya.
+
+```
+engine.build_episode()
+   └→ episode {lines:[{text, shot}], shots, vote, ending}
+        │
+render.render_episode(cfg, ep)
+   ├─ synthesize_voices()     edge-tts en-US-Christopher, boundary=WordBoundary
+   │                          → word-level timings har line ke liye
+   ├─ engine timeline         title card → per-line shots → vote/ending card
+   ├─ animate.frame_svg(i)    Har frame ka SVG compose hota hai:
+   │     · scenes.build()     15 scene builders, parallax layers (k=0.02..1.0)
+   │     · characters.*       human/dog/zombie rigs — pose by shot action+t
+   │     · camera fx_at()     push/pull/pan/tilt/shake/creep + locomotion force
+   │     · hud_layer()        stat pills, SEASON/DAY, subtitle, vote panel
+   │     · caption layer      karaoke — word-timed highlight
+   │     · fx_layer()         fog / rain / embers / lightning flash
+   ├─ svgrender.render_frames multiprocessing (4 workers, internal 720×1280)
+   │                          resvg_py.svg_to_bytes → PNG per frame
+   └─ svgrender.encode_video  ffmpeg: scale lanczos→1080×1920, libx264 crf
+                              + build_master_audio (concat voices, optional music bed)
+```
+
+Key design points:
+- **Design space fixed 1080×1920** hai, internally hum uska 720×1280 crop/render karte hain, phir
+  1.5x lanczos upscale karke 1080×1920 final — mushkil feathers/sirf 1.5x, cartoon art crisp rehta hai.
+- **Parallax**: har layer ka apna `k` (0.02 far-sky … 1.0 near); camera `fx` se world translate.
+- **resvg quirks handled**: stroked text ko `paint-order="stroke"` (warna solid black); bundled
+  fonts (`assets/fonts/`) + `skip_system_fonts=True` — CI par bhi identical output.
+- **GIL note**: resvg GIL release nahi karta — isliye processes (4 workers), threads nahi.
+- Ek 48s episode ≈ **1450 frames, ~3 min @ 4 jobs** locally; CI par bhi fit.
+
+## 9. Dashboard (local control room)
+
+`dashboard/server.py` — FastAPI (port 8787) + `dashboard/static/` vanilla SPA. GitHub Actions
+ka replacement nahi — **local monitoring/triggering GUI** hai:
+
+| Endpoint | Kaam |
+|---|---|
+| `GET /api/overview` | season/day/arc/stats + token status + latest reel |
+| `GET /api/story` | poora story graph + current node |
+| `POST /api/trigger?mode=dry\|stills\|full` | `run_cycle.py` background spawn |
+| `GET /api/runs/{id}/log` | live log tail (polling) |
+| `GET /api/episodes`, `/api/video/{n}` | reels list + stream |
+| `GET/PUT /api/config` | config.json edit (secrets redacted) |
+| `PUT /api/scenarios` | story graph edit |
+| `GET /api/health` | config/state/token/ffmpeg checks |
+
+UI: glassmorphism + neon panels, animated gauges, pipeline stepper, story map,
+video player, live log — sab polling-based (koi websocket nahi), offline fallback
+ke saath. Chalane ke liye: `python dashboard/server.py` → http://127.0.0.1:8787

@@ -1,432 +1,382 @@
 {
+  "schema": 2,
+  "title": "ZOMBIE APOCALYPSE: YOU DECIDE",
+  "tagline": "Every night the story stops. You comment. The most votes decide.",
+  "cast": {
+    "max": { "name": "Max", "role": "hero", "art": "boy", "blurb": "A quiet survivor with a good heart and a failing car." },
+    "biscuit": { "name": "Biscuit", "role": "pet", "art": "dog", "blurb": "Max's dog. Small ears, big courage, always hungry." },
+    "ada": { "name": "Ada", "role": "friend", "art": "girl", "blurb": "Found at the gas station. Fast hands, faster plans." },
+    "old": { "name": "Otto", "role": "friend", "art": "old", "blurb": "An old trucker who knows every back road." },
+    "zombie": { "name": "The shamblers", "role": "threat", "art": "zombie", "blurb": "They listen for sound. They never hurry. They never stop." }
+  },
   "arcs": {
-    "farmhouse": {
-      "title": "Farmhouse — Season ka Pehla Thikana",
+    "road": {
+      "title": "Season 1 - The Long Road",
       "start": "intro",
       "nodes": {
         "intro": {
           "kind": "story",
-          "subtitle": "Zombie Apocalypse: Tum Decide Karo",
-          "hook": "Apocalypse shuru ho chuka hai. Tum phanse ho ek sunsaan farmhouse mein. Aur ab story SIRF tum decide karoge.",
-          "narration": [
-            "Shaam 6 baje. {location}. Phone dead hai. Road block hai. Aur bahar... bahar kuch bahut galat chal raha hai.",
-            "Gate ki taraf se wahi awaazein aa rahi hain jo news mein suni thi. Tum andar ho. Aaj raat tum yahin rahoge.",
-            "Ab suno rule: har din tumhe do raste milenge. Tum comment mein 1 ya 2 likhoge. Sabse zyada votes wala rasta jeetega. Koi undo button nahi hai.",
-            "Kal raat pehli asli raat hai. Better ho jaao."
+          "subtitle": "The Empty Highway",
+          "hook": "2:47 AM. Max's car dies on an empty road, next to one gas station that is still lit.",
+          "lines": [
+            { "text": "2:47 in the morning. Max's old car coughs... and dies.", "shot": { "place": "highway", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "Biscuit whines from the back seat. No phone. No signal. No plan.", "shot": { "place": "highway", "cast": [["max", "idle"], ["biscuit", "scared"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "Then Max sees it. One gas station, still lit, like the end of the world forgot about it.", "shot": { "place": "highway", "cast": [["max", "point"], ["biscuit", "wag"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "He grabs his backpack. 'Stay close, Biscuit. We do this together.'", "shot": { "place": "highway", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "Now it is your turn. Every night, the story stops, and you decide what Max does next.", "shot": { "place": "gas_station", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "Comment the choice with the most votes wins. Day one starts now.", "shot": { "place": "gas_station", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "pull", "fx": "fog", "mood": "hope", "time": "night" } }
           ],
-          "images": [
-            "isolated indian farmhouse at dusk, dirt driveway, dark fields all around, one window lit, ominous",
-            "hands boarding up a wooden farmhouse door with planks, dim lantern light, tense",
-            "dead smartphone on a wooden table, candle flame nearby, dusk light through window"
-          ],
-          "next": "garage_sound"
+          "next": "store_sound"
         },
-        "garage_sound": {
+        "store_sound": {
           "kind": "vote",
-          "subtitle": "Garage Ki Awaaz",
-          "hook": "Raat 2 baje farmhouse ke garage se awaaz aayi. Andar gaadi, tools aur kal ka ration hai. Tum kya karoge?",
-          "narration": [
-            "Raat 2 baje. Neend mein tumhe awaaz sunai deti hai. Awaaz tumhare farm ke garage se aa rahi hai. Kuch bhaari gira hai. Phir silence.",
-            "Garage mein gaadi hai, tools hain, aur kal ka saara ration. Par us darwaze ke us taraf wala andhera tumne 3 din se khola nahi.",
-            "Ab batao: RUN — chupke se peeche ke darwaze se bhaag jao, jaan bachao. Ya CHECK — jaake dekho andar kya hai?"
-          ],
-          "images": [
-            "dark garage exterior of an indian farmhouse at night, half open metal door, moonlight, fog",
-            "flashlight beam cutting through a dark garage interior, dust particles floating, tool rack silhouette",
-            "close up of a trembling hand reaching for a wooden door handle, dark, cinematic horror"
+          "subtitle": "Staff Only",
+          "hook": "The store has food for weeks. And something is dragging its feet behind the STAFF ONLY door.",
+          "lines": [
+            { "text": "The gas station is empty. Too empty.", "shot": { "place": "gas_station", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "Inside the store: water, cans, batteries. Everything Max needs to keep Biscuit alive.", "shot": { "place": "store", "cast": [["max", "walk"], ["biscuit", "sniff"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
+            { "text": "Then he hears it. Behind the STAFF ONLY door, something heavy drags across the floor.", "shot": { "place": "store", "cast": [["max", "idle"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Then silence. The storeroom has food for weeks. And whatever made that sound.", "shot": { "place": "store", "cast": [["max", "crouch"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Should Max RUN and leave it all behind? Or CHECK what is inside?", "shot": { "place": "store", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "tense", "time": "night" } }
           ],
           "choices": [
-            {
-              "key": "run",
-              "text": "RUN - bhaag jao",
-              "labels": ["run", "bhaago", "bhago", "bhag", "1"],
-              "next": "run_fields",
-              "effects": {"noise": -5, "supplies": -10}
-            },
-            {
-              "key": "check",
-              "text": "CHECK - jaake dekho",
-              "labels": ["check", "dekho", "dekh", "dekhna", "2"],
-              "next": "check_garage",
-              "effects": {"noise": 10}
-            }
+            { "key": "run", "text": "RUN - slip out and drive away", "labels": ["run", "1", "escape", "leave", "flee", "sneak"], "effects": { "food": -5 }, "next": "run_away" },
+            { "key": "check", "text": "CHECK - open the door", "labels": ["check", "2", "open", "look", "enter", "stay"], "effects": { "noise": 6 }, "next": "check_back" }
           ],
-          "default": "check"
+          "default": "run"
         },
-        "run_fields": {
-          "kind": "vote",
-          "subtitle": "Khet Ke Andhere Mein",
-          "hook": "Tum bhaage. Par khet mein kuch khada hai... jo tumhe dekh raha hai.",
-          "narration": [
-            "Tum peeche ke darwaze se nikle. Khet tak bhage. Sans phool rahi hai. Peeche se wahi awaaz aayi. Bhaari. Tedhi.",
-            "Aage do cheezein dikh rahi hain: purana borewell ka platform, jiske pipe mein chhup sakte ho. Aur aage tube light ke neeche... koi khada hai.",
-            "Chhup jao, ya dekho kaun hai?"
-          ],
-          "images": [
-            "running through tall dark crops at night, flashlight dropped on ground, motion blur, panic",
-            "old concrete tube well platform in a dark field, narrow opening, moonlight",
-            "distant human silhouette standing under a flickering tubelight, fog, eerie"
-          ],
-          "choices": [
-            {
-              "key": "pipe",
-              "text": "PIPE MEIN CHHUPO",
-              "labels": ["pipe", "tanki", "well", "borewell", "1"],
-              "next": "pipe_hide",
-              "effects": {"noise": -10}
-            },
-            {
-              "key": "figure",
-              "text": "FIGURE KO DEKHO",
-              "labels": ["figure", "insaan", "dekho", "2"],
-              "next": "figure_meet",
-              "effects": {"hp": -5}
-            }
-          ],
-          "default": "pipe"
-        },
-        "pipe_hide": {
+        "run_away": {
           "kind": "story",
-          "subtitle": "Pipe Ke Andar",
-          "hook": "Tum pipe mein chhupe. Aur bahar wala saaya... ruk gaya. Usne tumhe dekh liya hai.",
-          "narration": [
-            "Tum pipe mein utar gaye. Dhadkan kaanon mein. Bahar kadam ruke. Kisi ne dhool mein paer ghumaye.",
-            "Phir awaaz aayi. Dheemi. Insaani. Kaun hai andar? Main insaan hoon. Raj.",
-            "Ye awaaz tumhare dost Raj ki hai. Jo kal shehar ke raste nikla tha. Par kya tum bharosa karoge?",
-            "Dheere se upar jhanko."
+          "subtitle": "Do Not Look Back",
+          "hook": "Max ran. The car started. Some things you cannot unhear.",
+          "lines": [
+            { "text": "Max backs out slowly. Quiet steps. Biscuit walks so close, he can feel him breathing.", "shot": { "place": "store", "cast": [["max", "sneak"], ["biscuit", "follow"]], "cam": "panr", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "The dragging stops. Then the door handle turns. Max runs.", "shot": { "place": "gas_station", "cast": [["max", "run"], ["biscuit", "run"]], "cam": "shake", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "The car starts on the first try. Sometimes luck is a plan.", "shot": { "place": "highway", "cast": [["max", "drive"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "At sunrise, Max checks the bag. Fuel: enough. Food: almost nothing.", "shot": { "place": "highway", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "fog", "mood": "calm", "time": "dawn" } },
+            { "text": "But they are alive. And ahead, a motel sign is still glowing.", "shot": { "place": "highway", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "pull", "fx": "fog", "mood": "hope", "time": "dawn" } }
           ],
-          "images": [
-            "narrow dark well pipe interior looking up at a circle of night sky, claustrophobic",
-            "a hand reaching down into a dark opening, moonlight silhouette from above",
-            "two human eyes reflected in a flashlight beam at night, fear and caution"
-          ],
-          "effects": {"noise": -5, "trust": 10},
-          "next": "figure_meet"
+          "next": "motel_arrive"
         },
-        "figure_meet": {
-          "kind": "vote",
-          "subtitle": "Wo Kaun Hai?",
-          "hook": "Flashlight tumhari taraf aa rahi hai. Awaaz dena hai... ya chupke nikal jaana hai?",
-          "narration": [
-            "Woh keh raha hai: Raj hoon, shehar se. Gaadi ne dhoka diya. Teen din se isi khet mein hoon. Flashlight tumhari taraf badh rahi hai.",
-            "Bharosa karna hai? Ya abhi bhi time hai, chupke se nikal jaane ka?",
-            "Ek galat kadam... aur kuch bhi ho sakta hai."
-          ],
-          "images": [
-            "flashlight glow approaching through fog in dark fields, tense, cinematic",
-            "two men facing each other at a distance in a dark field, moonlight, wary expressions",
-            "footprints in mud beside dark crops at night, horror atmosphere"
-          ],
-          "choices": [
-            {
-              "key": "reply",
-              "text": "JAWAB DO - bharosa karo",
-              "labels": ["reply", "jawab", "bolo", "hello", "1"],
-              "next": "friend_found",
-              "effects": {"trust": 20}
-            },
-            {
-              "key": "sneak",
-              "text": "CHUPKE NIKLO",
-              "labels": ["sneak", "chupke", "niklo", "bhaago", "2"],
-              "next": "solo_escape",
-              "effects": {"trust": -20, "noise": -5}
-            }
-          ],
-          "default": "reply"
-        },
-        "friend_found": {
+        "check_back": {
           "kind": "story",
-          "subtitle": "Asli Raj, Asli Radio",
-          "hook": "Wo Raj hai. Asli Raj. Aur uske jhole mein pakka chamakta hua ek radio hai.",
-          "narration": [
-            "Wo Raj hai. Kamzor, bhookha, par asli. Usne tumhe khet ke kinare bulaya. Uske jhole se crackling awaaz aa rahi hai.",
-            "Kehta hai: roz 4 baje bus depot ke survivors signal bhejte hain. Par humein power chahiye. Farmhouse ke basement mein purana generator aur radio set pada hai.",
-            "Wapas farmhouse jaana padega. Garage wale saaye ke paas se guzarna padega. Plan ready hai?",
-            "Chalo. Aur is baar chupchaap."
+          "subtitle": "The Door",
+          "hook": "Behind the door was not a monster. It was something worse: hope.",
+          "lines": [
+            { "text": "Max grabs a tire iron. His hands shake. But Biscuit is hungry, and that decides it.", "shot": { "place": "store", "cast": [["max", "sneak"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Inside: a girl, crouched behind the crates, holding a box cutter. Alive.", "shot": { "place": "store", "cast": [["max", "idle"], ["ada", "crouch"], ["biscuit", "bark"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
+            { "text": "One step and I scream, she says. And screaming would bring them all.", "shot": { "place": "store", "cast": [["max", "idle"], ["ada", "point"]], "cam": "static", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Max drops the tire iron. I have a car. You have food. Deal?", "shot": { "place": "store", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
+            { "text": "Her name is Ada. Two days alone in here. And in her bag: a shortwave radio.", "shot": { "place": "store", "cast": [["max", "idle"], ["ada", "walk"], ["biscuit", "wag"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } }
           ],
-          "images": [
-            "two exhausted men sitting in a dark field, one holding a vintage radio transceiver, faint light",
-            "vintage radio crackling on a wooden table, flashlight glow, dust in air",
-            "dark basement stairs of an indian farmhouse with old generator silhouettes"
-          ],
-          "effects": {"trust": 10},
-          "next": "radio_room"
+          "effects": { "food": 15, "dog": 5 },
+          "next": "motel_arrive"
         },
-        "solo_escape": {
+        "motel_arrive": {
           "kind": "story",
-          "subtitle": "Akelа Rasta",
-          "hook": "Tum chupke nikle. Khet ke kinare par tractor hai... aur uske paas ek gaadi. Jisme kuch hila.",
-          "narration": [
-            "Tumne chupke se kadam badhaye. Raj ki awaaz peeche dheemi pad gayi. Khet ke kinare par ek tractor khada hai. Aur uske bagal mein chhoti si gaadi.",
-            "Chabi nahi hai. Par tool box khula hai. Aur gaadi ke engine ke under kuch hila. Dheere dheere. Bilkul jinda kutta ho.",
-            "Gaadi ke andar ek charger aur purana radio rakha hai. Ek chhota kadam sab badal deta hai."
+          "subtitle": "Vacancy",
+          "hook": "Twelve motel doors. One old truck. And a sign that still says VACANCY.",
+          "lines": [
+            { "text": "By sunrise they reach a roadside motel. Twelve doors, one old truck.", "shot": { "place": "motel_lot", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "fog", "mood": "calm", "time": "dawn" } },
+            { "text": "The sign says VACANCY. Somebody checked in a very long time ago.", "shot": { "place": "motel_lot", "cast": [["max", "point"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dawn" } },
+            { "text": "They take room six. Door locked. Curtains closed. For one day, they sleep.", "shot": { "place": "motel_hall", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "calm", "time": "day" } },
+            { "text": "Biscuit sleeps against the door. Always on guard.", "shot": { "place": "motel_hall", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "calm", "time": "day" } },
+            { "text": "Then comes 3:04 in the morning.", "shot": { "place": "motel_hall", "cast": [["max", "idle"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } }
           ],
-          "images": [
-            "tractor and a small car at the edge of a dark field at night, tools scattered, fog",
-            "car engine bay close up in darkness, moving silhouette blur, horror",
-            "vintage car radio glowing faintly on a dashboard at night"
-          ],
-          "effects": {"hp": -5},
-          "next": "truck_problem"
+          "next": "motel_door"
         },
-        "check_garage": {
+        "motel_door": {
           "kind": "vote",
-          "subtitle": "Garage Ke Andar",
-          "hook": "Tumne darwaza khola. Garage khaali hai... almost. Basement ki seedhi se awaaz aa rahi hai.",
-          "narration": [
-            "Tum darwaze tak gaye. Dheere se khola. Gaadi wahi khadi hai. Farsh par ek dabba gira hai. Bas itna sa shor. Phir seedhi se awaaz aayi. Neeche se.",
-            "Ya phir gaadi ka dikki kholo. Usme petrol can, chabi aur purana radio tumne khud rakhha tha.",
-            "Neeche utro, ya dikki kholkar plan B banao?"
-          ],
-          "images": [
-            "opening a farmhouse garage door at night, flashlight, junk scattered inside, car silhouette",
-            "dark wooden stairs going down to a basement, cobwebs, faint light from below",
-            "car trunk open in a dark garage, fuel can and toolbox inside, flashlight glow"
+          "subtitle": "3:04 AM",
+          "hook": "Scratch. Scratch. A voice at the motel door whispers: Please... open.",
+          "lines": [
+            { "text": "Scratch. Scratch. Right on the door.", "shot": { "place": "motel_hall", "cast": [["max", "idle"], ["biscuit", "scared"]], "cam": "static", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Then a whisper, soft and tired. Please... I am hurt. Open the door.", "shot": { "place": "motel_hall", "cast": [["max", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "The peephole is broken. The voice could be anyone. Or any thing.", "shot": { "place": "motel_hall", "cast": [["max", "crouch"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Ada grips the box cutter. Biscuit shows his teeth.", "shot": { "place": "motel_hall", "cast": [["ada", "point"], ["biscuit", "bark"]], "cam": "static", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Open the door... or stay quiet until morning?", "shot": { "place": "motel_hall", "cast": [["max", "idle"]], "cam": "pull", "fx": "none", "mood": "tense", "time": "night" } }
           ],
           "choices": [
-            {
-              "key": "basement",
-              "text": "BASEMENT - neeche utro",
-              "labels": ["basement", "neeche", "seedhi", "1"],
-              "next": "basement_dark",
-              "effects": {"hp": -10, "noise": -5}
-            },
-            {
-              "key": "trunk",
-              "text": "TRUNK KHO LO - tools nikalo",
-              "labels": ["trunk", "dikki", "gaadi", "keys", "2"],
-              "next": "trunk_keys",
-              "effects": {"supplies": 10}
-            }
+            { "key": "open", "text": "OPEN - pull the stranger inside", "labels": ["open", "1", "help", "door", "lets", "pull"], "effects": { "hp": -5, "dog": -5 }, "next": "open_door" },
+            { "key": "quiet", "text": "STAY QUIET - wait for daylight", "labels": ["quiet", "2", "stay", "wait", "hide", "ignore"], "effects": { "food": -8 }, "next": "stay_quiet" }
           ],
-          "default": "basement"
+          "default": "quiet"
         },
-        "basement_dark": {
+        "open_door": {
           "kind": "story",
-          "subtitle": "Basement Ka Raaz",
-          "hook": "Basement mein generator zinda hai... aur deewar par kisi ne kuch likha hai.",
-          "narration": [
-            "Neeche andhera tha, par ek purana generator dhak dhak kar raha tha. Bijli zinda hai. Matlab radio chal sakta hai.",
-            "Deewar par ungli se likha hai: bus depot, roz 4 baje, aa jao. Zinda log.",
-            "Aur tab upar se awaaz aayi. Koi dhoond raha hai. Gaon ki taraf se aawaz tumhara naam le rahi hai?",
-            "Kaise? Tumne to kisi ko bataya nahi tha."
+          "subtitle": "In From the Rain",
+          "hook": "The stranger was kind, hurt, and hiding something under his jacket.",
+          "lines": [
+            { "text": "Max opens the door and pulls the stranger inside. An old man, soaked and bleeding.", "shot": { "place": "motel_hall", "cast": [["max", "check"], ["old", "crouch"]], "cam": "push", "fx": "rain", "mood": "danger", "time": "night" } },
+            { "text": "His name is Otto. He was a trucker. He knows a shortcut over the mountains.", "shot": { "place": "motel_hall", "cast": [["max", "idle"], ["old", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
+            { "text": "But the bite on his arm is dark. He hides it under his jacket.", "shot": { "place": "motel_hall", "cast": [["max", "look"], ["old", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "They drive all night. Otto sleeps. Max keeps one eye on the mirror.", "shot": { "place": "highway", "cast": [["max", "drive"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "night" } }
           ],
-          "images": [
-            "old diesel generator humming in a dark indian basement, cables, one flickering bulb",
-            "handwritten message on a concrete basement wall, chalk, eerie shadows",
-            "old ham radio set on a shelf in a basement, dial lit, layers of dust"
-          ],
-          "effects": {"noise": -5},
-          "next": "radio_room"
+          "effects": { "hp": -5, "dog": -5 },
+          "next": "route_pick"
         },
-        "trunk_keys": {
+        "stay_quiet": {
           "kind": "story",
-          "subtitle": "Chabi Mil Gayi",
-          "hook": "Chabi mil gayi. Petrol bhi. Par gaadi start hone se pehle... engine ke andar se awaaz.",
-          "narration": [
-            "Dikki khuli. Petrol can, tool box aur wahi purani chabi. Sab mila. Gaadi ke andar charger bhi hai.",
-            "Tumne chabi ghumai. Engine khamosh. Battery dead. Aur petrol sirf do liter. Gaon tak pahunchega. Aage nahi.",
-            "Tab radio par awaaz aayi: bus depot. Char baje. Zinda log aa jao.",
-            "Do raste. Ek chhota sa petrol. Ek paidal chaudah kilometer."
+          "subtitle": "Until Morning",
+          "hook": "At dawn the hallway was empty. The door had scratches... and a handprint.",
+          "lines": [
+            { "text": "Nobody moves. The whisper becomes scratching. The scratching becomes knocking.", "shot": { "place": "motel_hall", "cast": [["max", "crouch"], ["ada", "crouch"], ["biscuit", "scared"]], "cam": "static", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Max pushes the dresser against the door and waits in the dark.", "shot": { "place": "motel_hall", "cast": [["max", "crouch"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "At dawn, the hallway is empty. The door has deep scratches. And a handprint.", "shot": { "place": "motel_hall", "cast": [["max", "look"], ["ada", "look"]], "cam": "push", "fx": "none", "mood": "tense", "time": "dawn" } },
+            { "text": "They leave fast, without the food from the office fridge.", "shot": { "place": "motel_lot", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "pull", "fx": "fog", "mood": "calm", "time": "dawn" } }
           ],
-          "images": [
-            "open car trunk at night with fuel can, toolbox and an old key, garage interior",
-            "car key turning in ignition, dark dashboard, night, tension",
-            "car radio crackling inside a dark car interior, faint green light"
-          ],
-          "effects": {"supplies": -5},
-          "next": "truck_problem"
+          "effects": { "food": -8 },
+          "next": "route_pick"
         },
-        "truck_problem": {
+        "route_pick": {
           "kind": "vote",
-          "subtitle": "Petrol Ya Depot",
-          "hook": "Do liter petrol, ya chaudah kilometer paidal. Ek hi rasta pakad sakte ho.",
-          "narration": [
-            "Decision time. Do liter petrol se tum das kilometer nikal sakte ho. Shayad gaon. Shayad kuch aur.",
-            "Ya bus depot. Chaudah kilometer. Char ghante paidal. Par wahan zinda log hain, paani hai, deewar hai.",
-            "Petrol gaadi mein daalo, ya depot ke liye nikal pado?"
-          ],
-          "images": [
-            "fuel can and car keys on a car hood at night, decision moment, cinematic",
-            "long empty foggy road at night with distant town lights, india",
-            "bus depot gate in darkness with survivor silhouettes on the wall, tense hope"
+          "subtitle": "Two Roads",
+          "hook": "The radio tower is ninety kilometers north. Forest shortcut, or the open highway?",
+          "lines": [
+            { "text": "The radio tower is ninety kilometers north. Two roads can get them there.", "shot": { "place": "motel_lot", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "fog", "mood": "calm", "time": "day" } },
+            { "text": "The forest road is shorter. Darker. No signal, no help.", "shot": { "place": "forest", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "fog", "mood": "tense", "time": "day" } },
+            { "text": "The highway is open. But every town on it was evacuated badly.", "shot": { "place": "highway", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "day" } },
+            { "text": "FOREST shortcut... or HIGHWAY detour?", "shot": { "place": "highway", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "day" } }
           ],
           "choices": [
-            {
-              "key": "petrol",
-              "text": "PETROL DALO - gaadi se niklo",
-              "labels": ["petrol", "gaadi", "drive", "1"],
-              "next": "truck_ready",
-              "effects": {"supplies": -20}
-            },
-            {
-              "key": "depot",
-              "text": "DEPOT CHALO - paidal",
-              "labels": ["depot", "paidal", "walk", "2"],
-              "next": "depot_run",
-              "effects": {"hp": -15, "noise": 10}
-            }
+            { "key": "forest", "text": "FOREST - the short dark road", "labels": ["forest", "1", "woods", "trees", "shortcut"], "effects": { "food": -5 }, "next": "forest_road" },
+            { "key": "highway", "text": "HIGHWAY - long, open, exposed", "labels": ["highway", "2", "road", "detour", "open"], "effects": { "hp": -10, "noise": 10 }, "next": "highway_road" }
           ],
-          "default": "petrol"
+          "default": "forest"
         },
-        "radio_room": {
-          "kind": "vote",
-          "subtitle": "Radio Ki Awaz",
-          "hook": "Radio set zinda ho gaya. Do jagah se signal aa raha hai. Kisi ek ko chunna hai.",
-          "narration": [
-            "Radio clear hua. Pehli awaaz: bus depot. Paani, deewar, log. Roz char baje.",
-            "Doosri frequency dheemi thi: radio tower, ek sau barah meter, transmitter zinda hai. Utha lo, aur pura shehar sun sakta hai.",
-            "Depot means log aur safety. Tower means aawaz aur umeed. Kahan jaoge?"
+        "forest_road": {
+          "kind": "story",
+          "subtitle": "Shapes in the Fog",
+          "hook": "They stood between the trees. Arms hanging. Waiting for a sound.",
+          "lines": [
+            { "text": "The forest swallows the road. Ada drives. Nobody talks.", "shot": { "place": "forest", "cast": [["max", "drive"]], "cam": "panr", "fx": "fog", "mood": "tense", "time": "day" } },
+            { "text": "An hour in, shapes appear in the fog. Standing. Arms hanging.", "shot": { "place": "forest", "cast": [["max", "look"]], "zeds": "far", "cam": "push", "fx": "fog", "mood": "danger", "time": "day" } },
+            { "text": "Biscuit growls, low. Max puts a hand on his head. Quiet, boy.", "shot": { "place": "forest", "cast": [["max", "crouch"], ["biscuit", "scared"]], "cam": "push", "fx": "fog", "mood": "danger", "time": "day" } },
+            { "text": "They roll past, engine low. One of them turns its head.", "shot": { "place": "forest", "cast": [["max", "drive"]], "zeds": "near", "cam": "shake", "fx": "fog", "mood": "danger", "time": "day" } },
+            { "text": "Two hundred meters later, the fog keeps their secret.", "shot": { "place": "forest", "cast": [["max", "drive"]], "cam": "pull", "fx": "fog", "mood": "calm", "time": "day" } }
           ],
-          "images": [
-            "old ham radio set glowing in a dark room, hands tuning the dial, warm light",
-            "high radio tower silhouette against a night sky full of stars, fog at base",
-            "bus depot entrance with barrier and faded sign, darkness, cautious silhouettes"
+          "effects": { "dog": 5 },
+          "next": "tower_arrive"
+        },
+        "highway_road": {
+          "kind": "story",
+          "subtitle": "The Blocked Bridge",
+          "hook": "The bridge was full of silent cars. Then one alarm started screaming.",
+          "lines": [
+            { "text": "The first twenty kilometers of highway are almost normal. That is the scary part.", "shot": { "place": "highway", "cast": [["max", "drive"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "day" } },
+            { "text": "Then the bridge. Jammed with empty cars, door to door.", "shot": { "place": "bridge", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "day" } },
+            { "text": "They walk between the cars. Then a car alarm screams.", "shot": { "place": "bridge", "cast": [["max", "idle"]], "cam": "shake", "fx": "flash", "mood": "danger", "time": "day" } },
+            { "text": "On the far bank: dozens of them. Drawn by every sound. By their sound.", "shot": { "place": "bridge", "cast": [["max", "run"], ["biscuit", "run"]], "zeds": "horde", "cam": "shake", "fx": "flash", "mood": "danger", "time": "day" } },
+            { "text": "They run the last kilometer and learn one rule. Noise is death.", "shot": { "place": "highway", "cast": [["max", "run"], ["ada", "run"], ["biscuit", "run"]], "cam": "shake", "fx": "fog", "mood": "danger", "time": "day" } }
+          ],
+          "effects": { "hp": -10, "noise": 10 },
+          "next": "tower_arrive"
+        },
+        "tower_arrive": {
+          "kind": "vote",
+          "subtitle": "Lookout Tower Three",
+          "hook": "There is a light at the top of the tower. But nobody answers the door.",
+          "lines": [
+            { "text": "At dusk they find it. Lookout Tower Three, in the middle of nothing.", "shot": { "place": "tower", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "fog", "mood": "tense", "time": "dusk" } },
+            { "text": "The door at the base is chained from the inside. Which means someone is here.", "shot": { "place": "tower", "cast": [["max", "look"], ["ada", "point"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dusk" } },
+            { "text": "A light moves at the top. The radio voice brought them here. Now: silence.", "shot": { "place": "tower", "cast": [["max", "idle"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dusk" } },
+            { "text": "Call out... or climb the ladder in the dark?", "shot": { "place": "tower", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "dusk" } }
           ],
           "choices": [
-            {
-              "key": "depot",
-              "text": "BUS DEPOT - logon ke paas",
-              "labels": ["depot", "bus", "1"],
-              "next": "depot_run",
-              "effects": {"trust": 10}
-            },
-            {
-              "key": "tower",
-              "text": "RADIO TOWER - signal uthao",
-              "labels": ["tower", "signal", "2"],
-              "next": "tower_run",
-              "effects": {"hp": -5}
-            }
+            { "key": "call", "text": "CALL OUT - knock and shout hello", "labels": ["call", "1", "shout", "knock", "hello", "loud"], "effects": { "noise": 15 }, "next": "call_out" },
+            { "key": "climb", "text": "CLIMB - take the ladder silently", "labels": ["climb", "2", "silent", "ladder", "quiet", "up"], "effects": { "hp": -10 }, "next": "climb_up" }
           ],
-          "default": "depot"
+          "default": "call"
         },
-        "truck_ready": {
-          "kind": "vote",
-          "subtitle": "Raat Ya Subah",
-          "hook": "Gaadi taiyar hai. Raat ke andhere mein niklo... ya subah ka intezaar karo?",
-          "narration": [
-            "Petrol dala. Battery charger lagaya. Gaadi chalegi, bas ek baar. Raat ki sadak khaali hai. Par andhere mein cheezein bhi active hain.",
-            "Subah tak rukо, to dhoop mein sab dikh jata hai. Par tum bhi dikhte ho.",
-            "Raat ya subah? Ye tumhari aakhri choice hai is farm se nikalne ki."
+        "call_out": {
+          "kind": "story",
+          "subtitle": "Hello?",
+          "hook": "The word hello rolled away into the dark. Then a lantern moved.",
+          "lines": [
+            { "text": "Max cups his hands. Hello! We heard your message! The word rolls away into the dark.", "shot": { "place": "tower", "cast": [["max", "call"], ["biscuit", "bark"]], "cam": "static", "fx": "fog", "mood": "danger", "time": "dusk" } },
+            { "text": "Silence. Then a lantern moves across the window.", "shot": { "place": "tower", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dusk" } },
+            { "text": "A woman's voice. Put your weapon down and walk to the light.", "shot": { "place": "tower", "cast": [["max", "walk"], ["ada", "walk"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dusk" } },
+            { "text": "Her name is Mara. Twenty one days alone. She knows this forest like a map.", "shot": { "place": "radio_room", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
+            { "text": "And tonight, the radio has news. A convoy is moving east. To the sea.", "shot": { "place": "radio_room", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "hope", "time": "night" } }
           ],
-          "images": [
-            "car headlights in dark foggy village road, india, night, tension",
-            "first morning light over an abandoned indian highway, mist, hope",
-            "hand on a gear lever of an old car, night, dashboard glow, close up"
+          "effects": { "hp": -5, "dog": 5 },
+          "next": "broadcast"
+        },
+        "climb_up": {
+          "kind": "story",
+          "subtitle": "The Ladder",
+          "hook": "At the top: an empty chair, cold coffee, and a light nobody turned off.",
+          "lines": [
+            { "text": "The ladder sings in the wind. Bolt by bolt, Max climbs into the dark.", "shot": { "place": "tower", "cast": [["max", "climb"]], "cam": "static", "fx": "fog", "mood": "danger", "time": "dusk" } },
+            { "text": "At the top: an empty chair. Cold coffee. And a light nobody turned off.", "shot": { "place": "tower_top", "cast": [["max", "look"]], "cam": "push", "fx": "none", "mood": "tense", "time": "dusk" } },
+            { "text": "Then a sound behind him. Slow. Hungry.", "shot": { "place": "tower_top", "cast": [["max", "idle"]], "zeds": "near", "cam": "shake", "fx": "none", "mood": "danger", "time": "dusk" } },
+            { "text": "A ranger. Still in his vest. Still up here.", "shot": { "place": "tower_top", "cast": [["max", "idle"], ["zombie", "reach"]], "cam": "shake", "fx": "none", "mood": "danger", "time": "dusk" } },
+            { "text": "Max swings his bag once, hard. Then he pockets the radio and the beans. Sorry, ranger.", "shot": { "place": "tower_top", "cast": [["max", "look"]], "cam": "pull", "fx": "none", "mood": "calm", "time": "dusk" } }
+          ],
+          "effects": { "hp": -10, "food": 10 },
+          "next": "broadcast"
+        },
+        "broadcast": {
+          "kind": "vote",
+          "subtitle": "You Are Live",
+          "hook": "Two voices answer the radio: a convoy going to the sea, or a voice from the dead city.",
+          "lines": [
+            { "text": "Max turns every dial. Static. Static. Then two voices break through.", "shot": { "place": "radio_room", "cast": [["max", "reach"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
+            { "text": "First: a convoy, heading east. We reach the sea in three days. You are welcome.", "shot": { "place": "radio_room", "cast": [["max", "idle"]], "cam": "static", "fx": "none", "mood": "hope", "time": "night" } },
+            { "text": "Second: a voice from the city. Slow. Careful. To whoever hears this... we know how it started.", "shot": { "place": "radio_room", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Safe water with strangers... or the truth, in a dead city?", "shot": { "place": "radio_room", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "tense", "time": "night" } }
           ],
           "choices": [
-            {
-              "key": "night",
-              "text": "RAAT KO NIKLO",
-              "labels": ["raat", "night", "abhi", "1"],
-              "next": "night_drive",
-              "effects": {"noise": 20}
-            },
-            {
-              "key": "dawn",
-              "text": "SUBAH NIKLO",
-              "labels": ["subah", "dawn", "morning", "2"],
-              "next": "dawn_drive",
-              "effects": {"hp": 5}
-            }
+            { "key": "convoy", "text": "CONVOY - drive east to the sea", "labels": ["convoy", "1", "sea", "coast", "east", "safe"], "effects": { "dog": 10 }, "next": "end_coast" },
+            { "key": "city", "text": "CITY - find where it started", "labels": ["city", "2", "truth", "lab", "origin", "signal"], "effects": { "noise": 10 }, "next": "end_city" }
           ],
-          "default": "dawn"
+          "default": "convoy"
         },
-        "night_drive": {
+        "end_coast": {
           "kind": "ending",
-          "subtitle": "ENDING: Raat Ki Sawari",
-          "hook": "Andhere mein gaadi, headlights, aur sadak par chalees log. Ye final run hai.",
-          "narration": [
-            "Tum nikal pade. Headlights sirf bees meter dikhati hain. Horn phir horn. Kuch bhaage. Koi nahi. Aath kilometer.",
-            "Depot ke gate apne aap khul gaye. Andar teis zinda log. Tumhari gaadi ki battery se unka pura radio system chala.",
-            "Subah unki team ne convoy ke saath tumhe aage bheja. Ek bada safe zone. Tum bach gaye.",
-            "Season ek khatam. Ab batao season do kahan? Comment karo: 1 pahad, 2 gaon, 3 shehar."
+          "subtitle": "The Coast",
+          "ending": { "title": "ENDING - THE COAST", "subtitle": "You chose safety. The sea keeps its promise." },
+          "hook": "The convoy was real. There was hot food, a generator, and a boat.",
+          "lines": [
+            { "text": "The convoy is real. Twenty three people. Four trucks. One boat.", "shot": { "place": "coast", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "none", "mood": "hope", "time": "dawn" } },
+            { "text": "There is hot food. A generator. Children who laugh at Biscuit's ears.", "shot": { "place": "coast", "cast": [["biscuit", "wag"], ["max", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "day" } },
+            { "text": "That night, Max sleeps with both eyes closed. For the first time since day one.", "shot": { "place": "coast", "cast": [["max", "sit"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "calm", "time": "dusk" } },
+            { "text": "But the city is still talking. And the voice knows his name.", "shot": { "place": "coast", "cast": [["max", "idle"]], "cam": "push", "fx": "embers", "mood": "tense", "time": "night" } },
+            { "text": "Season one: complete. The city remembers Max.", "shot": { "place": "coast", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "pull", "fx": "embers", "mood": "hope", "time": "night" } }
           ],
-          "images": [
-            "car headlights cutting through dark foggy road, silhouettes scattering, headlights glare",
-            "gates of a bus depot at night with warm light and people opening them",
-            "convoy of old cars and trucks driving at dawn on an indian highway"
-          ],
-          "effects": {"hp": 10},
           "choices": [
-            {"key": "pahad", "text": "SEASON 2: PAHAD", "labels": ["1", "pahad", "mountain"], "next_arc": "farmhouse", "location_text": "Himachal ke pahadon mein ek sunsaan rest stop", "effects": {}},
-            {"key": "gaon", "text": "SEASON 2: GAON", "labels": ["2", "gaon", "village"], "next_arc": "farmhouse", "location_text": "UP ke ek veeran gaon mein ek purana ghar", "effects": {}},
-            {"key": "shehar", "text": "SEASON 2: SHEHAR", "labels": ["3", "shehar", "city"], "next_arc": "farmhouse", "location_text": "shehar ke khaali mall ke parking mein", "effects": {}}
+            { "key": "continue", "text": "Season 2 - City of Echoes", "labels": ["continue", "1", "yes", "city"], "next_arc": "city", "location_text": "a dead city far east, where the signal comes from" }
           ],
-          "default": "pahad"
+          "default": "continue"
         },
-        "dawn_drive": {
+        "end_city": {
           "kind": "ending",
-          "subtitle": "ENDING: Subah Ki Roshni",
-          "hook": "Subah ki roshni. Sadak saaf. Foolproof? Kuch cheezein roshni mein bhi nahi dikhati.",
-          "narration": [
-            "Subah nikle. Dhoop ne zameen par pade chalees logon ko pathar bana diya. Engine zinda tha. Tum zinda the.",
-            "Pandrah kilometer baad ek checkpost. Asli log. Asli gun. Unke saath do raste the: aage convoy, ya wapas.",
-            "Tumne aage chuna. Naye shehar ki taraf. Naya chapter.",
-            "Season ek khatam. Season do kahan? Comment: 1 pahad, 2 gaon, 3 shehar."
+          "subtitle": "The Origin",
+          "ending": { "title": "ENDING - THE ORIGIN", "subtitle": "You chose the truth. The city was waiting." },
+          "hook": "The car pointed east. The city rose slowly, and one window was lit.",
+          "lines": [
+            { "text": "Max points the car east. Ada does not argue. Biscuit rides shotgun.", "shot": { "place": "highway", "cast": [["max", "drive"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "dusk" } },
+            { "text": "The city rises slowly. Broken towers, dark windows... and one light on.", "shot": { "place": "city", "cast": [["max", "walk"], ["ada", "walk"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "The broadcast came from a research lab. The front door is already open.", "shot": { "place": "lab", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
+            { "text": "Inside: walls of notes, empty cages, and a recording still playing.", "shot": { "place": "lab", "cast": [["max", "look"], ["ada", "look"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Season one: complete. Season two: the truth.", "shot": { "place": "lab", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "pull", "fx": "none", "mood": "hope", "time": "night" } }
           ],
-          "images": [
-            "morning sunlight over an abandoned indian highway, mist clearing, stillness",
-            "checkpoint barrier on a highway with armed survivors at dawn",
-            "convoy of vehicles driving toward a distant city skyline at sunrise"
-          ],
-          "effects": {"hp": 5},
           "choices": [
-            {"key": "pahad", "text": "SEASON 2: PAHAD", "labels": ["1", "pahad", "mountain"], "next_arc": "farmhouse", "location_text": "Himachal ke pahadon mein ek sunsaan rest stop", "effects": {}},
-            {"key": "gaon", "text": "SEASON 2: GAON", "labels": ["2", "gaon", "village"], "next_arc": "farmhouse", "location_text": "UP ke ek veeran gaon mein ek purana ghar", "effects": {}},
-            {"key": "shehar", "text": "SEASON 2: SHEHAR", "labels": ["3", "shehar", "city"], "next_arc": "farmhouse", "location_text": "shehar ke khaali mall ke parking mein", "effects": {}}
+            { "key": "continue", "text": "Season 2 - City of Echoes", "labels": ["continue", "1", "yes"], "next_arc": "city", "location_text": "inside the city lab, where the recording plays" }
           ],
-          "default": "pahad"
+          "default": "continue"
+        }
+      }
+    },
+    "city": {
+      "title": "Season 2 - City of Echoes",
+      "start": "intro",
+      "nodes": {
+        "intro": {
+          "kind": "story",
+          "subtitle": "City of Echoes",
+          "hook": "The city is quiet. Even the wind walks carefully here.",
+          "lines": [
+            { "text": "The city is quiet. Even the wind walks carefully here.", "shot": { "place": "city", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "The signal comes from a tall brick building, past a river of broken cars.", "shot": { "place": "city", "cast": [["max", "point"], ["ada", "idle"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "Ada checks the map. Two ways in. The metro tunnels, or the open streets.", "shot": { "place": "city", "cast": [["ada", "check"], ["max", "idle"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
+            { "text": "Biscuit smells the air and does not like it.", "shot": { "place": "city", "cast": [["biscuit", "sniff"], ["max", "crouch"]], "cam": "static", "fx": "fog", "mood": "danger", "time": "night" } }
+          ],
+          "next": "pick"
         },
-        "depot_run": {
-          "kind": "ending",
-          "subtitle": "ENDING: Bus Depot",
-          "hook": "Chaudah kilometer paidal. Char ghante. Aur samne bus depot ki deewar.",
-          "narration": [
-            "Tum paidal nikle. Chhe ghante lage. Depot ke gate par log mile. Chaalees zinda log. Paani. Khaana. Deewar.",
-            "Andar aane se pehle ek shart: yahan sab kaam karte hain. Aaj se tum guards ki team mein ho.",
-            "Kamzor nahi ho tum. Tum bach gaye.",
-            "Season ek khatam. Season do kahan? Comment: 1 pahad, 2 gaon, 3 shehar."
+        "pick": {
+          "kind": "vote",
+          "subtitle": "Tunnels or Streets",
+          "hook": "The metro is fast and dark. The streets are open and watched.",
+          "lines": [
+            { "text": "The metro is faster. Dark, but straight to the lab.", "shot": { "place": "metro", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "The streets are open. Nowhere to be trapped. And nowhere to hide.", "shot": { "place": "city", "cast": [["max", "idle"]], "cam": "panl", "fx": "fog", "mood": "danger", "time": "night" } },
+            { "text": "METRO... or STREETS?", "shot": { "place": "city", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "night" } }
           ],
-          "images": [
-            "walking alone on a foggy indian road at night with a backpack, determination",
-            "bus depot wall with a gate, survivors keeping watch from the roof, dawn light",
-            "community of survivors around a small fire in a depot yard, cautious hope"
-          ],
-          "effects": {"hp": -5, "trust": 10},
           "choices": [
-            {"key": "pahad", "text": "SEASON 2: PAHAD", "labels": ["1", "pahad", "mountain"], "next_arc": "farmhouse", "location_text": "Himachal ke pahadon mein ek sunsaan rest stop", "effects": {}},
-            {"key": "gaon", "text": "SEASON 2: GAON", "labels": ["2", "gaon", "village"], "next_arc": "farmhouse", "location_text": "UP ke ek veeran gaon mein ek purana ghar", "effects": {}},
-            {"key": "shehar", "text": "SEASON 2: SHEHAR", "labels": ["3", "shehar", "city"], "next_arc": "farmhouse", "location_text": "shehar ke khaali mall ke parking mein", "effects": {}}
+            { "key": "metro", "text": "METRO - fast, dark, deep", "labels": ["metro", "1", "tunnel", "subway", "under"], "effects": { "noise": 10 }, "next": "metro_run" },
+            { "key": "streets", "text": "STREETS - open and exposed", "labels": ["streets", "2", "road", "open", "above"], "effects": { "hp": -10 }, "next": "street_run" }
           ],
-          "default": "pahad"
+          "default": "metro"
         },
-        "tower_run": {
-          "kind": "ending",
-          "subtitle": "ENDING: Awaaz Ki Tower",
-          "hook": "Ek sau barah meter upar. Ek transmitter. Agar ye chala... pura shehar sunega.",
-          "narration": [
-            "Tower tak pahunchne mein poori raat lagi. Seedhiyaan zang lagi thi. Har qadam par awaaz. Par tum chadhte gaye.",
-            "Transmitter room mein bijli ka ek chhota sa jhatka... aur red light blink karne lagi. Signal live. Pura shehar tumhari awaaz sun raha hai.",
-            "Subah tak teen gaadiyaan tower ke base par aa chuki thi. Log aa rahe hain. Tumne apna safe zone khud banaya.",
-            "Season ek khatam. Season do kahan? Comment: 1 pahad, 2 gaon, 3 shehar."
+        "metro_run": {
+          "kind": "story",
+          "subtitle": "The Long Tunnel",
+          "hook": "The tunnel ate their footsteps. Ahead, slow shapes followed the echo.",
+          "lines": [
+            { "text": "The tunnel eats their footsteps. Biscuit's nails click like a clock.", "shot": { "place": "metro", "cast": [["max", "sneak"], ["ada", "sneak"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "In the dark ahead: slow shapes, dragging feet, following the echo.", "shot": { "place": "metro", "cast": [["max", "crouch"]], "zeds": "far", "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Ada finds a service door. It opens with a sound that lasts forever.", "shot": { "place": "metro", "cast": [["ada", "check"]], "cam": "shake", "fx": "flash", "mood": "danger", "time": "night" } },
+            { "text": "They slip through and shut it. Something hits the other side. Once.", "shot": { "place": "metro", "cast": [["max", "run"], ["biscuit", "scared"]], "cam": "pull", "fx": "none", "mood": "tense", "time": "night" } }
           ],
-          "images": [
-            "climbing a rusty radio tower at night, fog below, stars above, vertigo",
-            "radio transmitter room with old panels and a blinking red signal light",
-            "city skyline at dawn seen from a radio tower platform, hopeful horizon"
+          "effects": { "noise": -5 },
+          "next": "lab_inside"
+        },
+        "street_run": {
+          "kind": "story",
+          "subtitle": "The Open Street",
+          "hook": "Every step on the glass was a shout. Then a shopping cart rolled.",
+          "lines": [
+            { "text": "The streets are wide, dead, and full of glass. Every step is a shout.", "shot": { "place": "city", "cast": [["max", "sneak"], ["ada", "sneak"], ["biscuit", "follow"]], "cam": "push", "fx": "fog", "mood": "danger", "time": "night" } },
+            { "text": "Halfway there, a shopping cart rolls. Then a dozen heads turn.", "shot": { "place": "city", "cast": [["max", "idle"]], "zeds": "horde", "cam": "shake", "fx": "fog", "mood": "danger", "time": "night" } },
+            { "text": "They run. Biscuit is faster than all of them.", "shot": { "place": "city", "cast": [["max", "run"], ["biscuit", "run"]], "cam": "shake", "fx": "fog", "mood": "danger", "time": "night" } },
+            { "text": "Ada kicks the lab door open and slams it behind them.", "shot": { "place": "lab", "cast": [["ada", "check"], ["max", "run"]], "cam": "shake", "fx": "none", "mood": "tense", "time": "night" } }
           ],
-          "effects": {"hp": -10, "trust": 20},
+          "effects": { "noise": 10, "dog": 5 },
+          "next": "lab_inside"
+        },
+        "lab_inside": {
+          "kind": "vote",
+          "subtitle": "The Voice",
+          "hook": "The voice is coming from upstairs. It knows why the world ended.",
+          "lines": [
+            { "text": "The lab is cold. Empty cages. Walls of notes. A radio still talking.", "shot": { "place": "lab", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
+            { "text": "The voice repeats. Come up. I will open the door. I have been waiting.", "shot": { "place": "lab", "cast": [["max", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "Ada whispers, what if it is a trap? Biscuit stares up the stairs.", "shot": { "place": "lab", "cast": [["ada", "idle"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
+            { "text": "TRUST the voice... or BURN the stairs and walk away?", "shot": { "place": "lab", "cast": [["max", "idle"]], "cam": "static", "fx": "none", "mood": "tense", "time": "night" } }
+          ],
           "choices": [
-            {"key": "pahad", "text": "SEASON 2: PAHAD", "labels": ["1", "pahad", "mountain"], "next_arc": "farmhouse", "location_text": "Himachal ke pahadon mein ek sunsaan rest stop", "effects": {}},
-            {"key": "gaon", "text": "SEASON 2: GAON", "labels": ["2", "gaon", "village"], "next_arc": "farmhouse", "location_text": "UP ke ek veeran gaon mein ek purana ghar", "effects": {}},
-            {"key": "shehar", "text": "SEASON 2: SHEHAR", "labels": ["3", "shehar", "city"], "next_arc": "farmhouse", "location_text": "shehar ke khaali mall ke parking mein", "effects": {}}
+            { "key": "trust", "text": "TRUST - climb up and meet the voice", "labels": ["trust", "1", "up", "climb", "meet", "yes"], "effects": { "hp": -5 }, "next": "end_truth" },
+            { "key": "burn", "text": "BURN - light it and walk away", "labels": ["burn", "2", "fire", "leave", "no", "away"], "effects": { "food": -10 }, "next": "end_burn" }
           ],
-          "default": "pahad"
+          "default": "trust"
+        },
+        "end_truth": {
+          "kind": "ending",
+          "subtitle": "The Truth",
+          "ending": { "title": "ENDING - THE TRUTH", "subtitle": "Some doors open inward. Some answers open old wounds." },
+          "hook": "Upstairs: a woman, a hundred maps, and one honest sentence.",
+          "lines": [
+            { "text": "Upstairs: a small room, a woman, and a hundred maps of the outbreak.", "shot": { "place": "lab", "cast": [["max", "walk"], ["ada", "walk"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
+            { "text": "Her name is Dr. Wren. She was there on day zero. She kept the samples.", "shot": { "place": "lab", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
+            { "text": "It was not a virus, she says. It was a warning. And it is not finished.", "shot": { "place": "lab", "cast": [["max", "look"]], "cam": "push", "fx": "flash", "mood": "danger", "time": "night" } },
+            { "text": "Max looks at Biscuit, then at Ada. Whatever comes next, they face it together.", "shot": { "place": "lab", "cast": [["max", "idle"], ["biscuit", "wag"]], "cam": "pull", "fx": "none", "mood": "hope", "time": "night" } },
+            { "text": "Season two: complete. Season three: coming soon.", "shot": { "place": "lab", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "hope", "time": "night" } }
+          ],
+          "choices": [
+            { "key": "continue", "text": "Season 3 - coming soon", "labels": ["continue", "1", "yes"], "next_arc": "s3", "location_text": "wherever the warning leads next" }
+          ],
+          "default": "continue"
+        },
+        "end_burn": {
+          "kind": "ending",
+          "subtitle": "The Quiet Way",
+          "ending": { "title": "ENDING - THE QUIET WAY", "subtitle": "Some answers cost too much. They chose the river instead." },
+          "hook": "The lab burned. On the quiet edge of the city, a farmhouse had a porch and a well.",
+          "lines": [
+            { "text": "Max tips a can of lamp oil down the stairs and lights it. The past can burn.", "shot": { "place": "lab", "cast": [["max", "idle"]], "cam": "shake", "fx": "flash", "mood": "danger", "time": "night" } },
+            { "text": "They walk away from the tower of smoke, toward the quiet edge of the city.", "shot": { "place": "city", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "pull", "fx": "embers", "mood": "calm", "time": "dawn" } },
+            { "text": "Some answers cost too much, Ada says. Max agrees.", "shot": { "place": "farm", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "day" } },
+            { "text": "They find a small farmhouse by the river. It has a porch. It has a well.", "shot": { "place": "farm", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "none", "mood": "hope", "time": "day" } },
+            { "text": "Season two: complete. Season three: coming soon.", "shot": { "place": "farm", "cast": [["max", "sit"], ["biscuit", "sit"]], "cam": "pull", "fx": "none", "mood": "hope", "time": "dusk" } }
+          ],
+          "choices": [
+            { "key": "continue", "text": "Season 3 - coming soon", "labels": ["continue", "1", "yes"], "next_arc": "s3", "location_text": "a quiet farmhouse by the river" }
+          ],
+          "default": "continue"
         }
       }
     }
-  }
+  },
+  "season_arcs": { "1": "road", "2": "city" }
 }

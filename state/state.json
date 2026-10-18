@@ -1,11 +1,11 @@
 {
-  "schema": 1,
+  "schema": 2,
   "season": 1,
   "day": 0,
-  "arc": "farmhouse",
+  "arc": "road",
   "node": "intro",
-  "location": "shehar se 40 kilometer door ek sunsaan farmhouse",
-  "stats": {"hp": 100, "noise": 20, "supplies": 60, "trust": 50},
+  "location": "an empty highway at 2:47 in the morning",
+  "stats": {"hp": 100, "noise": 20, "food": 60, "dog": 70},
   "history": [],
   "last_episode": null,
   "recent_hashtags": []

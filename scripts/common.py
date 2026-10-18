@@ -17,6 +17,7 @@ EXAMPLE_CONFIG_PATH = ROOT / "config.example.json"
 STATE_PATH = ROOT / "state" / "state.json"
 SCENARIOS_PATH = ROOT / "content" / "scenarios.json"
 OUT_DIR = ROOT / "out"
+WORK_DIR = ROOT / "work"
 ASSETS_DIR = ROOT / "assets"
 
 IST = timezone(timedelta(hours=5, minutes=30))
