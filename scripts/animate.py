@@ -467,7 +467,7 @@ def hud_layer(stats, labels, meta, t, ep):
 
 # --------------------------------------------------------------- captions ----
 
-def chunk_words(words, Texts, size, max_w=900.0, max_words=5):
+def chunk_words(words, Texts, size, max_w=930.0, max_words=6):
     """words: [{w,start,end}] -> chunks [{words:[...], start, end}]"""
     chunks = []
     cur = []
@@ -493,7 +493,7 @@ def chunk_words(words, Texts, size, max_w=900.0, max_words=5):
     return out
 
 
-def caption_layer(chunks, t, Texts, size=52.0):
+def caption_layer(chunks, t, Texts, size=54.0, max_w=930.0):
     if not chunks:
         return ""
     active = None
@@ -515,7 +515,7 @@ def caption_layer(chunks, t, Texts, size=52.0):
     for wd in words:
         trial = cur + [wd]
         wid = sum(Texts.w(x["w"] + " ", size) for x in trial)
-        if cur and wid > 880:
+        if cur and wid > max_w:
             lines.append(cur)
             cur = [wd]
         else:
@@ -709,10 +709,19 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
         chunks = cache.setdefault(("chunks", id(shot)), None)
         if chunks is None:
             size = float(cfg.get("render", cfg).get("caption_size", 52))
-            chunks = chunk_words(shot.words, Texts, size) if shot.words else _fake_words(shot, Texts, size)
+            render_cfg = cfg.get("render", cfg)
+            chunks = chunk_words(
+                shot.words, Texts, size,
+                max_w=float(render_cfg.get("caption_max_width", 930)),
+                max_words=int(render_cfg.get("caption_max_words", 6)),
+            ) if shot.words else _fake_words(shot, Texts, size)
             cache[("chunks", id(shot))] = chunks
-        ov.append(caption_layer(chunks, local, Texts,
-                                float(cfg.get("render", cfg).get("caption_size", 52))))
+        render_cfg = cfg.get("render", cfg)
+        ov.append(caption_layer(
+            chunks, local, Texts,
+            float(render_cfg.get("caption_size", 54)),
+            float(render_cfg.get("caption_max_width", 930)),
+        ))
     if shot.kind != "title":
         ov.append(hud_layer(ep.get("stats", {}), ep.get("stats_labels", {}),
                             dict(meta, subtitle=ep.get("subtitle", "")), t, ep))
