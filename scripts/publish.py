@@ -88,7 +88,7 @@ def publish_reel(client, cfg: dict, ig_user_id: str, episode: dict, video_url: s
         raise RuntimeError("Caption is empty; refusing to publish an unlabelled Reel")
     if len(caption) > 2200:
         raise RuntimeError(f"Caption is too long ({len(caption)} characters; limit is 2200)")
-    hashtag_count = len(re.findall(r"(?<![\\w])#[\\w]+", caption, flags=re.UNICODE))
+    hashtag_count = len(re.findall(r"(?<!\w)#[\w]+", caption, flags=re.UNICODE))
     if hashtag_count > 5:
         raise RuntimeError(
             f"Caption contains {hashtag_count} hashtags; use 5 or fewer to avoid publishing rejection"
