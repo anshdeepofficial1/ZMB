@@ -269,6 +269,168 @@ def actors_layer(meta, t, fx, cache):
 HUD_COLORS = {"hp": "#ff6a6a", "noise": "#ffb347", "food": "#7ddc8f", "dog": "#7dc4ff"}
 
 
+
+
+# --------------------------------------------------------- story-specific beats
+def narrative_beat_layer(meta, t):
+    """Explicit visual beats for the opening Reel; screen-space, smoothly animated."""
+    beat = (meta or {}).get("beat")
+    if not beat:
+        return ""
+
+    out = []
+
+    def puffs(cx, cy, count=7, speed=38.0, spread=92.0):
+        items = []
+        for i in range(count):
+            phase = (t * speed + i * 31.0) % 190.0
+            x = cx + math.sin(t * 1.45 + i * 1.7) * spread * 0.42 + phase * 0.18
+            y = cy - phase
+            r = 13.0 + (phase / 190.0) * 32.0 + (i % 3) * 4.0
+            opacity = max(0.0, 0.32 * (1.0 - phase / 220.0))
+            items.append(sk.ell(x, y, r * 0.88, r * 1.18, "#b9c5d2", op=opacity,
+                                rotate=math.sin(t + i) * 24.0))
+        return "".join(items)
+
+    def car_body(x=70.0, y=1505.0, scale=1.0, color="#56677b", broken=False):
+        # side view, nose/engine on the right; wheels and glass remain distinct
+        body = (
+            sk.path("M 0 0 L 24 -105 Q 34 -142 88 -150 L 315 -150 "
+                    "L 402 -260 L 635 -260 L 745 -147 L 862 -119 "
+                    "Q 888 -109 890 -72 L 890 -2 Q 886 16 864 16 L 28 16 Z",
+                    color, "#172230", 13)
+            + sk.path("M 331 -161 L 411 -244 L 487 -244 L 487 -161 Z",
+                      "#15283c", "#a6c5db", 5)
+            + sk.path("M 504 -244 L 625 -244 L 707 -161 L 504 -161 Z",
+                      "#19324a", "#a6c5db", 5)
+            + sk.path("M 510 -234 L 619 -234 L 689 -171 L 510 -171 Z",
+                      "#284b68", op=0.52)
+            + sk.rect(60, -127, 245, 18, "#91a2b5", 8, op=0.72)
+            + sk.rect(60, -101, 220, 8, "#202e40", 4, op=0.7)
+            + sk.circ(185, 5, 59, "#111820", "#667386", 10)
+            + sk.circ(185, 5, 28, "#738195", "#182332", 7)
+            + sk.circ(733, 5, 59, "#111820", "#667386", 10)
+            + sk.circ(733, 5, 28, "#738195", "#182332", 7)
+            + sk.ell(867, -90, 18, 12, "#ffda8a", op=0.95)
+        )
+        if broken:
+            body += sk.path("M 698 -145 L 770 -294 L 844 -275 L 771 -131 Z",
+                            "#7b8a9b", "#172230", 10)
+            body += sk.path("M 697 -147 L 771 -294", "none", "#d5e0eb", 5)
+        return sk.g(f"translate({n(x)} {n(y)}) scale({n(scale)})", body)
+
+    if beat == "breakdown":
+        out.append(sk.rect(0, 970, W, 640, "#05080f", op=0.15))
+        out.append(sk.ell(520, 1508, 470, 42, "#02050a", op=0.58))
+        # large, readable car foreground and driver visible through the side window
+        out.append(car_body(72, 1515, 1.05, "#596b80", broken=True))
+        out.append('<defs><clipPath id="zmb-break-window" clipPathUnits="userSpaceOnUse">'
+                   '<path d="M 420 1351 L 505 1265 L 584 1265 L 584 1350 Z '
+                   'M 597 1265 L 720 1265 L 797 1350 L 597 1350 Z"/></clipPath></defs>')
+        out.append(sk.g("translate(505 1410)",
+                        ch.render_actor("max", "sit", t, size=315),
+                        op=0.98))
+        # mask the driver to the side windows, then redraw window frames
+        out[-1] = '<g clip-path="url(#zmb-break-window)">' + out[-1] + '</g>'
+        out.append(sk.path("M 420 1351 L 505 1265 L 584 1265 L 584 1350 M 597 1265 L 720 1265 L 797 1350 L 597 1350",
+                           "none", "#182739", 9))
+        out.append(puffs(785, 1215, 8, 42, 88))
+        out.append(sk.path("M 788 1257 L 852 1172 L 912 1188", "none", "#a9b7c5", 11))
+        out.append(sk.ell(880, 1317, 105, 28, "#ffbd63", op=0.075))
+        out.append(sk.text(540, 1075, "ENGINE FAILURE", 27, "Barlow", "#ffd58d",
+                           anchor="middle", weight="bold", ls=3, op=0.92))
+        out.append(sk.text(540, 1115, "2:47 AM  ·  NO SIGNAL", 23, "Barlow", "#e4ebf4",
+                           anchor="middle", weight="bold", ls=2, op=0.82))
+
+    elif beat == "car_interior":
+        # Opaque front-seat view: windshield, road disappearing into the night,
+        # Max and Biscuit inside, dashboard in the foreground.
+        out.append(sk.rect(0, 0, W, H, "#07101d"))
+        out.append(sk.rect(58, 110, 964, 1340, "#0a1424", 60))
+        out.append(sk.path("M 104 1120 L 170 450 Q 182 330 300 280 L 780 280 "
+                           "Q 900 335 911 450 L 976 1120 Z",
+                           "#101f31", "#657b91", 14))
+        out.append(sk.rect(188, 365, 704, 740, "#0d1d31", 24))
+        out.append(sk.circ(780, 530, 47, "#fff0c3", op=0.85))
+        out.append(sk.ell(780, 530, 112, 100, "#f2c779", op=0.105))
+        # distant road, lane markings, and the one still-lit station
+        out.append(sk.path("M 236 1100 L 450 820 L 630 820 L 845 1100 Z", "#202c3c"))
+        out.append(sk.path("M 535 1090 L 535 970 M 535 920 L 535 872",
+                           "none", "#d9d5c5", 9, op=0.72))
+        out.append(sk.rect(650, 700, 160, 12, "#f6d99a", 7, op=0.95))
+        out.append(sk.rect(665, 712, 9, 96, "#b1a28a", 5))
+        out.append(sk.rect(785, 712, 9, 96, "#b1a28a", 5))
+        out.append(sk.rect(687, 744, 32, 29, "#ffe7b0", op=0.92))
+        out.append(sk.rect(733, 744, 32, 29, "#ffe7b0", op=0.76))
+        # seat backs and passengers, held inside the cabin silhouette
+        out.append(sk.path("M 112 1290 L 112 1100 Q 112 1040 176 1025 L 255 1060 L 255 1455 L 112 1455 Z",
+                           "#172536", "#30445a", 13))
+        out.append(sk.path("M 824 1290 L 824 1100 Q 824 1040 887 1025 L 960 1060 L 960 1455 L 824 1455 Z",
+                           "#172536", "#30445a", 13))
+        out.append(sk.g("translate(425 1492)", ch.render_actor("max", "sit", t, size=370)))
+        out.append(sk.g("translate(692 1454)", ch.render_actor("biscuit", "scared", t + 0.35, size=510)))
+        # dashboard and steering wheel are layered in front of the occupants
+        out.append(sk.path("M 74 1385 Q 200 1335 328 1386 L 430 1510 L 74 1574 Z",
+                           "#182535", "#3d5268", 13))
+        out.append(sk.path("M 655 1380 Q 836 1328 1006 1390 L 1006 1580 L 642 1515 Z",
+                           "#182535", "#3d5268", 13))
+        out.append(sk.ell(334, 1436, 80, 82, "none", stroke="#9bafc2", sw=13, op=0.92))
+        out.append(sk.ell(334, 1436, 12, 12, "#9bafc2", op=0.92))
+        out.append(sk.path("M 335 1436 L 278 1495 M 335 1436 L 390 1492",
+                           "none", "#9bafc2", 10))
+        out.append(sk.path("M 0 1580 Q 190 1485 360 1532 Q 550 1586 730 1525 Q 905 1485 1080 1573 L 1080 1920 L 0 1920 Z",
+                           "#101722", "#26384b", 14))
+        out.append(sk.rect(450, 1584, 180, 16, "#263a4d", 8))
+        out.append(sk.text(540, 1700, "STALLED  ·  2:47 AM", 27, "Barlow", "#ffd58d",
+                           anchor="middle", weight="bold", ls=2, op=0.95))
+
+    elif beat == "spot_station":
+        # The illuminated destination now takes over the composition.
+        out.append(car_body(28, 1570, 0.62, "#42546a", broken=False))
+        out.append(puffs(515, 1455, 4, 24, 38))
+        out.append(sk.ell(820, 1000, 260, 210, "#ffca76", op=0.065))
+        out.append(sk.path("M 640 770 L 1040 770", "none", "#ffdf9e", 9, op=0.85))
+        out.append(sk.text(839, 730, "OPEN 24 HOURS", 29, "Barlow", "#ffe7b1",
+                           anchor="middle", weight="bold", ls=2, op=0.94))
+
+    elif beat == "backpack_exit":
+        # A visible, strapped pack placed against Max's upper back + parked car.
+        out.append(car_body(6, 1580, 0.52, "#344456", broken=False))
+        out.append(sk.ell(245, 1420, 210, 28, "#02050a", op=0.46))
+        out.append(sk.g("translate(0 0)",
+            sk.path("M 342 1028 Q 354 1004 389 1008 L 431 1030 L 429 1154 "
+                    "Q 392 1172 356 1152 Z",
+                    "#7b3f2b", "#f0c28c", 8)
+            + sk.path("M 355 1048 Q 378 1032 410 1049 L 412 1092 L 357 1092 Z",
+                      "#b6683d", "#3f251d", 6)
+            + sk.rect(374, 1096, 30, 28, "#dba766", 6, op=0.95)
+            + sk.path("M 349 1020 Q 367 1005 388 1032 M 421 1028 Q 435 1050 426 1073",
+                      "none", "#dca878", 9)))
+
+    elif beat == "choice_teaser":
+        # Explicit choice teaser while the station remains in the background.
+        out.append(sk.rect(86, 1110, 908, 330, "#07101de8", 28,
+                           stroke="#e4c778", sw=3, op=0.96))
+        out.append(sk.text(540, 1170, "YOUR FIRST DECISION", 31, "Barlow", "#f5d88b",
+                           anchor="middle", weight="bold", ls=3))
+        pulse = 0.78 + 0.12 * math.sin(t * 2.1)
+        out.append(sk.rect(125, 1212, 390, 138, "#1a2f43", 22,
+                           stroke="#79b8e8", sw=4, op=pulse))
+        out.append(sk.rect(565, 1212, 390, 138, "#30251d", 22,
+                           stroke="#e8a45e", sw=4, op=pulse))
+        out.append(sk.text(320, 1278, "RUN", 58, "Archivo Black", "#edf6ff",
+                           anchor="middle", weight="bold", ls=2))
+        out.append(sk.text(320, 1322, "GET OUT FAST", 21, "Barlow", "#a9d6ff",
+                           anchor="middle", weight="bold", ls=2))
+        out.append(sk.text(760, 1278, "CHECK", 58, "Archivo Black", "#fff0df",
+                           anchor="middle", weight="bold", ls=2))
+        out.append(sk.text(760, 1322, "OPEN THE DOOR", 21, "Barlow", "#ffd09b",
+                           anchor="middle", weight="bold", ls=2))
+        out.append(sk.text(540, 1408, "COMMENT ON TOMORROW'S REEL", 22, "Barlow",
+                           "#e6edf7", anchor="middle", weight="bold", ls=1.5))
+    return "".join(out)
+
+
 def hud_layer(stats, labels, meta, t, ep):
     x, y = 46.0, 92.0
     out = []
@@ -360,8 +522,9 @@ def caption_layer(chunks, t, Texts, size=52.0):
             cur = trial
     if cur:
         lines.append(cur)
-    out = [rect(0, 1470, W, H - 1470, "url(#cap_scrim)")]
-    base_y = 1650 if len(lines) == 2 else 1690
+    out = [rect(0, 1435, W, H - 1435, "url(#cap_scrim)")]
+    # Keep subtitles above the bottom safe area; anchor the last line consistently.
+    base_y = 1590 - (len(lines) - 1) * 70
     for li, ln in enumerate(lines):
         wid = sum(Texts.w(x["w"] + " ", size) for x in ln) - Texts.w(" ", size)
         x = (W - wid) / 2.0
@@ -374,7 +537,7 @@ def caption_layer(chunks, t, Texts, size=52.0):
             out.append(path(f"M {n(x)} {n(y - size * 0.72)} L {n(x + Texts.w(wd['w'], size))} {n(y - size * 0.72)}",
                             "none", "#080c14", 26, op=0.0))
             out.append(text(x, y, wd["w"], size, "Barlow", col, anchor="start",
-                            weight="bold", stroke="#070a11", sw=9, op=op))
+                            weight="bold", stroke="#05070c", sw=11, op=op))
             x += Texts.w(wd["w"] + " ", size)
     return "".join(out)
 
@@ -529,10 +692,15 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
         dx = (fx - W / 2.0) * (1.0 - k) - scroll * (0.25 + 0.75 * k)
         dy = (fy - H / 2.0) * (1.0 - k) * 0.4
         body.append(g(f"translate({n(dx)} {n(dy)})", content))
-    # gait phase absolute t — shot boundary par walk cycle mid-stride reset nahi hoga
-    body.append(actors_layer(meta, t, fx, cache))
+    # The two car-centric shots have their own composition/passengers; all other
+    # story beats keep the normal character rig and scene parallax.
+    beat = meta.get("beat") if shot.kind == "line" else None
+    if beat not in ("breakdown", "car_interior"):
+        body.append(actors_layer(meta, t, fx, cache))
 
     ov = []  # screen space
+    if shot.kind == "line" and beat:
+        ov.append(narrative_beat_layer(meta, local))
     if shot.kind == "line":
         ov.append(fx_layer(meta.get("fx", "none"), local, shot.dur, t_abs=t))
     elif shot.kind == "vote":
@@ -545,12 +713,11 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
             cache[("chunks", id(shot))] = chunks
         ov.append(caption_layer(chunks, local, Texts,
                                 float(cfg.get("render", cfg).get("caption_size", 52))))
-    ov.append(hud_layer(ep.get("stats", {}), ep.get("stats_labels", {}),
-                        dict(meta, subtitle=ep.get("subtitle", "")), t, ep))
-    if shot.kind == "title":
-        ov.append(title_card(ep, local, shot.dur, Texts))
+    if shot.kind != "title":
         ov.append(hud_layer(ep.get("stats", {}), ep.get("stats_labels", {}),
                             dict(meta, subtitle=ep.get("subtitle", "")), t, ep))
+    if shot.kind == "title":
+        ov.append(title_card(ep, local, shot.dur, Texts))
     if shot.kind == "vote":
         ov.append(vote_card(ep, t, shot.dur, Texts, ep.get("stats"), ep.get("stats_labels")))
     if shot.kind == "ending":
