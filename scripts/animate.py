@@ -486,7 +486,7 @@ def hud_layer(stats, labels, meta, t, ep):
 
 # --------------------------------------------------------------- captions ----
 
-def chunk_words(words, Texts, size, max_w=1020.0, max_words=7, source_text="")
+def chunk_words(words, Texts, size, max_w=1020.0, max_words=7, source_text=""):
     """Build karaoke chunks using source punctuation, since TTS word timings may strip it."""
     sentence_ends = set()
     source_punctuation = {}
