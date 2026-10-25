@@ -208,8 +208,18 @@ def main() -> None:
                 log(f"[cycle] queued Reel target reached/passed ({publish_target.isoformat()}); publishing now")
                 publish_target = now
             else:
-                log(f"[cycle] queued Reel is ready; next publish check at {publish_target.isoformat()}; no runner held open")
-                return
+                remaining_seconds = (publish_target - now).total_seconds()
+                grace_seconds = max(0, int(cfg.get("publish_wait_grace_seconds", 300)))
+                if remaining_seconds <= grace_seconds:
+                    log(
+                        f"[cycle] scheduled time is {remaining_seconds:.0f}s away; "
+                        "waiting briefly to publish on the 24-hour target"
+                    )
+                    time.sleep(max(0, remaining_seconds))
+                    publish_target = ist_now()
+                else:
+                    log(f"[cycle] queued Reel is ready; next publish check at {publish_target.isoformat()}; no runner held open")
+                    return
         else:
             publish_target = _publish_target(state, cfg, now, args.force_publish)
             if publish_target is None:
