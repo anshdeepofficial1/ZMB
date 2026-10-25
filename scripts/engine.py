@@ -146,7 +146,7 @@ def build_caption(cfg: dict, state: dict, node: dict, choices: list[dict], hasht
         lines += [recap, ""]
     if choices:
         for i, choice in enumerate(choices, start=1):
-            lines.append(f"{i}\\ufe0f\\u20e3 {choice['text']}")
+            lines.append(f"{i}\ufe0f\u20e3 {choice['text']}")
         handle = str(cfg.get("handle") or "@zmbstories").strip()
         if handle and not handle.startswith("@"):
             handle = "@" + handle
