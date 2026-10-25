@@ -93,7 +93,7 @@ class NarrativeVisualBeatTests(unittest.TestCase):
 
     def test_station_door_has_a_moving_shadow_and_visible_door_frame(self):
         svg = narrative_beat_layer({"beat": "door_shadow"}, 1.4)
-        self.assertIn("M 738 894", svg)
+        self.assertIn('x="738" y="894"', svg)
         self.assertIn("#05090f", svg)
         self.assertIn("flicker", svg.lower()) if "flicker" in svg.lower() else self.assertIn("OPEN 24 HOURS", svg)
 
