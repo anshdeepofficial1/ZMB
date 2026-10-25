@@ -50,9 +50,18 @@ jobs:
         run: pip install -r scripts/requirements.txt
 
       - name: System deps (ffmpeg + fonts)
+        timeout-minutes: 5
         run: |
           set -euo pipefail
-          sudo apt-get update -qq
+          # Retry transient Ubuntu mirror/network errors, but do not hang the cycle forever.
+          for attempt in 1 2 3; do
+            if timeout 90s sudo apt-get update -qq; then break; fi
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::apt-get update failed after 3 attempts"
+              exit 1
+            fi
+            sleep 5
+          done
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
@@ -82,12 +91,30 @@ jobs:
       - name: Commit state
         if: ${{ always() && github.event.inputs.dry_run != 'true' }}
         run: |
+          set -euo pipefail
           git config user.name "zombie-bot"
           git config user.email "zombie-bot@users.noreply.github.com"
           git add state/
           if git diff --cached --quiet; then
             echo "No state changes"
-          else
-            git commit -m "state: update $(date -u +%FT%TZ)"
-            git push
+            exit 0
           fi
+
+          git commit -m "state: update $(date -u +%FT%TZ)"
+          # Another commit may reach main while this long render is running.
+          # Rebase the state commit on the newest main before pushing, rather than
+          # silently losing state or leaving a successful Instagram post unrecorded.
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if ! git rebase origin/main; then
+              git rebase --abort || true
+              echo "::error::State rebase conflicted; refusing to overwrite main"
+              exit 1
+            fi
+            if git push origin HEAD:refs/heads/main; then
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "::error::Could not push state after 3 attempts"
+          exit 1
