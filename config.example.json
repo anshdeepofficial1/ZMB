@@ -1,11 +1,9 @@
 {
-  "handle": "@your_handle",
+  "handle": "@zmbstories",
   "timezone": "Asia/Kolkata",
   "publish_after_ist_hour": 13,
-
   "voice": "en-US-ChristopherNeural",
   "voice_rate": "-4%",
-
   "render": {
     "width": 720,
     "height": 1280,
@@ -17,31 +15,38 @@
     "gap_seconds": 0.45,
     "choice_card_seconds": 3.6,
     "ending_card_seconds": 4.2,
-    "title_card_seconds": 3.0
+    "title_card_seconds": 3
   },
-
   "min_votes": 10,
-  "cta_vote": "Comment 1 or 2. The choice with the most comments wins - and tomorrow it becomes real.",
-  "cta_story": "Follow so you do not miss the next choice. The story only moves when you vote.",
+  "cta_vote": "Comment 1 or 2. The winning choice shapes the next episode.",
+  "cta_story": "Follow @zmbstories to find out what happens next.",
   "fiction_disclaimer": "A fictional animated story. No real zombies were harmed.",
   "hashtag_pool": [
     "#zombieapocalypse",
-    "#chooseyourownadventure",
-    "#interactivestory",
     "#zombiesurvival",
     "#survivalstory",
+    "#zombiehorror",
+    "#horroranimation",
     "#animatedstory",
-    "#cartoon",
-    "#apocalypse",
-    "#chooseyourownpath",
-    "#storytime"
+    "#chooseyourownadventure",
+    "#interactivefiction",
+    "#survivalreels",
+    "#horrorstory"
   ],
   "hashtags_per_post": 5,
-
-  "music_volume": 0.10,
+  "music_volume": 0.1,
   "ai_disclosure": true,
   "media_branch": "media",
-
-  "stats_reset": { "hp": 100, "noise": 20, "food": 60, "dog": 70 },
-  "stats_labels": { "hp": "HP", "noise": "NOISE", "food": "FOOD", "dog": "BISCUIT" }
+  "stats_reset": {
+    "hp": 100,
+    "noise": 20,
+    "food": 60,
+    "dog": 70
+  },
+  "stats_labels": {
+    "hp": "HP",
+    "noise": "NOISE",
+    "food": "FOOD",
+    "dog": "BISCUIT"
+  }
 }
