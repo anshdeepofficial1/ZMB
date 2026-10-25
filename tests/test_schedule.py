@@ -1,5 +1,9 @@
 from datetime import datetime, timedelta
+from pathlib import Path
+import sys
 import unittest
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from common import IST
 from run_cycle import _publish_target, _parse_ist_timestamp
