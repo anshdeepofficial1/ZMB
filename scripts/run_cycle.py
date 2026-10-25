@@ -65,14 +65,14 @@ def main() -> None:
     if not args.dry_run and client is not None and ig_user_id:
         # Validate the token/account before paying the render cost.
         try:
-            profile = client.get("me", fields="id,username")
+            profile = client.get("me", fields="user_id,username")
         except Exception as exc:
             raise SystemExit(
                 "[cycle] Instagram credential preflight failed before rendering: "
                 + str(exc)
             ) from exc
 
-        profile_id = str(profile.get("user_id") or profile.get("id") or "").strip()
+        profile_id = str(profile.get("user_id") or "").strip()
         if profile_id and profile_id != ig_user_id:
             raise SystemExit(
                 "[cycle] IG_USER_ID does not match the account returned by IG_ACCESS_TOKEN; "
