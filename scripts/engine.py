@@ -166,7 +166,7 @@ def first_comment(choices: list[dict]) -> str | None:
     if not choices:
         return None
     parts = [f"{i} = {c['text']}" for i, c in enumerate(choices, start=1)]
-    return "VOTE \U0001f447 " + "  |  ".join(parts)
+    return "VOTE KARO \U0001f447 " + "  |  ".join(parts)
 
 
 def build_episode(state: dict, scn: dict, cfg: dict, recap: str | None = None) -> dict:
