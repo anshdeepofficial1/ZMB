@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import base64
 import os
+import re
 import shutil
 import sys
 import tempfile
@@ -82,10 +83,25 @@ def publish_reel(client, cfg: dict, ig_user_id: str, episode: dict, video_url: s
     except Exception as exc:
         log(f"[publish] quota check skipped: {exc}")
 
+    caption = str(episode.get("caption") or "").strip()
+    if not caption:
+        raise RuntimeError("Caption is empty; refusing to publish an unlabelled Reel")
+    if len(caption) > 2200:
+        raise RuntimeError(f"Caption is too long ({len(caption)} characters; limit is 2200)")
+    hashtag_count = len(re.findall(r"(?<![\\w])#[\\w]+", caption, flags=re.UNICODE))
+    if hashtag_count > 5:
+        raise RuntimeError(
+            f"Caption contains {hashtag_count} hashtags; use 5 or fewer to avoid publishing rejection"
+        )
+    for choice in episode.get("choices") or []:
+        choice_text = str(choice.get("text") or "").strip()
+        if choice_text and choice_text not in caption:
+            raise RuntimeError(f"Caption is missing choice option: {choice_text}")
+
     data = {
         "media_type": "REELS",
         "video_url": video_url,
-        "caption": episode["caption"],
+        "caption": caption,
         "share_to_feed": "true",
     }
     if cfg.get("ai_disclosure", True):
@@ -111,6 +127,12 @@ def publish_reel(client, cfg: dict, ig_user_id: str, episode: dict, video_url: s
 
     published = client.post(f"{ig_user_id}/media_publish", creation_id=container_id)
     media_id = published["id"]
+    config_issue = published.get("config_issue")
+    if config_issue:
+        # Meta may publish the Reel while dropping part of the request (for example,
+        # a caption failing integrity checks). Log it, but still return the media ID
+        # so the caller saves state and does not accidentally publish a duplicate.
+        log(f"[publish] WARNING: Instagram returned config_issue={config_issue}")
     log(f"[publish] LIVE: media_id={media_id}")
 
     if episode.get("first_comment"):
