@@ -10,15 +10,17 @@
     "out_height": 1920,
     "fps": 30,
     "jobs": 4,
-    "caption_size": 52,
+    "caption_size": 54,
     "gap_seconds": 0.45,
     "choice_card_seconds": 3.6,
     "ending_card_seconds": 4.2,
-    "title_card_seconds": 3
+    "title_card_seconds": 3,
+    "caption_max_words": 6,
+    "caption_max_width": 930
   },
   "min_votes": 10,
   "cta_vote": "Comment 1 or 2. The winning choice shapes the next episode.",
-  "cta_story": "Follow @zmbstories to find out what happens next.",
+  "cta_story": "Tomorrow, choose RUN or CHECK. Follow @zmbstories and vote on the next Reel.",
   "fiction_disclaimer": "A fictional animated story. No real zombies were harmed.",
   "hashtag_pool": [
     "#zombieapocalypse",
