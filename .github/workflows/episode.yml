@@ -1,6 +1,11 @@
 name: Episode Cycle
 
 on:
+  # Temporary one-time render-only run; removed immediately after it queues.
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/episode.yml"
   schedule:
     # UTC cron, IST = UTC+5:30. Vote checks during the day; every 30 min during
     # the 18:30-00:30 IST launch window so a Reel can be prepared at T-1h and
@@ -25,7 +30,7 @@ permissions:
 
 concurrency:
   group: episode-cycle
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   cycle:
@@ -79,7 +84,7 @@ jobs:
 
       - name: Run cycle
         env:
-          DRY: ${{ github.event.inputs.dry_run }}
+          DRY: ${{ github.event_name == 'push' || github.event.inputs.dry_run == 'true' }}
           FORCE: ${{ github.event.inputs.force_publish }}
         run: |
           ARGS=""
