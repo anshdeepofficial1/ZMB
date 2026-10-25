@@ -8,6 +8,7 @@
 from __future__ import annotations
 
 import base64
+import hashlib
 import os
 import re
 import shutil
@@ -32,19 +33,27 @@ def push_media_to_github(video_path: str, name: str, cfg: dict) -> str | None:
     if not origin:
         raise RuntimeError("git remote 'origin' nahi mila")
 
+    # Use a content hash in the public URL so a retry with a new render cannot
+    # receive a stale CDN copy of the same Sx_Dxxx filename.
+    digest = hashlib.sha256()
+    with open(video_path, "rb") as video_file:
+        for chunk in iter(lambda: video_file.read(1024 * 1024), b""):
+            digest.update(chunk)
+    hosted_name = f"{Path(name).stem}-{digest.hexdigest()[:12]}{Path(name).suffix}"
+
     tmp = Path(tempfile.mkdtemp(prefix="media_push_"))
     try:
-        shutil.copy2(video_path, tmp / name)
+        shutil.copy2(video_path, tmp / hosted_name)
         run(["git", "init", "-q"], cwd=tmp)
         run(["git", "config", "user.email", "bot@users.noreply.github.com"], cwd=tmp)
         run(["git", "config", "user.name", "zombie-bot"], cwd=tmp)
-        run(["git", "add", name], cwd=tmp)
-        run(["git", "commit", "-q", "-m", f"media: {name}"], cwd=tmp)
+        run(["git", "add", hosted_name], cwd=tmp)
+        run(["git", "commit", "-q", "-m", f"media: {hosted_name}"], cwd=tmp)
 
         # The temp repository does not inherit checkout's credential helper. Add
         # an in-memory HTTPS auth header for this push; never put tokens in the URL
         # or command line (the latter is included in errors by common.run).
-        token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT") or "").strip()
+        token = (os.environ.get("GITHUB_TOKEN") or "").strip() or (os.environ.get("GH_PAT") or "").strip()
         if not token:
             raise RuntimeError("GitHub push token missing (GITHUB_TOKEN/GH_PAT)")
 
@@ -71,7 +80,7 @@ def push_media_to_github(video_path: str, name: str, cfg: dict) -> str | None:
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
-    url = f"https://raw.githubusercontent.com/{repo}/{branch}/{name}"
+    url = f"https://raw.githubusercontent.com/{repo}/{branch}/{hosted_name}"
     log(f"[publish] video public URL: {url}")
     return url
 
