@@ -384,7 +384,7 @@ def narrative_beat_layer(meta, t):
         out.append(sk.text(540, 1700, "STALLED  ·  2:47 AM", 27, "Barlow", "#ffd58d",
                            anchor="middle", weight="bold", ls=2, op=0.95))
 
-    elif beat == "spot_station":
+    elif beat in ("spot_station", "door_shadow"):
         # The illuminated destination now takes over the composition.
         out.append(car_body(28, 1570, 0.62, "#42546a", broken=False))
         out.append(puffs(515, 1455, 4, 24, 38))
@@ -392,6 +392,24 @@ def narrative_beat_layer(meta, t):
         out.append(sk.path("M 640 770 L 1040 770", "none", "#ffdf9e", 9, op=0.85))
         out.append(sk.text(839, 730, "OPEN 24 HOURS", 29, "Barlow", "#ffe7b1",
                            anchor="middle", weight="bold", ls=2, op=0.94))
+        if beat == "door_shadow":
+            # The shadow moves behind the lit shop door rather than remaining a vague glow.
+            sx = 812.0 + math.sin(t * 1.65) * 24.0
+            shadow_op = 0.78 + 0.12 * math.sin(t * 2.4)
+            out.append(sk.rect(738, 894, 168, 270, "#101b28", 9,
+                               stroke="#cbb184", sw=7, op=0.84))
+            out.append(sk.rect(752, 909, 140, 242, "#192637", 5, op=0.96))
+            out.append(sk.ell(sx, 972, 31, 39, "#05090f", op=shadow_op))
+            out.append(sk.path(
+                f"M {n(sx - 26)} 1008 Q {n(sx)} 991 {n(sx + 26)} 1008 "
+                f"L {n(sx + 45)} 1138 L {n(sx - 43)} 1138 Z",
+                "#05090f", op=shadow_op))
+            out.append(sk.path(
+                f"M {n(sx - 16)} 1026 L {n(sx - 57)} 1070 "
+                f"M {n(sx + 16)} 1026 L {n(sx + 55)} 1061",
+                "none", "#05090f", 18, op=shadow_op))
+            out.append(sk.circ(sx - 10, 969, 4, "#f7b96d", op=0.75 + 0.15 * math.sin(t * 3.0)))
+            out.append(sk.circ(sx + 10, 969, 4, "#f7b96d", op=0.75 + 0.15 * math.sin(t * 3.0 + 0.4)))
 
     elif beat == "backpack_exit":
         # A visible, strapped pack placed against Max's upper back + parked car.
