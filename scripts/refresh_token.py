@@ -64,7 +64,7 @@ def main() -> None:
 
     new_token = data["access_token"]
     days = int(data.get("expires_in", 0)) // 86400
-    log(f"[token] refresh OK — naya token ~{days} din ke liye valid (masked: {new_token[:8]}...)")
+    log(f"[token] refresh OK — naya token ~{days} din ke liye valid (token value hidden)")
 
     repo = (os.environ.get("GITHUB_REPOSITORY") or "").strip()
     pat = (os.environ.get("GH_PAT") or "").strip()
