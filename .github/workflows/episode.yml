@@ -66,6 +66,13 @@ jobs:
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
 
+      - name: Validate Python and story engine
+        timeout-minutes: 2
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts
+          python scripts/engine.py --selftest
+
       - name: Run cycle
         env:
           DRY: ${{ github.event.inputs.dry_run }}
