@@ -81,26 +81,7 @@ def main() -> None:
         if not own_username:
             own_username = profile.get("username")
 
-        # Check publishing quota before rendering; avoid wasting runner minutes
-        # if the account has already exhausted the API publishing window.
-        try:
-            quota_payload = client.get(f"{ig_user_id}/content_publishing_limit")
-            quota_rows = quota_payload.get("data") or []
-            for quota_row in quota_rows:
-                usage = int(quota_row.get("quota_usage", 0) or 0)
-                total = int(quota_row.get("quota_total", 0) or 0)
-                if total > 0 and usage >= total:
-                    raise SystemExit(
-                        f"[cycle] publishing quota exhausted ({usage}/{total}); "
-                        "skipping render and waiting for quota reset."
-                    )
-            if quota_rows:
-                log(f"[cycle] publishing quota preflight: {quota_rows}")
-        except SystemExit:
-            raise
-        except Exception as exc:
-            # Quota read can be transient; publish_reel performs a second check.
-            log(f"[cycle] quota preflight unavailable (non-fatal): {exc}")
+
 
     now = ist_now()
     today = now.date().isoformat()
@@ -123,6 +104,27 @@ def main() -> None:
         if now.hour < int(cfg.get("publish_after_ist_hour", 13)) and not args.force_publish:
             log(f"[cycle] publish hour ({cfg.get('publish_after_ist_hour', 13)} IST) se pehle — exit")
             return
+
+        # Check publishing quota before rendering; avoid wasting runner minutes
+        # if the account has already exhausted the API publishing window.
+        try:
+            quota_payload = client.get(f"{ig_user_id}/content_publishing_limit")
+            quota_rows = quota_payload.get("data") or []
+            for quota_row in quota_rows:
+                usage = int(quota_row.get("quota_usage", 0) or 0)
+                total = int(quota_row.get("quota_total", 0) or 0)
+                if total > 0 and usage >= total:
+                    raise SystemExit(
+                        f"[cycle] publishing quota exhausted ({usage}/{total}); "
+                        "skipping render and waiting for quota reset."
+                    )
+            if quota_rows:
+                log(f"[cycle] publishing quota preflight: {quota_rows}")
+        except SystemExit:
+            raise
+        except Exception as exc:
+            # Quota read can be transient; publish_reel performs a second check.
+            log(f"[cycle] quota preflight unavailable (non-fatal): {exc}")
 
     # --- 3) pichhli episode resolve karo + agla node set karo ---
     last = state.get("last_episode")
