@@ -1,11 +1,6 @@
 name: Episode Cycle
 
 on:
-  # Temporary one-time preparation run for the final caption timing fix.
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/episode.yml"
   schedule:
     # UTC cron, IST = UTC+5:30. Vote checks during the day; every 30 min during
     # the 18:30-00:30 IST launch window so a Reel can be prepared at T-1h and
@@ -30,7 +25,7 @@ permissions:
 
 concurrency:
   group: episode-cycle
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   cycle:
