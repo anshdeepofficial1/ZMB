@@ -43,6 +43,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
+      - name: Sync latest main state
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git reset --hard origin/main
+
       - name: Python setup
         uses: actions/setup-python@v7
         with:
