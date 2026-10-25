@@ -62,11 +62,24 @@ def main() -> None:
     client = GraphClient(token) if token else None
 
     own_username = (os.environ.get("IG_USERNAME") or "").strip() or None
-    if client and not own_username:
+    if not args.dry_run and client is not None and ig_user_id:
+        # Validate the token/account before paying the render cost.
         try:
-            own_username = client.get("me", fields="username").get("username")
-        except Exception:
-            own_username = None
+            profile = client.get("me", fields="id,username")
+        except Exception as exc:
+            raise SystemExit(
+                "[cycle] Instagram credential preflight failed before rendering: "
+                + str(exc)
+            ) from exc
+
+        profile_id = str(profile.get("user_id") or profile.get("id") or "").strip()
+        if profile_id and profile_id != ig_user_id:
+            raise SystemExit(
+                "[cycle] IG_USER_ID does not match the account returned by IG_ACCESS_TOKEN; "
+                "refusing to publish to the wrong account."
+            )
+        if not own_username:
+            own_username = profile.get("username")
 
     now = ist_now()
     today = now.date().isoformat()
