@@ -485,8 +485,8 @@ def hud_layer(stats, labels, meta, t, ep):
 
 # --------------------------------------------------------------- captions ----
 
-def chunk_words(words, Texts, size, max_w=930.0, max_words=6):
-    """words: [{w,start,end}] -> chunks [{words:[...], start, end}]"""
+def chunk_words(words, Texts, size, max_w=930.0, max_words=7):
+    """words: [{w,start,end}] -> sentence-safe karaoke chunks."""
     chunks = []
     cur = []
     for wd in words:
@@ -497,6 +497,16 @@ def chunk_words(words, Texts, size, max_w=930.0, max_words=6):
             cur = [wd]
         else:
             cur = trial
+
+        # Keep each caption chunk inside the sentence; do not join a question
+        # to the follow/subscribe CTA that follows it.
+        token = wd["w"]
+        while token and token[-1] in ('"', "”", "’", ")", "]", "}"):
+            token = token[:-1]
+        if token.endswith((".", "!", "?")):
+            if cur:
+                chunks.append(cur)
+                cur = []
     if cur:
         chunks.append(cur)
     out = []
