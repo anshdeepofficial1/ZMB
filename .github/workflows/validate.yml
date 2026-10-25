@@ -4,9 +4,9 @@ on:
   push:
     branches: [main]
     paths:
-      - "scripts/run_cycle.py"
-      - "scripts/engine.py"
-      - "scripts/publish.py"
+      - "scripts/**"
+      - "content/scenarios.json"
+      - "config.example.json"
       - "tests/**"
       - ".github/workflows/validate.yml"
   workflow_dispatch:
