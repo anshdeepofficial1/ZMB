@@ -7,6 +7,7 @@
 """
 from __future__ import annotations
 
+import base64
 import os
 import shutil
 import sys
@@ -38,7 +39,34 @@ def push_media_to_github(video_path: str, name: str, cfg: dict) -> str | None:
         run(["git", "config", "user.name", "zombie-bot"], cwd=tmp)
         run(["git", "add", name], cwd=tmp)
         run(["git", "commit", "-q", "-m", f"media: {name}"], cwd=tmp)
-        run(["git", "push", "--force", origin, f"HEAD:refs/heads/{branch}"], cwd=tmp)
+
+        # The temp repository does not inherit checkout's credential helper. Add
+        # an in-memory HTTPS auth header for this push; never put tokens in the URL
+        # or command line (the latter is included in errors by common.run).
+        token = (os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT") or "").strip()
+        if not token:
+            raise RuntimeError("GitHub push token missing (GITHUB_TOKEN/GH_PAT)")
+
+        header = base64.b64encode(f"x-access-token:{token}".encode("utf-8")).decode("ascii")
+        try:
+            config_count = max(0, int(os.environ.get("GIT_CONFIG_COUNT", "0")))
+        except ValueError:
+            config_count = 0
+        added_keys = {
+            "GIT_CONFIG_COUNT": str(config_count + 1),
+            f"GIT_CONFIG_KEY_{config_count}": "http.https://github.com/.extraheader",
+            f"GIT_CONFIG_VALUE_{config_count}": f"AUTHORIZATION: basic {header}",
+        }
+        previous = {key: os.environ.get(key) for key in added_keys}
+        try:
+            os.environ.update(added_keys)
+            run(["git", "push", "--force", origin, f"HEAD:refs/heads/{branch}"], cwd=tmp)
+        finally:
+            for key, value in previous.items():
+                if value is None:
+                    os.environ.pop(key, None)
+                else:
+                    os.environ[key] = value
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
