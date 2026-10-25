@@ -2,9 +2,10 @@ name: Episode Cycle
 
 on:
   schedule:
-    # IST slots: 08:00, 10:30, 13:00, 16:30, 19:30, 22:30 (UTC+5:30)
+    # IST checkpoints (UTC+5:30): 08:00, 10:30, 13:00, 16:30, 19:30, 22:30.
     # Publish 13:00 IST ke baad pehle run par hota hai; baaki runs vote checkpoints hain.
-    - cron: "30 2,5,8,11,14,17 * * *"
+    - cron: "30 2,7 * * *"
+    - cron: "0 5,11,14,17 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
