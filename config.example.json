@@ -1,7 +1,6 @@
 {
   "handle": "@zmbstories",
   "timezone": "Asia/Kolkata",
-  "publish_after_ist_hour": 13,
   "voice": "en-US-ChristopherNeural",
   "voice_rate": "-4%",
   "render": {
@@ -48,5 +47,8 @@
     "noise": "NOISE",
     "food": "FOOD",
     "dog": "BISCUIT"
-  }
+  },
+  "publish_time_ist": "20:00",
+  "publish_every_hours": 24,
+  "publish_prepare_hours": 1
 }
