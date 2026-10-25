@@ -486,14 +486,17 @@ def hud_layer(stats, labels, meta, t, ep):
 
 # --------------------------------------------------------------- captions ----
 
-def chunk_words(words, Texts, size, max_w=930.0, max_words=7, source_text=""):
+def chunk_words(words, Texts, size, max_w=1020.0, max_words=7, source_text="")
     """Build karaoke chunks using source punctuation, since TTS word timings may strip it."""
     sentence_ends = set()
+    source_punctuation = {}
     source_matches = list(re.finditer(r"\d+(?::\d+)+|[\w]+(?:['’][\w]+)*", source_text, re.UNICODE))
     for i, match in enumerate(source_matches):
         next_start = source_matches[i + 1].start() if i + 1 < len(source_matches) else len(source_text)
-        if re.search(r"[.!?]", source_text[match.end():next_start]):
+        punctuation = re.search(r"[.!?]+", source_text[match.end():next_start])
+        if punctuation:
             sentence_ends.add(i)
+            source_punctuation[i] = punctuation.group(0)
 
     def norm(value):
         return re.sub(r"[^0-9a-z]+", "", str(value).casefold())
@@ -519,8 +522,14 @@ def chunk_words(words, Texts, size, max_w=930.0, max_words=7, source_text=""):
         else:
             cur = trial
 
-        # WordBoundary can strip punctuation; map the timed word back to the
-        # source narration so "door?" ends before "Follow and vote...".
+        # WordBoundary can strip punctuation; restore the original sentence-ending
+        # mark so a standalone final word still reads as "door?" or "Reel.".
+        if source_index in sentence_ends:
+            punctuation = source_punctuation.get(source_index, "")
+            if punctuation and not token.endswith((".", "!", "?")):
+                wd["w"] = token + punctuation
+                token = wd["w"]
+
         fallback_token = token
         while fallback_token and fallback_token[-1] in ('"', "”", "’", ")", "]", "}"):
             fallback_token = fallback_token[:-1]
@@ -552,7 +561,7 @@ def chunk_words(words, Texts, size, max_w=930.0, max_words=7, source_text=""):
     return out
 
 
-def caption_layer(chunks, t, Texts, size=54.0, max_w=930.0):
+def caption_layer(chunks, t, Texts, size=54.0, max_w=1020.0):
     if not chunks:
         return ""
     active = None
