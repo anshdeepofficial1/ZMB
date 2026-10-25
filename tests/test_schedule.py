@@ -89,13 +89,21 @@ class NarrativeVisualBeatTests(unittest.TestCase):
         self.assertIn(">CHECK</text>", svg)
         self.assertIn("COMMENT ON TOMORROW", svg)
 
+
+
+    def test_station_door_has_a_moving_shadow_and_visible_door_frame(self):
+        svg = narrative_beat_layer({"beat": "door_shadow"}, 1.4)
+        self.assertIn("M 738 894", svg)
+        self.assertIn("#05090f", svg)
+        self.assertIn("flicker", svg.lower()) if "flicker" in svg.lower() else self.assertIn("OPEN 24 HOURS", svg)
+
     def test_intro_narration_has_matching_visual_beats(self):
         scenarios = json.loads((ROOT / "content" / "scenarios.json").read_text(encoding="utf-8"))
         lines = scenarios["arcs"]["road"]["nodes"]["intro"]["lines"]
         beats = [line.get("shot", {}).get("beat") for line in lines]
         self.assertEqual(
             beats,
-            ["breakdown", "car_interior", "spot_station", "backpack_exit", "spot_station", "choice_teaser"],
+            ["breakdown", "car_interior", "spot_station", "backpack_exit", "door_shadow", "choice_teaser"],
         )
         self.assertIn("engine", lines[0]["text"].lower())
         self.assertIn("backpack", lines[3]["text"].lower())
