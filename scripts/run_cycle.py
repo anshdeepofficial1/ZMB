@@ -113,17 +113,28 @@ def main() -> None:
     ap.add_argument("--dry-run", action="store_true", help="render only — koi API call/post nahi")
     ap.add_argument("--stills", action="store_true", help="har line ka ek still frame (turant preview, video nahi)")
     ap.add_argument("--force-publish", action="store_true", help="time/date gate bypass karo")
+    ap.add_argument("--prepare-scheduled", action="store_true",
+                    help="render and host a Reel now, then queue it for the configured future publish time")
     args = ap.parse_args()
 
     cfg = load_config()
     state = load_state()
     scn = engine.load_scenarios()
+    pending_path = Path(__file__).resolve().parents[1] / "state" / "pending_episode.json"
+    pending = None
+    if pending_path.exists():
+        try:
+            pending = json.loads(pending_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise SystemExit(f"[cycle] pending episode file is unreadable: {exc}") from exc
+    if args.prepare_scheduled and pending:
+        raise SystemExit("[cycle] a pending Reel already exists; refusing to overwrite it")
 
     token = (os.environ.get("IG_ACCESS_TOKEN") or "").strip()
     ig_user_id = (os.environ.get("IG_USER_ID") or "").strip()
 
     # Fail before spending minutes rendering when required publishing credentials are absent.
-    if not args.dry_run:
+    if not args.dry_run and not args.prepare_scheduled:
         missing = []
         if not token:
             missing.append("IG_ACCESS_TOKEN")
@@ -141,7 +152,7 @@ def main() -> None:
     client = GraphClient(token) if token else None
 
     own_username = (os.environ.get("IG_USERNAME") or "").strip() or None
-    if not args.dry_run and client is not None and ig_user_id:
+    if not args.dry_run and not args.prepare_scheduled and client is not None and ig_user_id:
         # Validate the token/account before paying the render cost.
         try:
             profile = client.get("me", fields="user_id,username")
@@ -160,7 +171,12 @@ def main() -> None:
         if not own_username:
             own_username = profile.get("username")
 
-
+    if args.prepare_scheduled:
+        if not (os.environ.get("GITHUB_REPOSITORY") or "").strip():
+            raise SystemExit("[cycle] prepare preflight failed: GITHUB_REPOSITORY missing")
+        if not ((os.environ.get("GITHUB_TOKEN") or "").strip()
+                or (os.environ.get("GH_PAT") or "").strip()):
+            raise SystemExit("[cycle] prepare preflight failed: GITHUB_TOKEN/GH_PAT missing")
 
     now = ist_now()
     today = now.date().isoformat()
@@ -168,21 +184,37 @@ def main() -> None:
 
     # --- 1) vote checkpoint (khuli episode ke naye comments padho) ---
     last = state.get("last_episode")
-    if (not args.dry_run and client and ig_user_id
-            and last and last.get("vote") and not last.get("closed")):
+    if (not args.dry_run and not args.prepare_scheduled and not pending
+            and client and ig_user_id and last and last.get("vote") and not last.get("closed")):
         votes_mod.tally(client, cfg, state, own_username)
         save_state(state)
 
     # --- 2) due check ---
     publish_target = None
-    if not args.dry_run:
+    if not args.dry_run and not args.prepare_scheduled:
         now = ist_now()
         today = now.date().isoformat()
-        publish_target = _publish_target(state, cfg, now, args.force_publish)
-        if publish_target is None:
-            return
+        if pending:
+            publish_target = _parse_ist_timestamp(pending.get("publish_at_ist"), now.tzinfo)
+            if publish_target is None:
+                raise SystemExit("[cycle] pending Reel has an invalid publish_at_ist timestamp")
+            prep_hours = max(0, min(23, int(cfg.get("publish_prepare_hours", 1))))
+            prep_start = publish_target - timedelta(hours=prep_hours)
+            if now < prep_start:
+                remaining = prep_start - now
+                log(f"[cycle] queued Reel ready; preparation window opens in {remaining.total_seconds() / 3600:.1f}h")
+                return
+            if now >= publish_target:
+                log(f"[cycle] queued Reel target reached/passed ({publish_target.isoformat()}); publishing now")
+                publish_target = now
+            else:
+                log(f"[cycle] queued Reel is ready; scheduled for {publish_target.isoformat()}")
+        else:
+            publish_target = _publish_target(state, cfg, now, args.force_publish)
+            if publish_target is None:
+                return
 
-        # Check publishing quota before rendering; avoid wasting runner minutes
+        # Check publishing quota before rendering or publishing; avoid wasting runner minutes
         # if the account has already exhausted the API publishing window.
         try:
             quota_payload = client.get(f"{ig_user_id}/content_publishing_limit")
@@ -193,43 +225,50 @@ def main() -> None:
                 if total > 0 and usage >= total:
                     raise SystemExit(
                         f"[cycle] publishing quota exhausted ({usage}/{total}); "
-                        "skipping render and waiting for quota reset."
+                        "skipping publish and waiting for quota reset."
                     )
             if quota_rows:
                 log(f"[cycle] publishing quota preflight: {quota_rows}")
         except SystemExit:
             raise
         except Exception as exc:
-            # Quota read can be transient; publish_reel performs a second check.
             log(f"[cycle] quota preflight unavailable (non-fatal): {exc}")
 
-    # --- 3) pichhli episode resolve karo + agla node set karo ---
-    last = state.get("last_episode")
-    recap = None
-    if last:
-        if last.get("vote") and not last.get("closed"):
-            if client and ig_user_id and not args.dry_run:
-                votes_mod.tally(client, cfg, state, own_username)
-            resolution = engine.advance(state, scn, cfg, last.get("votes"))
-        else:
-            resolution = engine.advance(state, scn, cfg, None)
-        recap = engine.recap_line(resolution)
-        if resolution:
-            log(f"[cycle] resolution → {resolution}")
+    # --- 3/4) Use queued episode or resolve the story, then render ---
+    episode = None
+    result = None
+    if pending and not args.dry_run and not args.prepare_scheduled:
+        episode = pending.get("episode")
+        if not isinstance(episode, dict) or not pending.get("video_url"):
+            raise SystemExit("[cycle] pending Reel record is missing episode/video_url")
+        log(f"[cycle] using queued Reel S{episode.get('season')} D{episode.get('day')} — no rerender")
+        result = {"video_path": None}
+    else:
+        last = state.get("last_episode")
+        recap = None
+        if last:
+            if last.get("vote") and not last.get("closed"):
+                if client and ig_user_id and not args.dry_run and not args.prepare_scheduled:
+                    votes_mod.tally(client, cfg, state, own_username)
+                resolution = engine.advance(state, scn, cfg, last.get("votes"))
+            else:
+                resolution = engine.advance(state, scn, cfg, None)
+            recap = engine.recap_line(resolution)
+            if resolution:
+                log(f"[cycle] resolution → {resolution}")
 
-    # --- 4) episode banao + render ---
-    episode = engine.build_episode(state, scn, cfg, recap)
-    log(f"[cycle] episode: S{episode['season']} D{episode['day']} "
-        f"node={episode['node']} kind={episode['kind']} vote={episode['vote']}")
-    if args.stills:
-        stills = render.render_stills(cfg, episode)
-        log(f"[cycle] stills → {len(stills)} files in out/stills")
-        (OUT_DIR / "caption.txt").write_text(episode["caption"] + "\n", encoding="utf-8")
-        log("[cycle] dry-run complete: stills only")
-        return
-    result = render.render_episode(cfg, episode)
+        episode = engine.build_episode(state, scn, cfg, recap)
+        log(f"[cycle] episode: S{episode['season']} D{episode['day']} "
+            f"node={episode['node']} kind={episode['kind']} vote={episode['vote']}")
+        if args.stills:
+            stills = render.render_stills(cfg, episode)
+            log(f"[cycle] stills → {len(stills)} files in out/stills")
+            (OUT_DIR / "caption.txt").write_text(episode["caption"] + "\n", encoding="utf-8")
+            log("[cycle] dry-run complete: stills only")
+            return
+        result = render.render_episode(cfg, episode)
 
-    # debug artifacts (workflow inhe artifact ke roop mein upload karta hai)
+    # Debug artifacts: upload a rendered file only when this run actually rendered it.
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     (OUT_DIR / "episode.json").write_text(
         json.dumps(episode, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
@@ -243,11 +282,41 @@ def main() -> None:
         log(f"[cycle] dry-run complete: {result['video_path']}")
         return
 
+    if args.prepare_scheduled:
+        from datetime import time as clock_time
+
+        try:
+            hour_text, minute_text = str(cfg.get("publish_time_ist", "20:00")).split(":", 1)
+            target_date = ist_now().date() + timedelta(days=1)
+            target = datetime.combine(
+                target_date,
+                clock_time(hour=int(hour_text), minute=int(minute_text)),
+                tzinfo=ist_now().tzinfo,
+            )
+        except (TypeError, ValueError):
+            raise SystemExit("[cycle] invalid publish_time_ist in config.json")
+        media_url = publish.push_media_to_github(result["video_path"], episode["video_name"], cfg)
+        if not media_url:
+            raise SystemExit("[cycle] public media URL nahi mila while preparing scheduled Reel")
+        pending_record = {
+            "schema": 1,
+            "prepared_at_ist": ist_now().isoformat(),
+            "publish_at_ist": target.isoformat(),
+            "video_url": media_url,
+            "episode": episode,
+        }
+        pending_path.parent.mkdir(parents=True, exist_ok=True)
+        pending_path.write_text(json.dumps(pending_record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        log(f"[cycle] QUEUED: S{episode['season']} D{episode['day']} for {target.isoformat()}")
+        return
+
     # --- 5) publish ---
     if client is None or not ig_user_id:
         raise SystemExit("[cycle] IG_ACCESS_TOKEN / IG_USER_ID missing — publish nahi ho sakta")
 
-    media_url = publish.push_media_to_github(result["video_path"], episode["video_name"], cfg)
+    media_url = pending.get("video_url") if pending else None
+    if not media_url:
+        media_url = publish.push_media_to_github(result["video_path"], episode["video_name"], cfg)
     if not media_url:
         raise SystemExit("[cycle] public media URL nahi mila (repo/GITHUB_REPOSITORY check karo)")
 
@@ -266,6 +335,9 @@ def main() -> None:
     today = posted_at.date().isoformat()
     engine.commit_episode(state, episode, media_id, today, posted_at.isoformat())
     save_state(state)
+    if pending and pending_path.exists():
+        pending_path.unlink()
+        log("[cycle] queued Reel cleared after successful publish")
     log(f"[cycle] SUCCESS: S{episode['season']} D{episode['day']} live (media_id={media_id})")
 
 
