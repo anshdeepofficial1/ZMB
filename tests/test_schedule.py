@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from pathlib import Path
+import json
 import sys
 import unittest
 
@@ -7,6 +8,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from common import IST
 from run_cycle import _publish_target, _parse_ist_timestamp
+from animate import narrative_beat_layer
+
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class PublishScheduleTests(unittest.TestCase):
@@ -56,6 +60,45 @@ class PublishScheduleTests(unittest.TestCase):
     def test_timestamp_parser_respects_ist_offset(self):
         parsed = _parse_ist_timestamp("2026-10-25T20:00:00+05:30", IST)
         self.assertEqual(parsed, self.ts(25, 20, 0))
+
+
+class NarrativeVisualBeatTests(unittest.TestCase):
+    def test_breakdown_scene_has_car_driver_and_engine_smoke(self):
+        svg = narrative_beat_layer({"beat": "breakdown"}, 1.25)
+        self.assertIn("ENGINE FAILURE", svg)
+        self.assertIn("zmb-break-window", svg)
+        self.assertIn("M 788 1257", svg)
+        self.assertIn("translate(72 1515)", svg)
+
+    def test_interior_scene_is_a_real_cabin_composition(self):
+        svg = narrative_beat_layer({"beat": "car_interior"}, 2.0)
+        self.assertIn("STALLED", svg)
+        self.assertIn("translate(425 1492)", svg)
+        self.assertIn("translate(692 1454)", svg)
+        self.assertIn("STALLED", svg)
+
+    def test_backpack_is_explicitly_rendered(self):
+        svg = narrative_beat_layer({"beat": "backpack_exit"}, 0.8)
+        self.assertIn("#7b3f2b", svg)
+        self.assertIn("M 342 1028", svg)
+        self.assertIn("M 349 1020", svg)
+
+    def test_choice_teaser_has_both_real_story_choices(self):
+        svg = narrative_beat_layer({"beat": "choice_teaser"}, 1.1)
+        self.assertIn(">RUN</text>", svg)
+        self.assertIn(">CHECK</text>", svg)
+        self.assertIn("COMMENT ON TOMORROW", svg)
+
+    def test_intro_narration_has_matching_visual_beats(self):
+        scenarios = json.loads((ROOT / "content" / "scenarios.json").read_text(encoding="utf-8"))
+        lines = scenarios["arcs"]["road"]["nodes"]["intro"]["lines"]
+        beats = [line.get("shot", {}).get("beat") for line in lines]
+        self.assertEqual(
+            beats,
+            ["breakdown", "car_interior", "spot_station", "backpack_exit", "spot_station", "choice_teaser"],
+        )
+        self.assertIn("engine", lines[0]["text"].lower())
+        self.assertIn("backpack", lines[3]["text"].lower())
 
 
 if __name__ == "__main__":
