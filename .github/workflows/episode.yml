@@ -1,12 +1,6 @@
 name: Episode Cycle
 
 on:
-  # Temporary smoke trigger: only commits to the publisher file run production cycle.
-  # Remove after the first verified run; workflow_dispatch and schedule remain permanent.
-  push:
-    branches: [main]
-    paths:
-      - "scripts/publish.py"
   schedule:
     # IST slots: 08:00, 10:30, 13:00, 16:30, 19:30, 22:30 (UTC+5:30)
     # Publish 13:00 IST ke baad pehle run par hota hai; baaki runs vote checkpoints hain.
