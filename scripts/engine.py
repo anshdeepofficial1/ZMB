@@ -146,10 +146,17 @@ def build_caption(cfg: dict, state: dict, node: dict, choices: list[dict], hasht
         lines += [recap, ""]
     if choices:
         for i, choice in enumerate(choices, start=1):
-            lines.append(f"{i}\ufe0f\u20e3 {choice['text']}")
-        lines += ["", cfg.get("cta_vote", "Comment 1 or 2. Most comments wins.")]
+            lines.append(f"{i}\\ufe0f\\u20e3 {choice['text']}")
+        handle = str(cfg.get("handle") or "@zmbstories").strip()
+        if handle and not handle.startswith("@"):
+            handle = "@" + handle
+        lines += [
+            "",
+            cfg.get("cta_vote", "Comment 1 or 2. The winning choice shapes the next episode."),
+            f"Follow {handle} for the next episode." if handle else "Follow for the next episode.",
+        ]
     else:
-        lines += [cfg.get("cta_story", "Follow so you do not miss the next choice.")]
+        lines += [cfg.get("cta_story", "Follow @zmbstories to find out what happens next.")]
     lines += ["", cfg.get("fiction_disclaimer", "A fictional animated story."), "", " ".join(hashtags)]
     caption = "\n".join(line for line in lines if line is not None).strip()
     return caption[:2190] + "\u2026" if len(caption) > 2200 else caption
