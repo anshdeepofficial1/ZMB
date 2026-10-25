@@ -3,11 +3,36 @@
   "title": "ZOMBIE APOCALYPSE: YOU DECIDE",
   "tagline": "Every night the story stops. You comment. The most votes decide.",
   "cast": {
-    "max": { "name": "Max", "role": "hero", "art": "boy", "blurb": "A quiet survivor with a good heart and a failing car." },
-    "biscuit": { "name": "Biscuit", "role": "pet", "art": "dog", "blurb": "Max's dog. Small ears, big courage, always hungry." },
-    "ada": { "name": "Ada", "role": "friend", "art": "girl", "blurb": "Found at the gas station. Fast hands, faster plans." },
-    "old": { "name": "Otto", "role": "friend", "art": "old", "blurb": "An old trucker who knows every back road." },
-    "zombie": { "name": "The shamblers", "role": "threat", "art": "zombie", "blurb": "They listen for sound. They never hurry. They never stop." }
+    "max": {
+      "name": "Max",
+      "role": "hero",
+      "art": "boy",
+      "blurb": "A quiet survivor with a good heart and a failing car."
+    },
+    "biscuit": {
+      "name": "Biscuit",
+      "role": "pet",
+      "art": "dog",
+      "blurb": "Max's dog. Small ears, big courage, always hungry."
+    },
+    "ada": {
+      "name": "Ada",
+      "role": "friend",
+      "art": "girl",
+      "blurb": "Found at the gas station. Fast hands, faster plans."
+    },
+    "old": {
+      "name": "Otto",
+      "role": "friend",
+      "art": "old",
+      "blurb": "An old trucker who knows every back road."
+    },
+    "zombie": {
+      "name": "The shamblers",
+      "role": "threat",
+      "art": "zombie",
+      "blurb": "They listen for sound. They never hurry. They never stop."
+    }
   },
   "arcs": {
     "road": {
@@ -19,12 +44,126 @@
           "subtitle": "The Empty Highway",
           "hook": "2:47 AM. Max's car dies on an empty road, next to one gas station that is still lit.",
           "lines": [
-            { "text": "2:47 in the morning. Max's old car coughs... and dies.", "shot": { "place": "highway", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "Biscuit whines from the back seat. No phone. No signal. No plan.", "shot": { "place": "highway", "cast": [["max", "idle"], ["biscuit", "scared"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "Then Max sees it. One gas station, still lit, like the end of the world forgot about it.", "shot": { "place": "highway", "cast": [["max", "point"], ["biscuit", "wag"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "He grabs his backpack. 'Stay close, Biscuit. We do this together.'", "shot": { "place": "highway", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "Now it is your turn. Every night, the story stops, and you decide what Max does next.", "shot": { "place": "gas_station", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "Comment the choice with the most votes wins. Day one starts now.", "shot": { "place": "gas_station", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "pull", "fx": "fog", "mood": "hope", "time": "night" } }
+            {
+              "text": "2:47 in the morning. Max's old car coughs... and dies.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Biscuit whines from the back seat. No phone. No signal. No plan.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Then Max sees it. One gas station, still lit, like the end of the world forgot about it.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "point"
+                  ],
+                  [
+                    "biscuit",
+                    "wag"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "He grabs his backpack. 'Stay close, Biscuit. We do this together.'",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Now it is your turn. Every night, the story stops, and you decide what Max does next.",
+              "shot": {
+                "place": "gas_station",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Comment the choice with the most votes wins. Day one starts now.",
+              "shot": {
+                "place": "gas_station",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "fog",
+                "mood": "hope",
+                "time": "night"
+              }
+            }
           ],
           "next": "store_sound"
         },
@@ -33,15 +172,140 @@
           "subtitle": "Staff Only",
           "hook": "The store has food for weeks. And something is dragging its feet behind the STAFF ONLY door.",
           "lines": [
-            { "text": "The gas station is empty. Too empty.", "shot": { "place": "gas_station", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "Inside the store: water, cans, batteries. Everything Max needs to keep Biscuit alive.", "shot": { "place": "store", "cast": [["max", "walk"], ["biscuit", "sniff"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
-            { "text": "Then he hears it. Behind the STAFF ONLY door, something heavy drags across the floor.", "shot": { "place": "store", "cast": [["max", "idle"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Then silence. The storeroom has food for weeks. And whatever made that sound.", "shot": { "place": "store", "cast": [["max", "crouch"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Should Max RUN and leave it all behind? Or CHECK what is inside?", "shot": { "place": "store", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "tense", "time": "night" } }
+            {
+              "text": "The gas station is empty. Too empty.",
+              "shot": {
+                "place": "gas_station",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panl",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Inside the store: water, cans, batteries. Everything Max needs to keep Biscuit alive.",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "sniff"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Then he hears it. Behind the STAFF ONLY door, something heavy drags across the floor.",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Then silence. The storeroom has food for weeks. And whatever made that sound.",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "crouch"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Should Max RUN and leave it all behind? Or CHECK what is inside?",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
           ],
           "choices": [
-            { "key": "run", "text": "RUN - slip out and drive away", "labels": ["run", "1", "escape", "leave", "flee", "sneak"], "effects": { "food": -5 }, "next": "run_away" },
-            { "key": "check", "text": "CHECK - open the door", "labels": ["check", "2", "open", "look", "enter", "stay"], "effects": { "noise": 6 }, "next": "check_back" }
+            {
+              "key": "run",
+              "text": "RUN - slip out and drive away",
+              "labels": [
+                "run",
+                "1",
+                "escape",
+                "leave",
+                "flee",
+                "sneak"
+              ],
+              "effects": {
+                "food": -5
+              },
+              "next": "run_away"
+            },
+            {
+              "key": "check",
+              "text": "CHECK - open the door",
+              "labels": [
+                "check",
+                "2",
+                "open",
+                "look",
+                "enter",
+                "stay"
+              ],
+              "effects": {
+                "noise": 6
+              },
+              "next": "check_back"
+            }
           ],
           "default": "run"
         },
@@ -50,11 +314,102 @@
           "subtitle": "Do Not Look Back",
           "hook": "Max ran. The car started. Some things you cannot unhear.",
           "lines": [
-            { "text": "Max backs out slowly. Quiet steps. Biscuit walks so close, he can feel him breathing.", "shot": { "place": "store", "cast": [["max", "sneak"], ["biscuit", "follow"]], "cam": "panr", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "The dragging stops. Then the door handle turns. Max runs.", "shot": { "place": "gas_station", "cast": [["max", "run"], ["biscuit", "run"]], "cam": "shake", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "The car starts on the first try. Sometimes luck is a plan.", "shot": { "place": "highway", "cast": [["max", "drive"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "At sunrise, Max checks the bag. Fuel: enough. Food: almost nothing.", "shot": { "place": "highway", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "fog", "mood": "calm", "time": "dawn" } },
-            { "text": "But they are alive. And ahead, a motel sign is still glowing.", "shot": { "place": "highway", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "pull", "fx": "fog", "mood": "hope", "time": "dawn" } }
+            {
+              "text": "Max backs out slowly. Quiet steps. Biscuit walks so close, he can feel him breathing.",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "sneak"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "The dragging stops. Then the door handle turns. Max runs.",
+              "shot": {
+                "place": "gas_station",
+                "cast": [
+                  [
+                    "max",
+                    "run"
+                  ],
+                  [
+                    "biscuit",
+                    "run"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "The car starts on the first try. Sometimes luck is a plan.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "drive"
+                  ]
+                ],
+                "cam": "panl",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "At sunrise, Max checks the bag. Fuel: enough. Food: almost nothing.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "calm",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "But they are alive. And ahead, a motel sign is still glowing.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "fog",
+                "mood": "hope",
+                "time": "dawn"
+              }
+            }
           ],
           "next": "motel_arrive"
         },
@@ -63,13 +418,119 @@
           "subtitle": "The Door",
           "hook": "Behind the door was not a monster. It was something worse: hope.",
           "lines": [
-            { "text": "Max grabs a tire iron. His hands shake. But Biscuit is hungry, and that decides it.", "shot": { "place": "store", "cast": [["max", "sneak"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Inside: a girl, crouched behind the crates, holding a box cutter. Alive.", "shot": { "place": "store", "cast": [["max", "idle"], ["ada", "crouch"], ["biscuit", "bark"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
-            { "text": "One step and I scream, she says. And screaming would bring them all.", "shot": { "place": "store", "cast": [["max", "idle"], ["ada", "point"]], "cam": "static", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Max drops the tire iron. I have a car. You have food. Deal?", "shot": { "place": "store", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
-            { "text": "Her name is Ada. Two days alone in here. And in her bag: a shortwave radio.", "shot": { "place": "store", "cast": [["max", "idle"], ["ada", "walk"], ["biscuit", "wag"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } }
+            {
+              "text": "Max grabs a tire iron. His hands shake. But Biscuit is hungry, and that decides it.",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "sneak"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Inside: a girl, crouched behind the crates, holding a box cutter. Alive.",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "crouch"
+                  ],
+                  [
+                    "biscuit",
+                    "bark"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "One step and I scream, she says. And screaming would bring them all.",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "point"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Max drops the tire iron. I have a car. You have food. Deal?",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Her name is Ada. Two days alone in here. And in her bag: a shortwave radio.",
+              "shot": {
+                "place": "store",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "wag"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "night"
+              }
+            }
           ],
-          "effects": { "food": 15, "dog": 5 },
+          "effects": {
+            "food": 15,
+            "dog": 5
+          },
           "next": "motel_arrive"
         },
         "motel_arrive": {
@@ -77,11 +538,106 @@
           "subtitle": "Vacancy",
           "hook": "Twelve motel doors. One old truck. And a sign that still says VACANCY.",
           "lines": [
-            { "text": "By sunrise they reach a roadside motel. Twelve doors, one old truck.", "shot": { "place": "motel_lot", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "fog", "mood": "calm", "time": "dawn" } },
-            { "text": "The sign says VACANCY. Somebody checked in a very long time ago.", "shot": { "place": "motel_lot", "cast": [["max", "point"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dawn" } },
-            { "text": "They take room six. Door locked. Curtains closed. For one day, they sleep.", "shot": { "place": "motel_hall", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "calm", "time": "day" } },
-            { "text": "Biscuit sleeps against the door. Always on guard.", "shot": { "place": "motel_hall", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "calm", "time": "day" } },
-            { "text": "Then comes 3:04 in the morning.", "shot": { "place": "motel_hall", "cast": [["max", "idle"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } }
+            {
+              "text": "By sunrise they reach a roadside motel. Twelve doors, one old truck.",
+              "shot": {
+                "place": "motel_lot",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "calm",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "The sign says VACANCY. Somebody checked in a very long time ago.",
+              "shot": {
+                "place": "motel_lot",
+                "cast": [
+                  [
+                    "max",
+                    "point"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "They take room six. Door locked. Curtains closed. For one day, they sleep.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "day"
+              }
+            },
+            {
+              "text": "Biscuit sleeps against the door. Always on guard.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "calm",
+                "time": "day"
+              }
+            },
+            {
+              "text": "Then comes 3:04 in the morning.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            }
           ],
           "next": "motel_door"
         },
@@ -90,15 +646,129 @@
           "subtitle": "3:04 AM",
           "hook": "Scratch. Scratch. A voice at the motel door whispers: Please... open.",
           "lines": [
-            { "text": "Scratch. Scratch. Right on the door.", "shot": { "place": "motel_hall", "cast": [["max", "idle"], ["biscuit", "scared"]], "cam": "static", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Then a whisper, soft and tired. Please... I am hurt. Open the door.", "shot": { "place": "motel_hall", "cast": [["max", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "The peephole is broken. The voice could be anyone. Or any thing.", "shot": { "place": "motel_hall", "cast": [["max", "crouch"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Ada grips the box cutter. Biscuit shows his teeth.", "shot": { "place": "motel_hall", "cast": [["ada", "point"], ["biscuit", "bark"]], "cam": "static", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Open the door... or stay quiet until morning?", "shot": { "place": "motel_hall", "cast": [["max", "idle"]], "cam": "pull", "fx": "none", "mood": "tense", "time": "night" } }
+            {
+              "text": "Scratch. Scratch. Right on the door.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Then a whisper, soft and tired. Please... I am hurt. Open the door.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "The peephole is broken. The voice could be anyone. Or any thing.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "crouch"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Ada grips the box cutter. Biscuit shows his teeth.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "ada",
+                    "point"
+                  ],
+                  [
+                    "biscuit",
+                    "bark"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Open the door... or stay quiet until morning?",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
           ],
           "choices": [
-            { "key": "open", "text": "OPEN - pull the stranger inside", "labels": ["open", "1", "help", "door", "lets", "pull"], "effects": { "hp": -5, "dog": -5 }, "next": "open_door" },
-            { "key": "quiet", "text": "STAY QUIET - wait for daylight", "labels": ["quiet", "2", "stay", "wait", "hide", "ignore"], "effects": { "food": -8 }, "next": "stay_quiet" }
+            {
+              "key": "open",
+              "text": "OPEN - pull the stranger inside",
+              "labels": [
+                "open",
+                "1",
+                "help",
+                "door",
+                "lets",
+                "pull"
+              ],
+              "effects": {
+                "hp": -5,
+                "dog": -5
+              },
+              "next": "open_door"
+            },
+            {
+              "key": "quiet",
+              "text": "STAY QUIET - wait for daylight",
+              "labels": [
+                "quiet",
+                "2",
+                "stay",
+                "wait",
+                "hide",
+                "ignore"
+              ],
+              "effects": {
+                "food": -8
+              },
+              "next": "stay_quiet"
+            }
           ],
           "default": "quiet"
         },
@@ -107,12 +777,87 @@
           "subtitle": "In From the Rain",
           "hook": "The stranger was kind, hurt, and hiding something under his jacket.",
           "lines": [
-            { "text": "Max opens the door and pulls the stranger inside. An old man, soaked and bleeding.", "shot": { "place": "motel_hall", "cast": [["max", "check"], ["old", "crouch"]], "cam": "push", "fx": "rain", "mood": "danger", "time": "night" } },
-            { "text": "His name is Otto. He was a trucker. He knows a shortcut over the mountains.", "shot": { "place": "motel_hall", "cast": [["max", "idle"], ["old", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
-            { "text": "But the bite on his arm is dark. He hides it under his jacket.", "shot": { "place": "motel_hall", "cast": [["max", "look"], ["old", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "They drive all night. Otto sleeps. Max keeps one eye on the mirror.", "shot": { "place": "highway", "cast": [["max", "drive"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "night" } }
+            {
+              "text": "Max opens the door and pulls the stranger inside. An old man, soaked and bleeding.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "check"
+                  ],
+                  [
+                    "old",
+                    "crouch"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "rain",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "His name is Otto. He was a trucker. He knows a shortcut over the mountains.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "old",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "night"
+              }
+            },
+            {
+              "text": "But the bite on his arm is dark. He hides it under his jacket.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "old",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "They drive all night. Otto sleeps. Max keeps one eye on the mirror.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "drive"
+                  ]
+                ],
+                "cam": "panl",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
           ],
-          "effects": { "hp": -5, "dog": -5 },
+          "effects": {
+            "hp": -5,
+            "dog": -5
+          },
           "next": "route_pick"
         },
         "stay_quiet": {
@@ -120,12 +865,98 @@
           "subtitle": "Until Morning",
           "hook": "At dawn the hallway was empty. The door had scratches... and a handprint.",
           "lines": [
-            { "text": "Nobody moves. The whisper becomes scratching. The scratching becomes knocking.", "shot": { "place": "motel_hall", "cast": [["max", "crouch"], ["ada", "crouch"], ["biscuit", "scared"]], "cam": "static", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Max pushes the dresser against the door and waits in the dark.", "shot": { "place": "motel_hall", "cast": [["max", "crouch"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "At dawn, the hallway is empty. The door has deep scratches. And a handprint.", "shot": { "place": "motel_hall", "cast": [["max", "look"], ["ada", "look"]], "cam": "push", "fx": "none", "mood": "tense", "time": "dawn" } },
-            { "text": "They leave fast, without the food from the office fridge.", "shot": { "place": "motel_lot", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "pull", "fx": "fog", "mood": "calm", "time": "dawn" } }
+            {
+              "text": "Nobody moves. The whisper becomes scratching. The scratching becomes knocking.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "crouch"
+                  ],
+                  [
+                    "ada",
+                    "crouch"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Max pushes the dresser against the door and waits in the dark.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "crouch"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "At dawn, the hallway is empty. The door has deep scratches. And a handprint.",
+              "shot": {
+                "place": "motel_hall",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "ada",
+                    "look"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "They leave fast, without the food from the office fridge.",
+              "shot": {
+                "place": "motel_lot",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "fog",
+                "mood": "calm",
+                "time": "dawn"
+              }
+            }
           ],
-          "effects": { "food": -8 },
+          "effects": {
+            "food": -8
+          },
           "next": "route_pick"
         },
         "route_pick": {
@@ -133,14 +964,119 @@
           "subtitle": "Two Roads",
           "hook": "The radio tower is ninety kilometers north. Forest shortcut, or the open highway?",
           "lines": [
-            { "text": "The radio tower is ninety kilometers north. Two roads can get them there.", "shot": { "place": "motel_lot", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "fog", "mood": "calm", "time": "day" } },
-            { "text": "The forest road is shorter. Darker. No signal, no help.", "shot": { "place": "forest", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "fog", "mood": "tense", "time": "day" } },
-            { "text": "The highway is open. But every town on it was evacuated badly.", "shot": { "place": "highway", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "day" } },
-            { "text": "FOREST shortcut... or HIGHWAY detour?", "shot": { "place": "highway", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "day" } }
+            {
+              "text": "The radio tower is ninety kilometers north. Two roads can get them there.",
+              "shot": {
+                "place": "motel_lot",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "calm",
+                "time": "day"
+              }
+            },
+            {
+              "text": "The forest road is shorter. Darker. No signal, no help.",
+              "shot": {
+                "place": "forest",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "day"
+              }
+            },
+            {
+              "text": "The highway is open. But every town on it was evacuated badly.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panl",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "day"
+              }
+            },
+            {
+              "text": "FOREST shortcut... or HIGHWAY detour?",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "day"
+              }
+            }
           ],
           "choices": [
-            { "key": "forest", "text": "FOREST - the short dark road", "labels": ["forest", "1", "woods", "trees", "shortcut"], "effects": { "food": -5 }, "next": "forest_road" },
-            { "key": "highway", "text": "HIGHWAY - long, open, exposed", "labels": ["highway", "2", "road", "detour", "open"], "effects": { "hp": -10, "noise": 10 }, "next": "highway_road" }
+            {
+              "key": "forest",
+              "text": "FOREST - the short dark road",
+              "labels": [
+                "forest",
+                "1",
+                "woods",
+                "trees",
+                "shortcut"
+              ],
+              "effects": {
+                "food": -5
+              },
+              "next": "forest_road"
+            },
+            {
+              "key": "highway",
+              "text": "HIGHWAY - long, open, exposed",
+              "labels": [
+                "highway",
+                "2",
+                "road",
+                "detour",
+                "open"
+              ],
+              "effects": {
+                "hp": -10,
+                "noise": 10
+              },
+              "next": "highway_road"
+            }
           ],
           "default": "forest"
         },
@@ -149,13 +1085,96 @@
           "subtitle": "Shapes in the Fog",
           "hook": "They stood between the trees. Arms hanging. Waiting for a sound.",
           "lines": [
-            { "text": "The forest swallows the road. Ada drives. Nobody talks.", "shot": { "place": "forest", "cast": [["max", "drive"]], "cam": "panr", "fx": "fog", "mood": "tense", "time": "day" } },
-            { "text": "An hour in, shapes appear in the fog. Standing. Arms hanging.", "shot": { "place": "forest", "cast": [["max", "look"]], "zeds": "far", "cam": "push", "fx": "fog", "mood": "danger", "time": "day" } },
-            { "text": "Biscuit growls, low. Max puts a hand on his head. Quiet, boy.", "shot": { "place": "forest", "cast": [["max", "crouch"], ["biscuit", "scared"]], "cam": "push", "fx": "fog", "mood": "danger", "time": "day" } },
-            { "text": "They roll past, engine low. One of them turns its head.", "shot": { "place": "forest", "cast": [["max", "drive"]], "zeds": "near", "cam": "shake", "fx": "fog", "mood": "danger", "time": "day" } },
-            { "text": "Two hundred meters later, the fog keeps their secret.", "shot": { "place": "forest", "cast": [["max", "drive"]], "cam": "pull", "fx": "fog", "mood": "calm", "time": "day" } }
+            {
+              "text": "The forest swallows the road. Ada drives. Nobody talks.",
+              "shot": {
+                "place": "forest",
+                "cast": [
+                  [
+                    "max",
+                    "drive"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "day"
+              }
+            },
+            {
+              "text": "An hour in, shapes appear in the fog. Standing. Arms hanging.",
+              "shot": {
+                "place": "forest",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ]
+                ],
+                "zeds": "far",
+                "cam": "push",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "day"
+              }
+            },
+            {
+              "text": "Biscuit growls, low. Max puts a hand on his head. Quiet, boy.",
+              "shot": {
+                "place": "forest",
+                "cast": [
+                  [
+                    "max",
+                    "crouch"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "day"
+              }
+            },
+            {
+              "text": "They roll past, engine low. One of them turns its head.",
+              "shot": {
+                "place": "forest",
+                "cast": [
+                  [
+                    "max",
+                    "drive"
+                  ]
+                ],
+                "zeds": "near",
+                "cam": "shake",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "day"
+              }
+            },
+            {
+              "text": "Two hundred meters later, the fog keeps their secret.",
+              "shot": {
+                "place": "forest",
+                "cast": [
+                  [
+                    "max",
+                    "drive"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "fog",
+                "mood": "calm",
+                "time": "day"
+              }
+            }
           ],
-          "effects": { "dog": 5 },
+          "effects": {
+            "dog": 5
+          },
           "next": "tower_arrive"
         },
         "highway_road": {
@@ -163,13 +1182,112 @@
           "subtitle": "The Blocked Bridge",
           "hook": "The bridge was full of silent cars. Then one alarm started screaming.",
           "lines": [
-            { "text": "The first twenty kilometers of highway are almost normal. That is the scary part.", "shot": { "place": "highway", "cast": [["max", "drive"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "day" } },
-            { "text": "Then the bridge. Jammed with empty cars, door to door.", "shot": { "place": "bridge", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "day" } },
-            { "text": "They walk between the cars. Then a car alarm screams.", "shot": { "place": "bridge", "cast": [["max", "idle"]], "cam": "shake", "fx": "flash", "mood": "danger", "time": "day" } },
-            { "text": "On the far bank: dozens of them. Drawn by every sound. By their sound.", "shot": { "place": "bridge", "cast": [["max", "run"], ["biscuit", "run"]], "zeds": "horde", "cam": "shake", "fx": "flash", "mood": "danger", "time": "day" } },
-            { "text": "They run the last kilometer and learn one rule. Noise is death.", "shot": { "place": "highway", "cast": [["max", "run"], ["ada", "run"], ["biscuit", "run"]], "cam": "shake", "fx": "fog", "mood": "danger", "time": "day" } }
+            {
+              "text": "The first twenty kilometers of highway are almost normal. That is the scary part.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "drive"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "day"
+              }
+            },
+            {
+              "text": "Then the bridge. Jammed with empty cars, door to door.",
+              "shot": {
+                "place": "bridge",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "day"
+              }
+            },
+            {
+              "text": "They walk between the cars. Then a car alarm screams.",
+              "shot": {
+                "place": "bridge",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "flash",
+                "mood": "danger",
+                "time": "day"
+              }
+            },
+            {
+              "text": "On the far bank: dozens of them. Drawn by every sound. By their sound.",
+              "shot": {
+                "place": "bridge",
+                "cast": [
+                  [
+                    "max",
+                    "run"
+                  ],
+                  [
+                    "biscuit",
+                    "run"
+                  ]
+                ],
+                "zeds": "horde",
+                "cam": "shake",
+                "fx": "flash",
+                "mood": "danger",
+                "time": "day"
+              }
+            },
+            {
+              "text": "They run the last kilometer and learn one rule. Noise is death.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "run"
+                  ],
+                  [
+                    "ada",
+                    "run"
+                  ],
+                  [
+                    "biscuit",
+                    "run"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "day"
+              }
+            }
           ],
-          "effects": { "hp": -10, "noise": 10 },
+          "effects": {
+            "hp": -10,
+            "noise": 10
+          },
           "next": "tower_arrive"
         },
         "tower_arrive": {
@@ -177,14 +1295,120 @@
           "subtitle": "Lookout Tower Three",
           "hook": "There is a light at the top of the tower. But nobody answers the door.",
           "lines": [
-            { "text": "At dusk they find it. Lookout Tower Three, in the middle of nothing.", "shot": { "place": "tower", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "fog", "mood": "tense", "time": "dusk" } },
-            { "text": "The door at the base is chained from the inside. Which means someone is here.", "shot": { "place": "tower", "cast": [["max", "look"], ["ada", "point"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dusk" } },
-            { "text": "A light moves at the top. The radio voice brought them here. Now: silence.", "shot": { "place": "tower", "cast": [["max", "idle"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dusk" } },
-            { "text": "Call out... or climb the ladder in the dark?", "shot": { "place": "tower", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "dusk" } }
+            {
+              "text": "At dusk they find it. Lookout Tower Three, in the middle of nothing.",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "The door at the base is chained from the inside. Which means someone is here.",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "ada",
+                    "point"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "A light moves at the top. The radio voice brought them here. Now: silence.",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "Call out... or climb the ladder in the dark?",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dusk"
+              }
+            }
           ],
           "choices": [
-            { "key": "call", "text": "CALL OUT - knock and shout hello", "labels": ["call", "1", "shout", "knock", "hello", "loud"], "effects": { "noise": 15 }, "next": "call_out" },
-            { "key": "climb", "text": "CLIMB - take the ladder silently", "labels": ["climb", "2", "silent", "ladder", "quiet", "up"], "effects": { "hp": -10 }, "next": "climb_up" }
+            {
+              "key": "call",
+              "text": "CALL OUT - knock and shout hello",
+              "labels": [
+                "call",
+                "1",
+                "shout",
+                "knock",
+                "hello",
+                "loud"
+              ],
+              "effects": {
+                "noise": 15
+              },
+              "next": "call_out"
+            },
+            {
+              "key": "climb",
+              "text": "CLIMB - take the ladder silently",
+              "labels": [
+                "climb",
+                "2",
+                "silent",
+                "ladder",
+                "quiet",
+                "up"
+              ],
+              "effects": {
+                "hp": -10
+              },
+              "next": "climb_up"
+            }
           ],
           "default": "call"
         },
@@ -193,13 +1417,111 @@
           "subtitle": "Hello?",
           "hook": "The word hello rolled away into the dark. Then a lantern moved.",
           "lines": [
-            { "text": "Max cups his hands. Hello! We heard your message! The word rolls away into the dark.", "shot": { "place": "tower", "cast": [["max", "call"], ["biscuit", "bark"]], "cam": "static", "fx": "fog", "mood": "danger", "time": "dusk" } },
-            { "text": "Silence. Then a lantern moves across the window.", "shot": { "place": "tower", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dusk" } },
-            { "text": "A woman's voice. Put your weapon down and walk to the light.", "shot": { "place": "tower", "cast": [["max", "walk"], ["ada", "walk"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "dusk" } },
-            { "text": "Her name is Mara. Twenty one days alone. She knows this forest like a map.", "shot": { "place": "radio_room", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
-            { "text": "And tonight, the radio has news. A convoy is moving east. To the sea.", "shot": { "place": "radio_room", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "hope", "time": "night" } }
+            {
+              "text": "Max cups his hands. Hello! We heard your message! The word rolls away into the dark.",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "call"
+                  ],
+                  [
+                    "biscuit",
+                    "bark"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "Silence. Then a lantern moves across the window.",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "A woman's voice. Put your weapon down and walk to the light.",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "Her name is Mara. Twenty one days alone. She knows this forest like a map.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "night"
+              }
+            },
+            {
+              "text": "And tonight, the radio has news. A convoy is moving east. To the sea.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "hope",
+                "time": "night"
+              }
+            }
           ],
-          "effects": { "hp": -5, "dog": 5 },
+          "effects": {
+            "hp": -5,
+            "dog": 5
+          },
           "next": "broadcast"
         },
         "climb_up": {
@@ -207,13 +1529,96 @@
           "subtitle": "The Ladder",
           "hook": "At the top: an empty chair, cold coffee, and a light nobody turned off.",
           "lines": [
-            { "text": "The ladder sings in the wind. Bolt by bolt, Max climbs into the dark.", "shot": { "place": "tower", "cast": [["max", "climb"]], "cam": "static", "fx": "fog", "mood": "danger", "time": "dusk" } },
-            { "text": "At the top: an empty chair. Cold coffee. And a light nobody turned off.", "shot": { "place": "tower_top", "cast": [["max", "look"]], "cam": "push", "fx": "none", "mood": "tense", "time": "dusk" } },
-            { "text": "Then a sound behind him. Slow. Hungry.", "shot": { "place": "tower_top", "cast": [["max", "idle"]], "zeds": "near", "cam": "shake", "fx": "none", "mood": "danger", "time": "dusk" } },
-            { "text": "A ranger. Still in his vest. Still up here.", "shot": { "place": "tower_top", "cast": [["max", "idle"], ["zombie", "reach"]], "cam": "shake", "fx": "none", "mood": "danger", "time": "dusk" } },
-            { "text": "Max swings his bag once, hard. Then he pockets the radio and the beans. Sorry, ranger.", "shot": { "place": "tower_top", "cast": [["max", "look"]], "cam": "pull", "fx": "none", "mood": "calm", "time": "dusk" } }
+            {
+              "text": "The ladder sings in the wind. Bolt by bolt, Max climbs into the dark.",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "climb"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "At the top: an empty chair. Cold coffee. And a light nobody turned off.",
+              "shot": {
+                "place": "tower_top",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "Then a sound behind him. Slow. Hungry.",
+              "shot": {
+                "place": "tower_top",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "zeds": "near",
+                "cam": "shake",
+                "fx": "none",
+                "mood": "danger",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "A ranger. Still in his vest. Still up here.",
+              "shot": {
+                "place": "tower_top",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "zombie",
+                    "reach"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "none",
+                "mood": "danger",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "Max swings his bag once, hard. Then he pockets the radio and the beans. Sorry, ranger.",
+              "shot": {
+                "place": "tower_top",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "none",
+                "mood": "calm",
+                "time": "dusk"
+              }
+            }
           ],
-          "effects": { "hp": -10, "food": 10 },
+          "effects": {
+            "hp": -10,
+            "food": 10
+          },
           "next": "broadcast"
         },
         "broadcast": {
@@ -221,48 +1626,359 @@
           "subtitle": "You Are Live",
           "hook": "Two voices answer the radio: a convoy going to the sea, or a voice from the dead city.",
           "lines": [
-            { "text": "Max turns every dial. Static. Static. Then two voices break through.", "shot": { "place": "radio_room", "cast": [["max", "reach"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
-            { "text": "First: a convoy, heading east. We reach the sea in three days. You are welcome.", "shot": { "place": "radio_room", "cast": [["max", "idle"]], "cam": "static", "fx": "none", "mood": "hope", "time": "night" } },
-            { "text": "Second: a voice from the city. Slow. Careful. To whoever hears this... we know how it started.", "shot": { "place": "radio_room", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Safe water with strangers... or the truth, in a dead city?", "shot": { "place": "radio_room", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "tense", "time": "night" } }
+            {
+              "text": "Max turns every dial. Static. Static. Then two voices break through.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "max",
+                    "reach"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "First: a convoy, heading east. We reach the sea in three days. You are welcome.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "hope",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Second: a voice from the city. Slow. Careful. To whoever hears this... we know how it started.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Safe water with strangers... or the truth, in a dead city?",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
           ],
           "choices": [
-            { "key": "convoy", "text": "CONVOY - drive east to the sea", "labels": ["convoy", "1", "sea", "coast", "east", "safe"], "effects": { "dog": 10 }, "next": "end_coast" },
-            { "key": "city", "text": "CITY - find where it started", "labels": ["city", "2", "truth", "lab", "origin", "signal"], "effects": { "noise": 10 }, "next": "end_city" }
+            {
+              "key": "convoy",
+              "text": "CONVOY - drive east to the sea",
+              "labels": [
+                "convoy",
+                "1",
+                "sea",
+                "coast",
+                "east",
+                "safe"
+              ],
+              "effects": {
+                "dog": 10
+              },
+              "next": "end_coast"
+            },
+            {
+              "key": "city",
+              "text": "CITY - find where it started",
+              "labels": [
+                "city",
+                "2",
+                "truth",
+                "lab",
+                "origin",
+                "signal"
+              ],
+              "effects": {
+                "noise": 10
+              },
+              "next": "end_city"
+            }
           ],
           "default": "convoy"
         },
         "end_coast": {
           "kind": "ending",
           "subtitle": "The Coast",
-          "ending": { "title": "ENDING - THE COAST", "subtitle": "You chose safety. The sea keeps its promise." },
+          "ending": {
+            "title": "ENDING - THE COAST",
+            "subtitle": "You chose safety. The sea keeps its promise."
+          },
           "hook": "The convoy was real. There was hot food, a generator, and a boat.",
           "lines": [
-            { "text": "The convoy is real. Twenty three people. Four trucks. One boat.", "shot": { "place": "coast", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "none", "mood": "hope", "time": "dawn" } },
-            { "text": "There is hot food. A generator. Children who laugh at Biscuit's ears.", "shot": { "place": "coast", "cast": [["biscuit", "wag"], ["max", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "day" } },
-            { "text": "That night, Max sleeps with both eyes closed. For the first time since day one.", "shot": { "place": "coast", "cast": [["max", "sit"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "calm", "time": "dusk" } },
-            { "text": "But the city is still talking. And the voice knows his name.", "shot": { "place": "coast", "cast": [["max", "idle"]], "cam": "push", "fx": "embers", "mood": "tense", "time": "night" } },
-            { "text": "Season one: complete. The city remembers Max.", "shot": { "place": "coast", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "pull", "fx": "embers", "mood": "hope", "time": "night" } }
+            {
+              "text": "The convoy is real. Twenty three people. Four trucks. One boat.",
+              "shot": {
+                "place": "coast",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "none",
+                "mood": "hope",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "There is hot food. A generator. Children who laugh at Biscuit's ears.",
+              "shot": {
+                "place": "coast",
+                "cast": [
+                  [
+                    "biscuit",
+                    "wag"
+                  ],
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "day"
+              }
+            },
+            {
+              "text": "That night, Max sleeps with both eyes closed. For the first time since day one.",
+              "shot": {
+                "place": "coast",
+                "cast": [
+                  [
+                    "max",
+                    "sit"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "calm",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "But the city is still talking. And the voice knows his name.",
+              "shot": {
+                "place": "coast",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "embers",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Season one: complete. The city remembers Max.",
+              "shot": {
+                "place": "coast",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "embers",
+                "mood": "hope",
+                "time": "night"
+              }
+            }
           ],
           "choices": [
-            { "key": "continue", "text": "Season 2 - City of Echoes", "labels": ["continue", "1", "yes", "city"], "next_arc": "city", "location_text": "a dead city far east, where the signal comes from" }
+            {
+              "key": "continue",
+              "text": "Season 2 - City of Echoes",
+              "labels": [
+                "continue",
+                "1",
+                "yes",
+                "city"
+              ],
+              "next_arc": "city",
+              "location_text": "a dead city far east, where the signal comes from"
+            }
           ],
           "default": "continue"
         },
         "end_city": {
           "kind": "ending",
           "subtitle": "The Origin",
-          "ending": { "title": "ENDING - THE ORIGIN", "subtitle": "You chose the truth. The city was waiting." },
+          "ending": {
+            "title": "ENDING - THE ORIGIN",
+            "subtitle": "You chose the truth. The city was waiting."
+          },
           "hook": "The car pointed east. The city rose slowly, and one window was lit.",
           "lines": [
-            { "text": "Max points the car east. Ada does not argue. Biscuit rides shotgun.", "shot": { "place": "highway", "cast": [["max", "drive"]], "cam": "panl", "fx": "fog", "mood": "tense", "time": "dusk" } },
-            { "text": "The city rises slowly. Broken towers, dark windows... and one light on.", "shot": { "place": "city", "cast": [["max", "walk"], ["ada", "walk"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "The broadcast came from a research lab. The front door is already open.", "shot": { "place": "lab", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
-            { "text": "Inside: walls of notes, empty cages, and a recording still playing.", "shot": { "place": "lab", "cast": [["max", "look"], ["ada", "look"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Season one: complete. Season two: the truth.", "shot": { "place": "lab", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "pull", "fx": "none", "mood": "hope", "time": "night" } }
+            {
+              "text": "Max points the car east. Ada does not argue. Biscuit rides shotgun.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "drive"
+                  ]
+                ],
+                "cam": "panl",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "The city rises slowly. Broken towers, dark windows... and one light on.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "The broadcast came from a research lab. The front door is already open.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Inside: walls of notes, empty cages, and a recording still playing.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "ada",
+                    "look"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Season one: complete. Season two: the truth.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "none",
+                "mood": "hope",
+                "time": "night"
+              }
+            }
           ],
           "choices": [
-            { "key": "continue", "text": "Season 2 - City of Echoes", "labels": ["continue", "1", "yes"], "next_arc": "city", "location_text": "inside the city lab, where the recording plays" }
+            {
+              "key": "continue",
+              "text": "Season 2 - City of Echoes",
+              "labels": [
+                "continue",
+                "1",
+                "yes"
+              ],
+              "next_arc": "city",
+              "location_text": "inside the city lab, where the recording plays"
+            }
           ],
           "default": "continue"
         }
@@ -277,10 +1993,90 @@
           "subtitle": "City of Echoes",
           "hook": "The city is quiet. Even the wind walks carefully here.",
           "lines": [
-            { "text": "The city is quiet. Even the wind walks carefully here.", "shot": { "place": "city", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "The signal comes from a tall brick building, past a river of broken cars.", "shot": { "place": "city", "cast": [["max", "point"], ["ada", "idle"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "Ada checks the map. Two ways in. The metro tunnels, or the open streets.", "shot": { "place": "city", "cast": [["ada", "check"], ["max", "idle"]], "cam": "push", "fx": "fog", "mood": "tense", "time": "night" } },
-            { "text": "Biscuit smells the air and does not like it.", "shot": { "place": "city", "cast": [["biscuit", "sniff"], ["max", "crouch"]], "cam": "static", "fx": "fog", "mood": "danger", "time": "night" } }
+            {
+              "text": "The city is quiet. Even the wind walks carefully here.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "The signal comes from a tall brick building, past a river of broken cars.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "point"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Ada checks the map. Two ways in. The metro tunnels, or the open streets.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "ada",
+                    "check"
+                  ],
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Biscuit smells the air and does not like it.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "biscuit",
+                    "sniff"
+                  ],
+                  [
+                    "max",
+                    "crouch"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "night"
+              }
+            }
           ],
           "next": "pick"
         },
@@ -289,13 +2085,94 @@
           "subtitle": "Tunnels or Streets",
           "hook": "The metro is fast and dark. The streets are open and watched.",
           "lines": [
-            { "text": "The metro is faster. Dark, but straight to the lab.", "shot": { "place": "metro", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "The streets are open. Nowhere to be trapped. And nowhere to hide.", "shot": { "place": "city", "cast": [["max", "idle"]], "cam": "panl", "fx": "fog", "mood": "danger", "time": "night" } },
-            { "text": "METRO... or STREETS?", "shot": { "place": "city", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "fog", "mood": "tense", "time": "night" } }
+            {
+              "text": "The metro is faster. Dark, but straight to the lab.",
+              "shot": {
+                "place": "metro",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "The streets are open. Nowhere to be trapped. And nowhere to hide.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "panl",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "METRO... or STREETS?",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
           ],
           "choices": [
-            { "key": "metro", "text": "METRO - fast, dark, deep", "labels": ["metro", "1", "tunnel", "subway", "under"], "effects": { "noise": 10 }, "next": "metro_run" },
-            { "key": "streets", "text": "STREETS - open and exposed", "labels": ["streets", "2", "road", "open", "above"], "effects": { "hp": -10 }, "next": "street_run" }
+            {
+              "key": "metro",
+              "text": "METRO - fast, dark, deep",
+              "labels": [
+                "metro",
+                "1",
+                "tunnel",
+                "subway",
+                "under"
+              ],
+              "effects": {
+                "noise": 10
+              },
+              "next": "metro_run"
+            },
+            {
+              "key": "streets",
+              "text": "STREETS - open and exposed",
+              "labels": [
+                "streets",
+                "2",
+                "road",
+                "open",
+                "above"
+              ],
+              "effects": {
+                "hp": -10
+              },
+              "next": "street_run"
+            }
           ],
           "default": "metro"
         },
@@ -304,12 +2181,87 @@
           "subtitle": "The Long Tunnel",
           "hook": "The tunnel ate their footsteps. Ahead, slow shapes followed the echo.",
           "lines": [
-            { "text": "The tunnel eats their footsteps. Biscuit's nails click like a clock.", "shot": { "place": "metro", "cast": [["max", "sneak"], ["ada", "sneak"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "In the dark ahead: slow shapes, dragging feet, following the echo.", "shot": { "place": "metro", "cast": [["max", "crouch"]], "zeds": "far", "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Ada finds a service door. It opens with a sound that lasts forever.", "shot": { "place": "metro", "cast": [["ada", "check"]], "cam": "shake", "fx": "flash", "mood": "danger", "time": "night" } },
-            { "text": "They slip through and shut it. Something hits the other side. Once.", "shot": { "place": "metro", "cast": [["max", "run"], ["biscuit", "scared"]], "cam": "pull", "fx": "none", "mood": "tense", "time": "night" } }
+            {
+              "text": "The tunnel eats their footsteps. Biscuit's nails click like a clock.",
+              "shot": {
+                "place": "metro",
+                "cast": [
+                  [
+                    "max",
+                    "sneak"
+                  ],
+                  [
+                    "ada",
+                    "sneak"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "In the dark ahead: slow shapes, dragging feet, following the echo.",
+              "shot": {
+                "place": "metro",
+                "cast": [
+                  [
+                    "max",
+                    "crouch"
+                  ]
+                ],
+                "zeds": "far",
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Ada finds a service door. It opens with a sound that lasts forever.",
+              "shot": {
+                "place": "metro",
+                "cast": [
+                  [
+                    "ada",
+                    "check"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "flash",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "They slip through and shut it. Something hits the other side. Once.",
+              "shot": {
+                "place": "metro",
+                "cast": [
+                  [
+                    "max",
+                    "run"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
           ],
-          "effects": { "noise": -5 },
+          "effects": {
+            "noise": -5
+          },
           "next": "lab_inside"
         },
         "street_run": {
@@ -317,12 +2269,92 @@
           "subtitle": "The Open Street",
           "hook": "Every step on the glass was a shout. Then a shopping cart rolled.",
           "lines": [
-            { "text": "The streets are wide, dead, and full of glass. Every step is a shout.", "shot": { "place": "city", "cast": [["max", "sneak"], ["ada", "sneak"], ["biscuit", "follow"]], "cam": "push", "fx": "fog", "mood": "danger", "time": "night" } },
-            { "text": "Halfway there, a shopping cart rolls. Then a dozen heads turn.", "shot": { "place": "city", "cast": [["max", "idle"]], "zeds": "horde", "cam": "shake", "fx": "fog", "mood": "danger", "time": "night" } },
-            { "text": "They run. Biscuit is faster than all of them.", "shot": { "place": "city", "cast": [["max", "run"], ["biscuit", "run"]], "cam": "shake", "fx": "fog", "mood": "danger", "time": "night" } },
-            { "text": "Ada kicks the lab door open and slams it behind them.", "shot": { "place": "lab", "cast": [["ada", "check"], ["max", "run"]], "cam": "shake", "fx": "none", "mood": "tense", "time": "night" } }
+            {
+              "text": "The streets are wide, dead, and full of glass. Every step is a shout.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "sneak"
+                  ],
+                  [
+                    "ada",
+                    "sneak"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Halfway there, a shopping cart rolls. Then a dozen heads turn.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "zeds": "horde",
+                "cam": "shake",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "They run. Biscuit is faster than all of them.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "run"
+                  ],
+                  [
+                    "biscuit",
+                    "run"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Ada kicks the lab door open and slams it behind them.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "ada",
+                    "check"
+                  ],
+                  [
+                    "max",
+                    "run"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
           ],
-          "effects": { "noise": 10, "dog": 5 },
+          "effects": {
+            "noise": 10,
+            "dog": 5
+          },
           "next": "lab_inside"
         },
         "lab_inside": {
@@ -330,53 +2362,1081 @@
           "subtitle": "The Voice",
           "hook": "The voice is coming from upstairs. It knows why the world ended.",
           "lines": [
-            { "text": "The lab is cold. Empty cages. Walls of notes. A radio still talking.", "shot": { "place": "lab", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
-            { "text": "The voice repeats. Come up. I will open the door. I have been waiting.", "shot": { "place": "lab", "cast": [["max", "idle"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "Ada whispers, what if it is a trap? Biscuit stares up the stairs.", "shot": { "place": "lab", "cast": [["ada", "idle"], ["biscuit", "scared"]], "cam": "push", "fx": "none", "mood": "danger", "time": "night" } },
-            { "text": "TRUST the voice... or BURN the stairs and walk away?", "shot": { "place": "lab", "cast": [["max", "idle"]], "cam": "static", "fx": "none", "mood": "tense", "time": "night" } }
+            {
+              "text": "The lab is cold. Empty cages. Walls of notes. A radio still talking.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "The voice repeats. Come up. I will open the door. I have been waiting.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Ada whispers, what if it is a trap? Biscuit stares up the stairs.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "ada",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "TRUST the voice... or BURN the stairs and walk away?",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
           ],
           "choices": [
-            { "key": "trust", "text": "TRUST - climb up and meet the voice", "labels": ["trust", "1", "up", "climb", "meet", "yes"], "effects": { "hp": -5 }, "next": "end_truth" },
-            { "key": "burn", "text": "BURN - light it and walk away", "labels": ["burn", "2", "fire", "leave", "no", "away"], "effects": { "food": -10 }, "next": "end_burn" }
+            {
+              "key": "trust",
+              "text": "TRUST - climb up and meet the voice",
+              "labels": [
+                "trust",
+                "1",
+                "up",
+                "climb",
+                "meet",
+                "yes"
+              ],
+              "effects": {
+                "hp": -5
+              },
+              "next": "end_truth"
+            },
+            {
+              "key": "burn",
+              "text": "BURN - light it and walk away",
+              "labels": [
+                "burn",
+                "2",
+                "fire",
+                "leave",
+                "no",
+                "away"
+              ],
+              "effects": {
+                "food": -10
+              },
+              "next": "end_burn"
+            }
           ],
           "default": "trust"
         },
         "end_truth": {
           "kind": "ending",
           "subtitle": "The Truth",
-          "ending": { "title": "ENDING - THE TRUTH", "subtitle": "Some doors open inward. Some answers open old wounds." },
+          "ending": {
+            "title": "ENDING - THE TRUTH",
+            "subtitle": "Some doors open inward. Some answers open old wounds."
+          },
           "hook": "Upstairs: a woman, a hundred maps, and one honest sentence.",
           "lines": [
-            { "text": "Upstairs: a small room, a woman, and a hundred maps of the outbreak.", "shot": { "place": "lab", "cast": [["max", "walk"], ["ada", "walk"]], "cam": "push", "fx": "none", "mood": "tense", "time": "night" } },
-            { "text": "Her name is Dr. Wren. She was there on day zero. She kept the samples.", "shot": { "place": "lab", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "night" } },
-            { "text": "It was not a virus, she says. It was a warning. And it is not finished.", "shot": { "place": "lab", "cast": [["max", "look"]], "cam": "push", "fx": "flash", "mood": "danger", "time": "night" } },
-            { "text": "Max looks at Biscuit, then at Ada. Whatever comes next, they face it together.", "shot": { "place": "lab", "cast": [["max", "idle"], ["biscuit", "wag"]], "cam": "pull", "fx": "none", "mood": "hope", "time": "night" } },
-            { "text": "Season two: complete. Season three: coming soon.", "shot": { "place": "lab", "cast": [["max", "idle"], ["biscuit", "sit"]], "cam": "static", "fx": "none", "mood": "hope", "time": "night" } }
+            {
+              "text": "Upstairs: a small room, a woman, and a hundred maps of the outbreak.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Her name is Dr. Wren. She was there on day zero. She kept the samples.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "night"
+              }
+            },
+            {
+              "text": "It was not a virus, she says. It was a warning. And it is not finished.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "flash",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Max looks at Biscuit, then at Ada. Whatever comes next, they face it together.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "wag"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "none",
+                "mood": "hope",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Season two: complete. Season three: coming soon.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "hope",
+                "time": "night"
+              }
+            }
           ],
           "choices": [
-            { "key": "continue", "text": "Season 3 - coming soon", "labels": ["continue", "1", "yes"], "next_arc": "s3", "location_text": "wherever the warning leads next" }
+            {
+              "key": "continue",
+              "text": "Season 3 - River of Secrets",
+              "labels": [
+                "continue",
+                "1",
+                "yes",
+                "river"
+              ],
+              "next_arc": "river",
+              "location_text": "a riverside settlement where Dr. Wren's radio signal leads"
+            }
           ],
           "default": "continue"
         },
         "end_burn": {
           "kind": "ending",
           "subtitle": "The Quiet Way",
-          "ending": { "title": "ENDING - THE QUIET WAY", "subtitle": "Some answers cost too much. They chose the river instead." },
+          "ending": {
+            "title": "ENDING - THE QUIET WAY",
+            "subtitle": "Some answers cost too much. They chose the river instead."
+          },
           "hook": "The lab burned. On the quiet edge of the city, a farmhouse had a porch and a well.",
           "lines": [
-            { "text": "Max tips a can of lamp oil down the stairs and lights it. The past can burn.", "shot": { "place": "lab", "cast": [["max", "idle"]], "cam": "shake", "fx": "flash", "mood": "danger", "time": "night" } },
-            { "text": "They walk away from the tower of smoke, toward the quiet edge of the city.", "shot": { "place": "city", "cast": [["max", "walk"], ["ada", "walk"], ["biscuit", "follow"]], "cam": "pull", "fx": "embers", "mood": "calm", "time": "dawn" } },
-            { "text": "Some answers cost too much, Ada says. Max agrees.", "shot": { "place": "farm", "cast": [["max", "idle"], ["ada", "idle"]], "cam": "push", "fx": "none", "mood": "calm", "time": "day" } },
-            { "text": "They find a small farmhouse by the river. It has a porch. It has a well.", "shot": { "place": "farm", "cast": [["max", "walk"], ["biscuit", "follow"]], "cam": "panr", "fx": "none", "mood": "hope", "time": "day" } },
-            { "text": "Season two: complete. Season three: coming soon.", "shot": { "place": "farm", "cast": [["max", "sit"], ["biscuit", "sit"]], "cam": "pull", "fx": "none", "mood": "hope", "time": "dusk" } }
+            {
+              "text": "Max tips a can of lamp oil down the stairs and lights it. The past can burn.",
+              "shot": {
+                "place": "lab",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "flash",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "They walk away from the tower of smoke, toward the quiet edge of the city.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "embers",
+                "mood": "calm",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "Some answers cost too much, Ada says. Max agrees.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "calm",
+                "time": "day"
+              }
+            },
+            {
+              "text": "They find a small farmhouse by the river. It has a porch. It has a well.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "none",
+                "mood": "hope",
+                "time": "day"
+              }
+            },
+            {
+              "text": "Season two: complete. Season three: coming soon.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "max",
+                    "sit"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "none",
+                "mood": "hope",
+                "time": "dusk"
+              }
+            }
           ],
           "choices": [
-            { "key": "continue", "text": "Season 3 - coming soon", "labels": ["continue", "1", "yes"], "next_arc": "s3", "location_text": "a quiet farmhouse by the river" }
+            {
+              "key": "continue",
+              "text": "Season 3 - River of Secrets",
+              "labels": [
+                "continue",
+                "1",
+                "yes",
+                "river"
+              ],
+              "next_arc": "river",
+              "location_text": "a quiet riverside farmhouse beyond the city"
+            }
           ],
           "default": "continue"
         }
       }
+    },
+    "river": {
+      "title": "The River Settlement",
+      "start": "arrival",
+      "nodes": {
+        "arrival": {
+          "kind": "story",
+          "subtitle": "The River Settlement",
+          "hook": "By sunrise, the river is calm—but every farmhouse window is lit.",
+          "lines": [
+            {
+              "text": "You reach a riverside settlement just before sunrise.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "A radio crackles from inside. Someone on the other side knows your names.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "ada",
+                    "look"
+                  ],
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "The gate hangs open. Two sets of footprints head in different directions.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "max",
+                    "crouch"
+                  ],
+                  [
+                    "biscuit",
+                    "sniff"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "danger",
+                "time": "dawn"
+              }
+            }
+          ],
+          "next": "gate"
+        },
+        "gate": {
+          "kind": "vote",
+          "subtitle": "At the Gate",
+          "hook": "Someone is watching from behind the curtains. Do you announce yourself or scout first?",
+          "lines": [
+            {
+              "text": "The porch light flickers twice, then goes dark.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "ada",
+                    "look"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "Biscuit growls at the fence line. The footprints are fresh.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "biscuit",
+                    "sniff"
+                  ],
+                  [
+                    "max",
+                    "crouch"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "dawn"
+              }
+            }
+          ],
+          "choices": [
+            {
+              "key": "knock",
+              "text": "KNOCK — ask for shelter",
+              "labels": [
+                "knock",
+                "shelter",
+                "ask",
+                "1"
+              ],
+              "next": "porch"
+            },
+            {
+              "key": "scout",
+              "text": "SCOUT — check the footprints",
+              "labels": [
+                "scout",
+                "tracks",
+                "footprints",
+                "2"
+              ],
+              "next": "tracks"
+            }
+          ],
+          "default": "scout"
+        },
+        "porch": {
+          "kind": "story",
+          "subtitle": "The Porch",
+          "hook": "The door opens three inches. A trembling voice says: You came back.",
+          "lines": [
+            {
+              "text": "A woman opens the door but keeps one hand on the chain.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "ada",
+                    "idle"
+                  ],
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "She insists she has never met you. Her radio says otherwise.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "ada",
+                    "look"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "day"
+              }
+            },
+            {
+              "text": "The radio repeats a location: the old watchtower by the bridge.",
+              "shot": {
+                "place": "bridge",
+                "cast": [
+                  [
+                    "max",
+                    "point"
+                  ],
+                  [
+                    "biscuit",
+                    "idle"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "day"
+              }
+            }
+          ],
+          "next": "radio"
+        },
+        "tracks": {
+          "kind": "vote",
+          "subtitle": "Two Trails",
+          "hook": "One trail disappears into the barn. The other crosses the old bridge.",
+          "lines": [
+            {
+              "text": "Mud on the first trail is mixed with oil and straw.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "max",
+                    "crouch"
+                  ],
+                  [
+                    "biscuit",
+                    "sniff"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "Across the river, a signal flashes from the bridge railing.",
+              "shot": {
+                "place": "bridge",
+                "cast": [
+                  [
+                    "ada",
+                    "point"
+                  ],
+                  [
+                    "max",
+                    "look"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "day"
+              }
+            }
+          ],
+          "choices": [
+            {
+              "key": "barn",
+              "text": "BARN — follow the muddy trail",
+              "labels": [
+                "barn",
+                "mud",
+                "1"
+              ],
+              "next": "barn"
+            },
+            {
+              "key": "bridge",
+              "text": "BRIDGE — follow the flashing signal",
+              "labels": [
+                "bridge",
+                "signal",
+                "2"
+              ],
+              "next": "bridge_watch"
+            }
+          ],
+          "default": "barn"
+        },
+        "barn": {
+          "kind": "story",
+          "subtitle": "The Barn",
+          "hook": "The barn door is locked from the inside. Something gently taps back.",
+          "lines": [
+            {
+              "text": "You find a warning scratched into the wood: do not trust the radio.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "ada",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "day"
+              }
+            },
+            {
+              "text": "Biscuit finds a fresh blanket and a half-eaten meal. Someone escaped moments ago.",
+              "shot": {
+                "place": "farm",
+                "cast": [
+                  [
+                    "biscuit",
+                    "sniff"
+                  ],
+                  [
+                    "max",
+                    "crouch"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "tense",
+                "time": "day"
+              }
+            },
+            {
+              "text": "A map beneath the blanket marks a single safe road out.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "ada",
+                    "check"
+                  ],
+                  [
+                    "max",
+                    "look"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "fog",
+                "mood": "hope",
+                "time": "dusk"
+              }
+            }
+          ],
+          "next": "leader"
+        },
+        "bridge_watch": {
+          "kind": "story",
+          "subtitle": "The Bridge",
+          "hook": "The flashing signal is a mirror tied to the railing. Someone is signaling back.",
+          "lines": [
+            {
+              "text": "Across the bridge, an empty radio is still broadcasting.",
+              "shot": {
+                "place": "bridge",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
+                    "walk"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "day"
+              }
+            },
+            {
+              "text": "The transmission contains tomorrow's date—and a description of your car.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "ada",
+                    "look"
+                  ],
+                  [
+                    "max",
+                    "look"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "day"
+              }
+            },
+            {
+              "text": "The voice says there are survivors on the road, but only until dark.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "point"
+                  ],
+                  [
+                    "biscuit",
+                    "idle"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "fog",
+                "mood": "hope",
+                "time": "dusk"
+              }
+            }
+          ],
+          "next": "leader"
+        },
+        "radio": {
+          "kind": "vote",
+          "subtitle": "The Voice",
+          "hook": "The radio says it can lead you to survivors. But it asks you to reveal your location.",
+          "lines": [
+            {
+              "text": "Static fades. A calm voice gives you a choice.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "ada",
+                    "check"
+                  ],
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "day"
+              }
+            },
+            {
+              "text": "Outside, the tower light turns on although its power line is cut.",
+              "shot": {
+                "place": "tower",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "biscuit",
+                    "look"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "dusk"
+              }
+            }
+          ],
+          "choices": [
+            {
+              "key": "answer",
+              "text": "ANSWER — reveal your location",
+              "labels": [
+                "answer",
+                "reply",
+                "1"
+              ],
+              "next": "signal"
+            },
+            {
+              "key": "trace",
+              "text": "TRACE — find the source quietly",
+              "labels": [
+                "trace",
+                "quiet",
+                "2"
+              ],
+              "next": "tower_watch"
+            }
+          ],
+          "default": "trace"
+        },
+        "signal": {
+          "kind": "story",
+          "subtitle": "The Reply",
+          "hook": "You answer. The voice whispers: Thank you. Now they can find you.",
+          "lines": [
+            {
+              "text": "You give a false location, but the radio clicks before you finish.",
+              "shot": {
+                "place": "radio_room",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "ada",
+                    "look"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "danger",
+                "time": "dusk"
+              }
+            },
+            {
+              "text": "A car horn sounds far away—then three more answer it.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "point"
+                  ],
+                  [
+                    "biscuit",
+                    "alert"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Someone has found the settlement. You have one chance to choose a road.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "ada",
+                    "look"
+                  ],
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "embers",
+                "mood": "tense",
+                "time": "night"
+              }
+            }
+          ],
+          "next": "leader"
+        },
+        "tower_watch": {
+          "kind": "story",
+          "subtitle": "The Watchtower",
+          "hook": "At the tower, you find a radio transmitter wired to an empty room.",
+          "lines": [
+            {
+              "text": "The transmitter has been running on a car battery for weeks.",
+              "shot": {
+                "place": "tower_top",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "ada",
+                    "check"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "night"
+              }
+            },
+            {
+              "text": "The logbook shows the same message repeated every night: keep moving.",
+              "shot": {
+                "place": "tower_top",
+                "cast": [
+                  [
+                    "ada",
+                    "look"
+                  ],
+                  [
+                    "max",
+                    "idle"
+                  ]
+                ],
+                "cam": "static",
+                "fx": "none",
+                "mood": "danger",
+                "time": "night"
+              }
+            },
+            {
+              "text": "Beyond the river, two roads lead toward two different lights.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "point"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "panr",
+                "fx": "fog",
+                "mood": "hope",
+                "time": "dawn"
+              }
+            }
+          ],
+          "next": "leader"
+        },
+        "leader": {
+          "kind": "vote",
+          "subtitle": "Two Roads",
+          "hook": "The settlement is no longer safe. One light leads to an old highway; the other to the city.",
+          "lines": [
+            {
+              "text": "Ada folds the map. Biscuit waits beside the car.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "ada",
+                    "check"
+                  ],
+                  [
+                    "max",
+                    "idle"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
+                  ]
+                ],
+                "cam": "push",
+                "fx": "none",
+                "mood": "tense",
+                "time": "dawn"
+              }
+            },
+            {
+              "text": "You can leave before the horde reaches the river—or follow the radio deeper into the city.",
+              "shot": {
+                "place": "city",
+                "cast": [
+                  [
+                    "max",
+                    "look"
+                  ],
+                  [
+                    "ada",
+                    "point"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "fog",
+                "mood": "danger",
+                "time": "dawn"
+              }
+            }
+          ],
+          "choices": [
+            {
+              "key": "road",
+              "text": "HIGHWAY — head for the open road",
+              "labels": [
+                "highway",
+                "road",
+                "leave",
+                "1"
+              ],
+              "next_arc": "road",
+              "location_text": "a new highway beyond the river"
+            },
+            {
+              "key": "city",
+              "text": "CITY — follow the signal to its source",
+              "labels": [
+                "city",
+                "signal",
+                "follow",
+                "2"
+              ],
+              "next_arc": "city",
+              "location_text": "a hidden district beyond the river"
+            }
+          ],
+          "default": "road"
+        }
+      }
     }
   },
-  "season_arcs": { "1": "road", "2": "city" }
+  "season_arcs": {
+    "1": "road",
+    "2": "city",
+    "3": "river"
+  }
 }
