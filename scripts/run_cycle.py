@@ -208,7 +208,8 @@ def main() -> None:
                 log(f"[cycle] queued Reel target reached/passed ({publish_target.isoformat()}); publishing now")
                 publish_target = now
             else:
-                log(f"[cycle] queued Reel is ready; scheduled for {publish_target.isoformat()}")
+                log(f"[cycle] queued Reel is ready; next publish check at {publish_target.isoformat()}; no runner held open")
+                return
         else:
             publish_target = _publish_target(state, cfg, now, args.force_publish)
             if publish_target is None:
@@ -320,13 +321,21 @@ def main() -> None:
     if not media_url:
         raise SystemExit("[cycle] public media URL nahi mila (repo/GITHUB_REPOSITORY check karo)")
 
-    # Video is already rendered and hosted before the deadline. For scheduled runs,
-    # hold the job until the 24h publish target; manual force-publish remains immediate.
-    if publish_target is not None and not args.force_publish:
-        wait_seconds = (publish_target - ist_now()).total_seconds()
-        if wait_seconds > 0:
-            log(f"[cycle] Reel prepared and hosted; waiting {wait_seconds / 60:.1f} min for planned publish time")
-            time.sleep(wait_seconds)
+    # If this run began in the final-hour window, persist the prepared Reel and exit.
+    # The scheduled run at/after the target time publishes the existing hosted file.
+    if (not pending and publish_target is not None and publish_target > ist_now()
+            and not args.force_publish):
+        pending_record = {
+            "schema": 1,
+            "prepared_at_ist": ist_now().isoformat(),
+            "publish_at_ist": publish_target.isoformat(),
+            "video_url": media_url,
+            "episode": episode,
+        }
+        pending_path.parent.mkdir(parents=True, exist_ok=True)
+        pending_path.write_text(json.dumps(pending_record, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        log(f"[cycle] QUEUED: S{episode['season']} D{episode['day']} for {publish_target.isoformat()}")
+        return
 
     media_id = publish.publish_reel(client, cfg, ig_user_id, episode, media_url)
 
