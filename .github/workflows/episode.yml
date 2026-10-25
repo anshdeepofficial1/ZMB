@@ -2,10 +2,13 @@ name: Episode Cycle
 
 on:
   schedule:
-    # IST checkpoints (UTC+5:30): 08:00, 10:30, 13:00, 16:30, 19:30, 22:30.
-    # Publish 13:00 IST ke baad pehle run par hota hai; baaki runs vote checkpoints hain.
+    # UTC cron, IST = UTC+5:30. Vote checks during the day; every 30 min during
+    # the 18:30-00:30 IST launch window so a Reel can be prepared at T-1h and
+    # published at the 24h target. Once history exists, random checkpoints never post.
     - cron: "30 2,7 * * *"
-    - cron: "0 5,11,14,17 * * *"
+    - cron: "0 5,11 * * *"
+    - cron: "*/30 13-18 * * *"
+    - cron: "0 19 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -27,7 +30,7 @@ concurrency:
 jobs:
   cycle:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 120
     env:
       IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
       IG_USER_ID: ${{ secrets.IG_USER_ID }}
