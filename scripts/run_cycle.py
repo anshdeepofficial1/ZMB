@@ -308,6 +308,7 @@ def main() -> None:
         }
         pending_path.parent.mkdir(parents=True, exist_ok=True)
         pending_path.write_text(json.dumps(pending_record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        save_state(state)
         log(f"[cycle] QUEUED: S{episode['season']} D{episode['day']} for {target.isoformat()}")
         return
 
@@ -333,7 +334,8 @@ def main() -> None:
             "episode": episode,
         }
         pending_path.parent.mkdir(parents=True, exist_ok=True)
-        pending_path.write_text(json.dumps(pending_record, ensure_ascii=False, indent=2) + "\\n", encoding="utf-8")
+        pending_path.write_text(json.dumps(pending_record, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        save_state(state)
         log(f"[cycle] QUEUED: S{episode['season']} D{episode['day']} for {publish_target.isoformat()}")
         return
 
