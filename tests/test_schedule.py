@@ -98,15 +98,18 @@ class NarrativeVisualBeatTests(unittest.TestCase):
             def w(self, value, size):
                 return len(value) * 10
 
-        tokens = ["RUN", "to", "escape", "or", "CHECK", "the", "door?",
-                  "Follow", "and", "vote", "on", "tomorrow's", "Reel."]
+        # Simulate Edge TTS WordBoundary, which commonly drops punctuation.
+        tokens = ["RUN", "to", "escape", "or", "CHECK", "the", "door",
+                  "Follow", "and", "vote", "on", "tomorrow's", "Reel"]
         words = [{"w": word, "start": i * 0.2, "end": i * 0.2 + 0.18}
                  for i, word in enumerate(tokens)]
-        chunks = chunk_words(words, DummyTexts(), 54, max_w=1200, max_words=7)
+        source = "RUN to escape or CHECK the door? Follow and vote on tomorrow's Reel."
+        chunks = chunk_words(words, DummyTexts(), 54, max_w=1200, max_words=7,
+                             source_text=source)
         self.assertEqual([x["w"] for x in chunks[0]["words"]],
-                         ["RUN", "to", "escape", "or", "CHECK", "the", "door?"])
+                         ["RUN", "to", "escape", "or", "CHECK", "the", "door"])
         self.assertEqual([x["w"] for x in chunks[1]["words"]],
-                         ["Follow", "and", "vote", "on", "tomorrow's", "Reel."])
+                         ["Follow", "and", "vote", "on", "tomorrow's", "Reel"])
 
     def test_station_door_has_a_moving_shadow_and_visible_door_frame(self):
         svg = narrative_beat_layer({"beat": "door_shadow"}, 1.4)
