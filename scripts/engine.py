@@ -239,7 +239,9 @@ def substitute_shots(value, state: dict):
     return value
 
 
-def commit_episode(state: dict, episode: dict, media_id: str, ist_date: str) -> None:
+def commit_episode(
+    state: dict, episode: dict, media_id: str, ist_date: str, posted_at_ist: str | None = None
+) -> None:
     state["day"] = episode["day"]
     state.setdefault("history", []).append({
         "season": episode["season"],
@@ -250,9 +252,11 @@ def commit_episode(state: dict, episode: dict, media_id: str, ist_date: str) -> 
         "media_id": media_id,
         "video": episode["video_name"],
         "posted_ist_date": ist_date,
+        "posted_at_ist": posted_at_ist,
     })
     state["last_episode"] = {
         "media_id": media_id,
+        "posted_at_ist": posted_at_ist,
         "node": episode["node"],
         "kind": episode["kind"],
         "vote": episode["vote"],
