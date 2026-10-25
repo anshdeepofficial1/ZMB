@@ -42,6 +42,23 @@ def main() -> None:
 
     token = (os.environ.get("IG_ACCESS_TOKEN") or "").strip()
     ig_user_id = (os.environ.get("IG_USER_ID") or "").strip()
+
+    # Fail before spending minutes rendering when required publishing credentials are absent.
+    if not args.dry_run:
+        missing = []
+        if not token:
+            missing.append("IG_ACCESS_TOKEN")
+        if not ig_user_id:
+            missing.append("IG_USER_ID")
+        if os.environ.get("GITHUB_REPOSITORY") and not (
+            os.environ.get("GITHUB_TOKEN") or os.environ.get("GH_PAT")
+        ):
+            missing.append("GITHUB_TOKEN/GH_PAT")
+        if missing:
+            raise SystemExit(
+                "[cycle] preflight failed before rendering: missing " + ", ".join(missing)
+            )
+
     client = GraphClient(token) if token else None
 
     own_username = (os.environ.get("IG_USERNAME") or "").strip() or None
