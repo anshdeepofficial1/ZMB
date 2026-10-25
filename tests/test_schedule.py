@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from common import IST
 from run_cycle import _publish_target, _parse_ist_timestamp
-from animate import narrative_beat_layer
+from animate import narrative_beat_layer, chunk_words
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -90,6 +90,23 @@ class NarrativeVisualBeatTests(unittest.TestCase):
         self.assertIn("COMMENT ON TOMORROW", svg)
 
 
+
+
+
+    def test_caption_chunks_stop_at_sentence_punctuation(self):
+        class DummyTexts:
+            def w(self, value, size):
+                return len(value) * 10
+
+        tokens = ["RUN", "to", "escape", "or", "CHECK", "the", "door?",
+                  "Follow", "and", "vote", "on", "tomorrow's", "Reel."]
+        words = [{"w": word, "start": i * 0.2, "end": i * 0.2 + 0.18}
+                 for i, word in enumerate(tokens)]
+        chunks = chunk_words(words, DummyTexts(), 54, max_w=1200, max_words=7)
+        self.assertEqual([x["w"] for x in chunks[0]["words"]],
+                         ["RUN", "to", "escape", "or", "CHECK", "the", "door?"])
+        self.assertEqual([x["w"] for x in chunks[1]["words"]],
+                         ["Follow", "and", "vote", "on", "tomorrow's", "Reel."])
 
     def test_station_door_has_a_moving_shadow_and_visible_door_frame(self):
         svg = narrative_beat_layer({"beat": "door_shadow"}, 1.4)
