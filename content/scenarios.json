@@ -42,16 +42,16 @@
         "intro": {
           "kind": "story",
           "subtitle": "The Empty Highway",
-          "hook": "2:47 AM. Max's car dies on an empty road, next to one gas station that is still lit.",
+          "hook": "At 2:47 AM, Max's engine dies on an empty road. One gas station is still lit.",
           "lines": [
             {
-              "text": "2:47 in the morning. Max's old car coughs... and dies.",
+              "text": "2:47 AM. Max's engine coughs, sputters, and dies.",
               "shot": {
                 "place": "highway",
                 "cast": [
                   [
                     "max",
-                    "idle"
+                    "sit"
                   ],
                   [
                     "biscuit",
@@ -61,17 +61,18 @@
                 "cam": "push",
                 "fx": "fog",
                 "mood": "tense",
-                "time": "night"
+                "time": "night",
+                "beat": "breakdown"
               }
             },
             {
-              "text": "Biscuit whines from the back seat. No phone. No signal. No plan.",
+              "text": "Inside, Biscuit whines. No signal, no help, no plan.",
               "shot": {
                 "place": "highway",
                 "cast": [
                   [
                     "max",
-                    "idle"
+                    "sit"
                   ],
                   [
                     "biscuit",
@@ -81,13 +82,14 @@
                 "cam": "static",
                 "fx": "fog",
                 "mood": "tense",
-                "time": "night"
+                "time": "night",
+                "beat": "car_interior"
               }
             },
             {
-              "text": "Then Max sees it. One gas station, still lit, like the end of the world forgot about it.",
+              "text": "Then Max spots it: one gas station still glowing in the dark.",
               "shot": {
-                "place": "highway",
+                "place": "gas_station",
                 "cast": [
                   [
                     "max",
@@ -95,17 +97,18 @@
                   ],
                   [
                     "biscuit",
-                    "wag"
+                    "scared"
                   ]
                 ],
                 "cam": "push",
                 "fx": "fog",
                 "mood": "tense",
-                "time": "night"
+                "time": "night",
+                "beat": "spot_station"
               }
             },
             {
-              "text": "He grabs his backpack. 'Stay close, Biscuit. We do this together.'",
+              "text": "He grabs his backpack and climbs out. 'Stay close, Biscuit.'",
               "shot": {
                 "place": "highway",
                 "cast": [
@@ -121,47 +124,50 @@
                 "cam": "panr",
                 "fx": "fog",
                 "mood": "tense",
-                "time": "night"
+                "time": "night",
+                "beat": "backpack_exit"
               }
             },
             {
-              "text": "Now it is your turn. Every night, the story stops, and you decide what Max does next.",
+              "text": "The station is lit, but a shadow moves behind the locked door.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
                   [
                     "max",
-                    "walk"
+                    "look"
                   ],
                   [
                     "biscuit",
-                    "follow"
+                    "scared"
                   ]
                 ],
-                "cam": "push",
+                "cam": "creep",
                 "fx": "fog",
-                "mood": "tense",
-                "time": "night"
+                "mood": "danger",
+                "time": "night",
+                "beat": "spot_station"
               }
             },
             {
-              "text": "Comment the choice with the most votes wins. Day one starts now.",
+              "text": "RUN to escape or CHECK the door? Follow and vote on tomorrow's Reel.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
                   [
                     "max",
-                    "idle"
+                    "point"
                   ],
                   [
                     "biscuit",
                     "sit"
                   ]
                 ],
-                "cam": "pull",
+                "cam": "static",
                 "fx": "fog",
                 "mood": "hope",
-                "time": "night"
+                "time": "night",
+                "beat": "choice_teaser"
               }
             }
           ],
