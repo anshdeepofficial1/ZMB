@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#090b12">
+<title>ZMB · Command Center</title>
+<style>
+:root{color-scheme:dark;--bg:#090b12;--panel:#111521;--panel2:#151b2a;--line:#283044;--text:#edf1fa;--muted:#98a3b8;--green:#8af0b2;--amber:#ffd27d;--red:#ff8995;--blue:#8fb8ff;--radius:18px}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% -10%,#1d2440 0,transparent 42%),radial-gradient(ellipse at 95% 15%,#17352b 0,transparent 30%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1220px;margin:auto;padding:28px 22px 56px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:25px}.brand{display:flex;gap:14px;align-items:center}.logo{width:50px;height:50px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#c0ffdb,#50c98d);color:#07140d;font-weight:950;font-size:21px;box-shadow:0 0 35px #50c98d24}.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--green);font-weight:800;text-transform:uppercase}.brand h1{font-size:23px;letter-spacing:-.035em;margin:1px 0 0}.header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+button,.button{border:1px solid var(--line);background:#171d2c;color:var(--text);padding:10px 14px;border-radius:11px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center}button:hover,.button:hover{background:#20283b;text-decoration:none}.tiny{font-size:12px;color:var(--muted)}.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px #8af0b2}
+.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding:26px;border:1px solid #384158;border-radius:24px;background:linear-gradient(115deg,#151b2acc,#10271fbc);margin-bottom:17px}.hero h2{margin:5px 0 8px;font-size:clamp(25px,4vw,39px);letter-spacing:-.045em;line-height:1.12}.hero p{margin:0;color:var(--muted);max-width:650px}.hero-side{min-width:185px;text-align:right}.status{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#0c101a8c;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800}.status.success{color:var(--green);border-color:#2e6248}.status.pending{color:var(--amber);border-color:#745b31}.status.failure{color:var(--red);border-color:#713640}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:0 0 18px}.metric,.panel{border:1px solid var(--line);background:linear-gradient(160deg,#141a28f0,#0e121cf0);border-radius:var(--radius);padding:18px;min-width:0}.metric .label{font-size:12px;color:var(--muted);margin-bottom:8px}.metric .value{font-size:24px;font-weight:850;letter-spacing:-.035em;overflow-wrap:anywhere}.metric .sub{font-size:12px;color:var(--muted);margin-top:5px}
+.content-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:16px;align-items:start}.panel{margin-bottom:16px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.panel h3{margin:0;font-size:16px;letter-spacing:-.02em}.panel p{color:var(--muted);margin:5px 0}.label{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800}
+.run-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #252c3d}.run-step:last-child{border-bottom:0}.step-icon{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:#1c2537;color:var(--blue);font-size:13px;font-weight:900}.step-icon.success{color:var(--green);background:#142a22}.step-icon.failure{color:var(--red);background:#321a22}.step-icon.pending{color:var(--amber)}.step-main{flex:1;min-width:0}.step-title{font-weight:750;overflow-wrap:anywhere}.step-sub{font-size:12px;color:var(--muted);margin-top:2px}.run-list{display:grid;gap:9px}.run-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border-radius:12px;background:#0b101a;border:1px solid #252d40}.run-item strong{font-size:13px;display:block}.run-item .tiny{margin-top:3px}.run-badge{font-size:11px;font-weight:800;white-space:nowrap;padding:5px 8px;border-radius:100px;background:#1c2537;color:var(--muted)}.run-badge.success{background:#142a22;color:var(--green)}.run-badge.failure{background:#321a22;color:var(--red)}.run-badge.pending{background:#342a16;color:var(--amber)}
+.preview{overflow:hidden;border-radius:14px;background:#06080d;border:1px solid var(--line);aspect-ratio:9/16;max-height:480px;display:grid;place-items:center}.preview video{width:100%;height:100%;object-fit:contain}.preview-placeholder{text-align:center;padding:25px;color:var(--muted)}.caption{white-space:pre-wrap;overflow-wrap:anywhere;background:#090e17;border:1px solid #242c3d;padding:14px;border-radius:12px;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;color:#d7e0f1}
+.schedule-time{font-size:clamp(24px,3vw,31px);letter-spacing:-.04em;font-weight:900;margin:7px 0 2px}.schedule-date{color:var(--muted);font-weight:700}.divider{height:1px;background:var(--line);margin:16px 0}.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:6px 4px;color:var(--muted);font-size:12px}.error{padding:12px 14px;border:1px solid #713640;color:var(--red);background:#26141a;border-radius:12px;margin:10px 0}.empty{color:var(--muted);padding:17px;text-align:center;border:1px dashed var(--line);border-radius:12px}
+@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content-grid{grid-template-columns:1fr}.hero{flex-direction:column}.hero-side{text-align:left}.preview{max-height:390px}}@media(max-width:480px){.wrap{padding:18px 13px 35px}header{align-items:flex-start}.brand h1{font-size:19px}.logo{width:43px;height:43px}.grid{gap:9px}.metric,.panel{padding:14px}.metric .value{font-size:21px}.header-actions .tiny{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="brand"><div class="logo">Z</div><div><div class="eyebrow">Zombie survival automation</div><h1>Command Center</h1></div></div>
+    <div class="header-actions"><span class="tiny"><span class="live-dot"></span><span id="last-refresh">Connecting…</span></span><button id="refresh">↻ Refresh</button></div>
+  </header>
+
+  <section class="hero">
+    <div><div class="eyebrow">Publishing control room / read-only</div><h2>Every episode.<br>On schedule.</h2><p>Live view of GitHub Actions, the prepared Reel, publishing time and story progress. GitHub runs the automation; this page only monitors it.</p></div>
+    <div class="hero-side"><div id="overall-status" class="status pending">● Connecting</div><p class="tiny" id="account-label" style="margin-top:10px">@zmbstories · IST</p><p class="tiny" id="refresh-note">Auto-refresh every 3 minutes</p></div>
+  </section>
+
+  <section class="grid">
+    <div class="metric"><div class="label">Latest cycle</div><div class="value" id="metric-run">—</div><div class="sub" id="metric-run-sub">Loading GitHub Actions</div></div>
+    <div class="metric"><div class="label">Next publish</div><div class="value" id="metric-next">—</div><div class="sub" id="metric-next-sub">Checking queue</div></div>
+    <div class="metric"><div class="label">Episodes published</div><div class="value" id="metric-posted">0</div><div class="sub" id="metric-posted-sub">From saved story state</div></div>
+    <div class="metric"><div class="label">Story position</div><div class="value" id="metric-story">S1 · D0</div><div class="sub" id="metric-story-sub">Waiting for first post</div></div>
+  </section>
+
+  <div id="global-error"></div>
+  <section class="content-grid">
+    <div>
+      <section class="panel">
+        <div class="panel-head"><h3>Current pipeline</h3><a href="https://github.com/anshdeepofficial1/ZMB/actions" target="_blank" rel="noreferrer">Open all logs ↗</a></div>
+        <div class="tiny" id="active-run-label">Fetching latest run…</div>
+        <div class="divider"></div>
+        <div id="steps"><div class="empty">Connecting to GitHub Actions…</div></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Recent workflow runs</h3><a href="https://github.com/anshdeepofficial1/ZMB/actions" target="_blank" rel="noreferrer">GitHub Actions ↗</a></div>
+        <div id="runs" class="run-list"><div class="empty">Loading run history…</div></div>
+      </section>
+    </div>
+    <div>
+      <section class="panel">
+        <div class="panel-head"><h3>Queued Reel</h3><span class="status pending" id="queue-badge">Checking</span></div>
+        <div id="schedule-box"><div class="empty">Checking the queue…</div></div>
+        <div class="divider"></div>
+        <div id="video-area"><div class="preview"><div class="preview-placeholder">The Reel preview will appear here when a video is queued.</div></div></div>
+        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap" id="video-links"></div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Caption & hashtags</h3><span class="tiny">From queued episode</span></div>
+        <div id="caption-area" class="caption">No queued caption found.</div>
+      </section>
+      <section class="panel">
+        <div class="panel-head"><h3>Story state</h3><a href="https://github.com/anshdeepofficial1/ZMB/blob/main/state/state.json" target="_blank" rel="noreferrer">View JSON ↗</a></div>
+        <div id="story-state"><div class="empty">Loading story state…</div></div>
+      </section>
+    </div>
+  </section>
+  <footer class="footer"><span>Read-only monitor · No Instagram token stored here</span><span>Source: <a href="https://github.com/anshdeepofficial1/ZMB" target="_blank" rel="noreferrer">anshdeepofficial1/ZMB ↗</a></span></footer>
+</div>
+<script>
+(function(){
+"use strict";
+const OWNER="anshdeepofficial1", REPO="ZMB", BASE="https://api.github.com/repos/"+OWNER+"/"+REPO;
+const RAW="https://raw.githubusercontent.com/"+OWNER+"/"+REPO+"/main/";
+const $=id=>document.getElementById(id);
+const fmtDate=value=>{if(!value)return "Not set";const d=new Date(value);return Number.isNaN(+d)?"Unknown":new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",weekday:"long",day:"2-digit",month:"short",year:"numeric"}).format(d)};
+const fmtTime=value=>{if(!value)return "Not set";const d=new Date(value);return Number.isNaN(+d)?"Unknown":new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",hour12:true}).format(d)+" IST"};
+const fmtDateTime=value=>fmtDate(value)+" · "+fmtTime(value);
+const ago=value=>{if(!value)return "";const m=Math.max(0,Math.round((Date.now()-new Date(value).getTime())/60000));if(m<1)return "just now";if(m<60)return m+" min ago";const h=Math.floor(m/60);return h<24?h+"h "+m%60+"m ago":Math.floor(h/24)+"d ago"};
+const escapeHTML=value=>String(value==null?"":value).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
+function statusClass(s){if(["success","completed"].includes(s))return "success";if(["failure","failed","cancelled","timed_out","action_required"].includes(s))return "failure";if(["in_progress","queued","pending","waiting","requested"].includes(s))return "pending";return ""}
+function niceStatus(s){return String(s||"unknown").replaceAll("_"," ")}
+async function getJSON(url,raw=false){const res=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now(),{cache:"no-store",headers:raw?{}:{"Accept":"application/vnd.github+json"}});if(!res.ok)throw new Error("HTTP "+res.status+" loading "+url.split("?")[0]);return await res.json()}
+function statusPill(text,cls){return '<span class="status '+cls+'">'+escapeHTML(text)+'</span>'}
+async function loadQueue(){
+  try{
+    const q=await getJSON(RAW+"state/pending_episode.json",true);
+    $("queue-badge").className="status pending";$("queue-badge").textContent="Queued";
+    $("metric-next").textContent=fmtTime(q.publish_at_ist).replace(" IST","");
+    $("metric-next-sub").textContent=fmtDate(q.publish_at_ist);
+    $("schedule-box").innerHTML='<div class="label">Scheduled publish time</div><div class="schedule-time">'+escapeHTML(fmtTime(q.publish_at_ist))+'</div><div class="schedule-date">'+escapeHTML(fmtDate(q.publish_at_ist))+'</div><div class="divider"></div><div class="tiny">Prepared '+escapeHTML(ago(q.prepared_at_ist))+'</div><p><strong>'+escapeHTML(q.episode?.video_name||"Queued Reel")+'</strong> · Season '+escapeHTML(q.episode?.season??"—")+' / Day '+escapeHTML(q.episode?.day??"—")+'</p><p class="tiny">The file is hosted on GitHub. Instagram has not confirmed publication yet.</p>';
+    if(q.video_url){$("video-area").innerHTML='<div class="preview"><video controls playsinline preload="metadata" src="'+escapeHTML(q.video_url)+'"></video></div>';$("video-links").innerHTML='<a class="button" href="'+escapeHTML(q.video_url)+'" target="_blank" rel="noreferrer">Open video ↗</a>';}
+    $("caption-area").textContent=q.episode?.caption||"No caption saved.";
+    $("account-label").textContent=(q.episode?.handle||"@zmbstories")+" · IST";
+  }catch(e){
+    $("queue-badge").className="status";$("queue-badge").textContent="No queued file";
+    $("metric-next").textContent="Not queued";$("metric-next-sub").textContent="Check recent cycle";
+    $("schedule-box").innerHTML='<div class="empty">No pending_episode.json was found. A queued Reel may already have been published or may not be prepared yet.</div>';
+    $("video-area").innerHTML='<div class="preview"><div class="preview-placeholder">No pending video available.</div></div>';
+    $("video-links").innerHTML="";
+    $("caption-area").textContent="No queued caption found.";
+  }
+}
+async function loadState(){
+ try{
+   const s=await getJSON(RAW+"state/state.json",true);
+   $("metric-posted").textContent=String((s.history||[]).length);
+   $("metric-story").textContent="S"+(s.season??1)+" · D"+(s.day??0);
+   $("metric-story-sub").textContent=(s.location||s.node||"Story state loaded");
+   const st=s.stats||{};
+   const statHTML=Object.keys(st).map(k=>'<div class="run-item"><div><strong>'+escapeHTML(k.toUpperCase())+'</strong><div class="tiny">Survival stat</div></div><span class="run-badge">'+escapeHTML(st[k])+'</span></div>').join("");
+   const latest=(s.history||[]).slice(-3).reverse();
+   $("story-state").innerHTML=statHTML+'<div class="divider"></div><div class="tiny">Season '+escapeHTML(s.season??1)+' · Day '+escapeHTML(s.day??0)+' · Node '+escapeHTML(s.node||"intro")+'</div>'+(latest.length?'<div class="divider"></div><div class="label">Recent published history</div>'+latest.map(h=>'<div class="run-step"><div class="step-icon success">✓</div><div class="step-main"><div class="step-title">'+escapeHTML(h.video||("Day "+h.day))+'</div><div class="step-sub">'+escapeHTML(h.posted_at_ist||h.posted_ist_date||"Timestamp not saved")+'</div></div></div>').join(""):'<p class="tiny">No published episodes are recorded yet.</p>');
+ }catch(e){$("story-state").innerHTML='<div class="empty">Could not load saved story state.</div>';}
+}
+async function loadRuns(){
+ const data=await getJSON(BASE+"/actions/runs?per_page=12");
+ const all=data.workflow_runs||[];
+ const run=all.find(r=>r.status==="in_progress")||all.find(r=>/Episode Cycle/i.test(r.name))||all[0];
+ if(!run){$("steps").innerHTML='<div class="empty">No GitHub Actions runs found yet.</div>';return}
+ $("metric-run").textContent="#"+run.run_number;
+ $("metric-run-sub").textContent=niceStatus(run.status==="completed"?run.conclusion:run.status)+" · "+ago(run.updated_at||run.created_at);
+ $("overall-status").className="status "+statusClass(run.status==="completed"?run.conclusion:run.status);
+ $("overall-status").textContent="● "+niceStatus(run.status==="completed"?run.conclusion:run.status);
+ $("active-run-label").innerHTML='<a target="_blank" rel="noreferrer" href="'+escapeHTML(run.html_url)+'">Run #'+escapeHTML(run.run_number)+' · '+escapeHTML(run.name)+' ↗</a> <span class="tiny">· '+escapeHTML(ago(run.updated_at||run.created_at))+'</span>';
+ $("runs").innerHTML=all.slice(0,8).map(r=>'<div class="run-item"><div><strong>'+escapeHTML(r.name)+' #'+escapeHTML(r.run_number)+'</strong><div class="tiny">'+escapeHTML(ago(r.updated_at||r.created_at))+' · '+escapeHTML(r.event)+'</div></div><a class="run-badge '+statusClass(r.status==="completed"?r.conclusion:r.status)+'" target="_blank" rel="noreferrer" href="'+escapeHTML(r.html_url)+'">'+escapeHTML(niceStatus(r.status==="completed"?r.conclusion:r.status))+' ↗</a></div>').join("");
+ try{
+   const jd=await getJSON(BASE+"/actions/runs/"+run.id+"/jobs");
+   const jobs=jd.jobs||[];
+   const steps=jobs.flatMap(j=>(j.steps||[]).map(s=>({...s,jobName:j.name})));
+   $("steps").innerHTML=steps.length?steps.map(s=>{
+     const sc=statusClass(s.conclusion||s.status);
+     const icon=sc==="success"?"✓":sc==="failure"?"!":s.status==="in_progress"?"↻":"·";
+     return '<div class="run-step"><div class="step-icon '+sc+'">'+icon+'</div><div class="step-main"><div class="step-title">'+escapeHTML(s.name)+'</div><div class="step-sub">'+escapeHTML(niceStatus(s.conclusion||s.status))+(s.started_at?' · '+escapeHTML(ago(s.started_at)):"")+'</div></div></div>';
+   }).join(""):'<div class="empty">GitHub has not published step details yet. Open the run for more information.</div>';
+ }catch(e){$("steps").innerHTML='<div class="empty">Step detail is temporarily unavailable. Use the GitHub logs link above.</div>';}
+}
+async function refresh(){
+ $("refresh").disabled=true;$("refresh").textContent="↻ Updating";
+ $("global-error").innerHTML="";
+ try{await Promise.all([loadQueue(),loadState(),loadRuns()]);}
+ catch(e){$("global-error").innerHTML='<div class="error">GitHub status is temporarily unavailable: '+escapeHTML(e.message)+'. The source workflows continue independently; try Refresh again.</div>';}
+ finally{$("last-refresh").textContent="Updated "+new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",second:"2-digit"}).format(new Date())+" IST";$("refresh").disabled=false;$("refresh").textContent="↻ Refresh";}
+}
+$("refresh").addEventListener("click",refresh);
+refresh();
+setInterval(refresh,180000);
+})();
+</script>
+</body>
+</html>
