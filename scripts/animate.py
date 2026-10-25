@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import math
 import random
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -485,11 +486,31 @@ def hud_layer(stats, labels, meta, t, ep):
 
 # --------------------------------------------------------------- captions ----
 
-def chunk_words(words, Texts, size, max_w=930.0, max_words=7):
-    """words: [{w,start,end}] -> sentence-safe karaoke chunks."""
+def chunk_words(words, Texts, size, max_w=930.0, max_words=7, source_text=""):
+    """Build karaoke chunks using source punctuation, since TTS word timings may strip it."""
+    sentence_ends = set()
+    source_matches = list(re.finditer(r"\d+(?::\d+)+|[\w]+(?:['’][\w]+)*", source_text, re.UNICODE))
+    for i, match in enumerate(source_matches):
+        next_start = source_matches[i + 1].start() if i + 1 < len(source_matches) else len(source_text)
+        if re.search(r"[.!?]", source_text[match.end():next_start]):
+            sentence_ends.add(i)
+
+    def norm(value):
+        return re.sub(r"[^0-9a-z]+", "", str(value).casefold())
+
     chunks = []
     cur = []
+    source_cursor = 0
     for wd in words:
+        token = str(wd.get("w", ""))
+        token_norm = norm(token)
+        source_index = None
+        for j in range(source_cursor, min(len(source_matches), source_cursor + 5)):
+            if norm(source_matches[j].group(0)) == token_norm:
+                source_index = j
+                source_cursor = j + 1
+                break
+
         trial = cur + [wd]
         wid = sum(Texts.w(x["w"] + " ", size) for x in trial)
         if cur and (wid > max_w or len(trial) > max_words):
@@ -498,17 +519,27 @@ def chunk_words(words, Texts, size, max_w=930.0, max_words=7):
         else:
             cur = trial
 
-        # Keep each caption chunk inside the sentence; do not join a question
-        # to the follow/subscribe CTA that follows it.
-        token = wd["w"]
-        while token and token[-1] in ('"', "”", "’", ")", "]", "}"):
-            token = token[:-1]
-        if token.endswith((".", "!", "?")):
-            if cur:
-                chunks.append(cur)
-                cur = []
+        # WordBoundary can strip punctuation; map the timed word back to the
+        # source narration so "door?" ends before "Follow and vote...".
+        fallback_token = token
+        while fallback_token and fallback_token[-1] in ('"', "”", "’", ")", "]", "}"):
+            fallback_token = fallback_token[:-1]
+        boundary = (source_index in sentence_ends) if source_index is not None else False
+        boundary = boundary or fallback_token.endswith((".", "!", "?"))
+        if boundary and cur:
+            chunks.append(cur)
+            cur = []
+
     if cur:
         chunks.append(cur)
+    out = []
+    for chunk in chunks:
+        out.append(dict(words=chunk, start=chunk[0]["start"], end=chunk[-1]["end"] + 0.22))
+    for i in range(len(out) - 1):
+        out[i]["end"] = min(out[i]["end"], out[i + 1]["start"] - 0.02)
+    return out
+
+
     out = []
     for i, c in enumerate(chunks):
         out.append(dict(
@@ -552,7 +583,7 @@ def caption_layer(chunks, t, Texts, size=54.0, max_w=930.0):
         lines.append(cur)
     out = [rect(0, 1435, W, H - 1435, "url(#cap_scrim)")]
     # Keep subtitles above the bottom safe area; anchor the last line consistently.
-    base_y = 1590 - (len(lines) - 1) * 70
+    base_y = 1540 - (len(lines) - 1) * 80
     for li, ln in enumerate(lines):
         wid = sum(Texts.w(x["w"] + " ", size) for x in ln) - Texts.w(" ", size)
         x = (W - wid) / 2.0
@@ -741,7 +772,8 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
             chunks = chunk_words(
                 shot.words, Texts, size,
                 max_w=float(render_cfg.get("caption_max_width", 930)),
-                max_words=int(render_cfg.get("caption_max_words", 6)),
+                max_words=int(render_cfg.get("caption_max_words", 7)),
+                source_text=shot.text,
             ) if shot.words else _fake_words(shot, Texts, size)
             cache[("chunks", id(shot))] = chunks
         render_cfg = cfg.get("render", cfg)
