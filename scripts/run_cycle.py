@@ -1,4 +1,4 @@
-"""Main orchestrator — GitHub Actions isi ko chalata hai (har 3 ghante).
+"""Main orchestrator — daytime vote checks + final-hour daily publishing window.
 
 Cycle:
   1. Agar koi episode khuli hai (vote open) → comments se tally (checkpoint)
