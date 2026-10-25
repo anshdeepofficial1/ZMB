@@ -5,8 +5,19 @@
   "arc": "road",
   "node": "intro",
   "location": "an empty highway at 2:47 in the morning",
-  "stats": {"hp": 100, "noise": 20, "food": 60, "dog": 70},
+  "stats": {
+    "hp": 100,
+    "noise": 20,
+    "food": 60,
+    "dog": 70
+  },
   "history": [],
   "last_episode": null,
-  "recent_hashtags": []
+  "recent_hashtags": [
+    "#zombiehorror",
+    "#animatedstory",
+    "#chooseyourownadventure",
+    "#interactivefiction",
+    "#zombiesurvival"
+  ]
 }
