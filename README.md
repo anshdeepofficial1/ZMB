@@ -106,9 +106,6 @@ GitHub Actions (har 3 ghante, free)
 - GitHub runner par pehli val `dry_run: true` chalakar sanity-check, phir `force_publish` se live jao.
 
 
-## AI storyboard visuals
+## Local-only AI refinement
 
-The selected AI storyboard mode creates a detailed illustration per narration beat, with subtle camera movement and readable subtitles. Configure `HF_TOKEN` (Hugging Face token with Inference Providers permission) for hosted story refinement and image generation; optionally configure `POLLINATIONS_KEY` as an image-provider fallback. Set these only in GitHub Settings → Secrets and variables → Actions. Hugging Face currently advertises $0.10/month in free Inference Provider credits for free accounts, so this is a limited trial allowance, not unlimited daily generation. The pipeline logs the provider used, validates generated JSON/images, retries transient failures, and stops instead of publishing fake AI output. Check the model card and provider availability before production use. See `AI-PIPELINE.md` for setup and limits.
-
-
-**Optional real-motion mode:** set `visual_mode` to `ai_video` to generate moving clips through Pollinations (default model `google/veo-3.1-fast`). This can consume paid credits per generated second. It is not enabled by default; `ai_storyboard` remains the default until you explicitly change it.
+The default pipeline runs a pinned Qwen2.5-1.5B-Instruct GGUF model locally on the standard GitHub Actions CPU runner using llama.cpp. It improves narration and shot instructions while the existing procedural SVG character rigs, scene layers, camera motion, FX, captions, narration, and FFmpeg renderer continue to create the Reel. It does **not** call hosted AI inference APIs or external image/video-generation APIs. Model weights are downloaded as a file and cached; prompts stay on the Actions runner. The first run can be slower due to the roughly 1.04 GiB model download and CPU inference. If local inference fails, the authored scenario and existing animation are retained and the dashboard reports a fallback status. See `AI-PIPELINE.md` for details.
