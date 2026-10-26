@@ -9,6 +9,7 @@ on:
       - "config.example.json"
       - "tests/**"
       - ".github/workflows/validate.yml"
+      - ".github/workflows/episode.yml"
   workflow_dispatch:
 
 permissions:
