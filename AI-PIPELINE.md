@@ -1,48 +1,45 @@
-# ZMB AI Pipeline: Setup, limits, and failure behaviour
+# ZMB Stories — Local-only AI pipeline
 
-## What this implementation does
+## Architecture
 
-- Uses the existing authored story graph as the canonical source for choices and branching.
-- When `HF_TOKEN` is configured, asks a hosted chat model to improve spoken dialogue and per-shot metadata. It must return valid JSON with the same number of lines; the code rejects malformed output and does not alter vote choices or next-node links.
-- Generates a separate cinematic 9:16 image for each narration beat. Hugging Face Inference Providers is attempted first when configured. Pollinations is used only if its own `POLLINATIONS_KEY` is configured and the Hugging Face attempt fails.
-- Adds captions/cards, motion, narration and sound through the existing FFmpeg renderer.
-- Keeps the existing GitHub Actions publishing schedule and Instagram Graph API publisher. AI failures stop the production cycle; they do not silently publish fake AI output.
+ZMB uses a small, quantized Qwen2.5-1.5B-Instruct GGUF model for **local text inference inside the standard GitHub-hosted Ubuntu runner**. The pinned model revision is Apache-2.0 licensed. The workflow downloads the model file from the upstream model repository and caches it between runs. Downloading model weights is not inference: episode prompts and story content are passed to llama.cpp running on the Actions machine, not to a hosted inference API.
 
-## GitHub Actions secrets
+The local model can improve:
+- concise spoken narration and emotional beats;
+- shot descriptions, staging, camera intent, and continuity;
+- character movement instructions and supported atmosphere/FX metadata.
 
-In repository **Settings → Secrets and variables → Actions → New repository secret**:
+It cannot generate new photorealistic/3D video footage on a standard CPU runner. The existing ZMB procedural SVG character rigs, layered scene backgrounds, camera presets, frame rasterizer, FFmpeg compositor, narration, captions, and title/vote cards remain the animation engine. The existing Instagram Graph API publishing flow and 7:00 PM IST schedule remain in place.
 
-- `HF_TOKEN`: Hugging Face user token with Inference Providers permission. The code never prints the token.
-- `POLLINATIONS_KEY` (optional): a separately obtained Pollinations API key, used only as an image fallback.
+## Runtime and caching
 
-Optional repository variables:
+- Model: `Qwen/Qwen2.5-1.5B-Instruct-GGUF`
+- Quantization: `Q4_K_M`, about 1.04 GiB
+- Runtime: `llama-cpp-python` on CPU
+- Model revision: `91cad51170dc346986eccefdc2dd33a9da36ead9`
+- Cache: GitHub Actions cache at `~/.cache/huggingface/hub`
+- No `HF_TOKEN`, `POLLINATIONS_KEY`, hosted chat inference, hosted image inference, or hosted video inference is required by the production workflow.
 
-- `HF_STORY_MODEL`: default `Qwen/Qwen2.5-7B-Instruct`; choose a currently supported chat model with an acceptable licence.
-- `HF_IMAGE_MODEL`: default `black-forest-labs/FLUX.1-schnell`; choose a currently supported text-to-image model and review its model card/licence.
+The first run downloads the model weights and will take longer; subsequent runs can reuse the cache. GitHub-hosted runner caches are best-effort and may be evicted. If the cache is unavailable, the workflow downloads the same pinned model again.
 
-## Free-tier reality
+## Failure behaviour
 
-Hugging Face's published pricing currently lists $0.10 in monthly Inference Providers credits for free accounts, subject to change. This is useful for testing, not a guarantee of enough credits to generate a daily multi-scene Reel. Provider availability and model routing can change. A request may fail due to exhausted credits, unavailable hardware, access restrictions, or provider throttling. No unlimited free generation is promised.
+- The model output must be valid JSON with the same number and order of story beats.
+- The story graph, choice keys, and branch destinations are not rewritten by the model.
+- Existing shot fields are retained when the model omits or returns invalid optional fields.
+- If the model cannot load or inference fails, the authored scenario and local procedural renderer are used. Episode metadata reports `ai_story.status=fallback`; this is not reported as a successful AI generation.
+- Remote visual modes from older configuration files are disabled and forced back to the existing local procedural renderer.
 
-The GitHub runner performs orchestration and FFmpeg composition; hosted models run on their provider's infrastructure. Standard GitHub-hosted runners are not general-purpose GPU video-generation machines.
+## Free-tier trade-offs
 
-## Validation and failure policy
+This uses standard GitHub-hosted runners and does not require a paid GPU runner or inference credits. CPU generation will be slower than a hosted GPU model, and the model improves text and shot instructions rather than synthesizing new video footage. The existing animation engine is preserved and remains responsible for all rendered pixels.
 
-- AI story JSON must parse and preserve line count; empty lines or incomplete shot metadata are rejected.
-- Each image is decoded and normalized to 720×1280 before use.
-- Image requests retry up to three times; the render stops if no configured provider can generate an image.
-- Do not enable production posting until a manual dry run succeeds and the resulting MP4 is reviewed.
-- Do not commit tokens or paste them into issue comments/logs.
+## Test before production
 
+1. Run the `Validate Python and Scheduler` workflow and confirm the local-AI tests pass.
+2. Use **Actions → Episode Cycle → Run workflow → Dry run** to render without publishing.
+3. Download the `reel-debug` artifact and review the MP4 and `episode.json`.
+4. Check the dashboard's AI health entry. A fallback status means local inference did not run successfully.
+5. Leave Instagram credentials and publishing schedule unchanged unless you intentionally want to change posting behaviour.
 
-## Optional true AI-video mode (credits may be charged)
-
-The default \`ai_storyboard\` mode creates illustrated scene art with subtle camera movement and keeps the daily pipeline more credit-conscious. For actual moving character footage, the optional \`ai_video\` mode calls Pollinations' video endpoint with the \`veo\` model by default, generates a short moving clip for each narration beat, then adds fixed subtitles/title cards and the existing narration. This is a real video-generation call and is billed according to the provider/model and generated duration; it is not assumed to be free.
-
-To enable it deliberately:
-1. Create a server-side API key with **video-generation permission** at https://enter.pollinations.ai/keys and set a budget you are comfortable with.
-2. Store it as \`POLLINATIONS_KEY\` in GitHub Actions Secrets. Never commit or share the key.
-3. Change \`config.json\` / \`config.example.json\` setting \`visual_mode\` to \`ai_video\`. The model defaults to \`veo\`, and clip length defaults to 6 seconds.
-4. Run a dry preview first. Production refuses this mode without the video key and does not silently fall back to still images.
-
-Available video models and their duration limits can change; verify the model name and budget in the provider's dashboard before switching.
+Do not put tokens into the repository or logs. Instagram publishing still requires the existing Instagram and GitHub secrets; these are separate from AI inference.
