@@ -55,5 +55,7 @@
   "publish_prepare_hours": 1,
   "visual_mode": "ai_storyboard",
   "ai_story_generation": true,
-  "ai_visual_model": "flux"
+  "ai_visual_model": "flux",
+  "ai_video_model": "veo",
+  "ai_video_clip_seconds": 6
 }

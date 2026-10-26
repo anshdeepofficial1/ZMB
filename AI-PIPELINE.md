@@ -33,3 +33,16 @@ The GitHub runner performs orchestration and FFmpeg composition; hosted models r
 - Image requests retry up to three times; the render stops if no configured provider can generate an image.
 - Do not enable production posting until a manual dry run succeeds and the resulting MP4 is reviewed.
 - Do not commit tokens or paste them into issue comments/logs.
+
+
+## Optional true AI-video mode (credits may be charged)
+
+The default \`ai_storyboard\` mode creates illustrated scene art with subtle camera movement and keeps the daily pipeline more credit-conscious. For actual moving character footage, the optional \`ai_video\` mode calls Pollinations' video endpoint with the \`veo\` model by default, generates a short moving clip for each narration beat, then adds fixed subtitles/title cards and the existing narration. This is a real video-generation call and is billed according to the provider/model and generated duration; it is not assumed to be free.
+
+To enable it deliberately:
+1. Create a server-side API key with **video-generation permission** at https://enter.pollinations.ai/keys and set a budget you are comfortable with.
+2. Store it as \`POLLINATIONS_KEY\` in GitHub Actions Secrets. Never commit or share the key.
+3. Change \`config.json\` / \`config.example.json\` setting \`visual_mode\` to \`ai_video\`. The model defaults to \`veo\`, and clip length defaults to 6 seconds.
+4. Run a dry preview first. Production refuses this mode without the video key and does not silently fall back to still images.
+
+Available video models and their duration limits can change; verify the model name and budget in the provider's dashboard before switching.

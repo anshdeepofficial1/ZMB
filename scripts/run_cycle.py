@@ -110,13 +110,17 @@ def main() -> None:
     token = (os.environ.get("IG_ACCESS_TOKEN") or "").strip()
     ig_user_id = (os.environ.get("IG_USER_ID") or "").strip()
 
-    if (not args.dry_run
-            and str(cfg.get("visual_mode", "procedural")).strip().lower() == "ai_storyboard"
-            and not (os.environ.get("POLLINATIONS_KEY") or "").strip()
-            and not (os.environ.get("HF_TOKEN") or "").strip()):
+    visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
+    if not args.dry_run and visual_mode == "ai_storyboard":
+        if not (os.environ.get("POLLINATIONS_KEY") or "").strip() and not (os.environ.get("HF_TOKEN") or "").strip():
+            raise SystemExit(
+                "[cycle] visual_mode=ai_storyboard but no AI image provider key is configured. "
+                "Add HF_TOKEN or POLLINATIONS_KEY in GitHub Actions secrets. No Reel was rendered or published."
+            )
+    if not args.dry_run and visual_mode == "ai_video" and not (os.environ.get("POLLINATIONS_KEY") or "").strip():
         raise SystemExit(
-            "[cycle] visual_mode=ai_storyboard but no AI image provider key is configured. "
-            "Add HF_TOKEN or POLLINATIONS_KEY in GitHub Actions secrets. No Reel was rendered or published."
+            "[cycle] visual_mode=ai_video needs POLLINATIONS_KEY with video-generation permission. "
+            "This mode can consume paid provider credits. No Reel was rendered or published."
         )
 
     # Fail before spending minutes rendering when required publishing credentials are absent.

@@ -193,3 +193,14 @@ Free tier: 10GB storage, no egress fees, public bucket URL. `publish.py` mein `m
 | `content/scenarios.json` | Naye story arcs |
 | `state/state.json` | Kabhi manually nahi (bot chalata hai) |
 | `scripts/*` | Sirf agar technical ho |
+
+
+## Optional: true AI-generated moving video
+
+The default \`ai_storyboard\` mode produces AI illustrated scenes with cinematic camera movement. For continuous AI-generated character motion, use Pollinations video generation. This is **not guaranteed to be free**.
+
+1. Open https://enter.pollinations.ai/keys and create a server-side key that has video-generation permission.
+2. Set a conservative budget in the provider dashboard.
+3. Add it to GitHub Actions Secrets as \`POLLINATIONS_KEY\`.
+4. After previewing a storyboard, change \`visual_mode\` to \`ai_video\` in the config. Leave it as \`ai_storyboard\` if you need to stay on limited/free image credits.
+5. Model \`veo\` and a 6-second source clip are the defaults. Provider duration limits, cost and availability may change. A production run stops on video-generation errors rather than publishing the older vector video.

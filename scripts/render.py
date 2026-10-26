@@ -26,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import animate as an  # noqa: E402
 from ai_storyboard import render_storyboard  # noqa: E402
+from ai_video import render_ai_video  # noqa: E402
 import characters as ch  # noqa: E402
 import engine  # noqa: E402
 import scenes as sc  # noqa: E402
@@ -190,7 +191,21 @@ def render_episode(cfg: dict, ep: dict, *, jobs=None, scale=None, crf=None,
     audio = build_master_audio(voices, lead, outro, work, total, cfg)
 
     visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
-    if visual_mode == "ai_storyboard":
+    if visual_mode == "ai_video":
+        if (os.environ.get("POLLINATIONS_KEY") or "").strip():
+            result = render_ai_video(cfg, ep, voices, shots, total, audio, work, out_path,
+                                     fps, ow, oh, crf, Log)
+            ep["visual_mode_used"] = "ai_video"
+            return result
+        if (os.environ.get("HF_TOKEN") or "").strip():
+            Log("[render] no video-capable POLLINATIONS_KEY; using AI storyboard only for preview/dry-run.")
+            result = render_storyboard(cfg, ep, voices, shots, total, audio, work, out_path,
+                                       fps, ow, oh, crf, Log)
+            ep["visual_mode_used"] = "ai_storyboard"
+            return result
+        ep["visual_mode_used"] = "procedural_fallback"
+        Log("[render] no AI video key; procedural renderer used only for preview/local fallback.")
+    elif visual_mode == "ai_storyboard":
         if (os.environ.get("POLLINATIONS_KEY") or "").strip() or (os.environ.get("HF_TOKEN") or "").strip():
             result = render_storyboard(cfg, ep, voices, shots, total, audio, work, out_path,
                                        fps, ow, oh, crf, Log)

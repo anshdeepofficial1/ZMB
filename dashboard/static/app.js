@@ -4,8 +4,10 @@ const el = t => document.createElement(t);
 const fmtMB = b => (b / 1e6).toFixed(1) + " MB";
 
 const CFG_FIELDS = [
-  ["visual_mode", "Visual mode (procedural / ai_storyboard)"],
+  ["visual_mode", "Visual mode (procedural / ai_storyboard / ai_video)"],
   ["ai_visual_model", "AI image model"],
+  ["ai_video_model", "AI video model (veo / seedance / wan)"],
+  ["ai_video_clip_seconds", "AI video clip duration (4–8 seconds)"],
   ["publish_time_ist", "Daily publish time (IST, HH:MM)"],
   ["publish_every_hours", "Publish cadence hours"],
   ["publish_prepare_hours", "Preparation window hours"],
