@@ -1,7 +1,7 @@
 {
   "schema": 2,
   "season": 1,
-  "day": 0,
+  "day": 1,
   "arc": "road",
   "node": "intro",
   "location": "an empty highway at 2:47 in the morning",
@@ -11,8 +11,30 @@
     "food": 60,
     "dog": 70
   },
-  "history": [],
-  "last_episode": null,
+  "history": [
+    {
+      "season": 1,
+      "day": 1,
+      "arc": "road",
+      "node": "intro",
+      "kind": "story",
+      "media_id": "18142002565619707",
+      "video": "reel_s1_d001.mp4",
+      "posted_ist_date": "2026-10-26",
+      "posted_at_ist": "2026-10-26T22:39:17.146242+05:30"
+    }
+  ],
+  "last_episode": {
+    "media_id": "18142002565619707",
+    "posted_at_ist": "2026-10-26T22:39:17.146242+05:30",
+    "node": "intro",
+    "kind": "story",
+    "vote": false,
+    "choices": [],
+    "votes": {},
+    "voters": {},
+    "closed": false
+  },
   "recent_hashtags": [
     "#zombiehorror",
     "#animatedstory",
