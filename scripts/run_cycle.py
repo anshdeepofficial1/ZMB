@@ -232,6 +232,8 @@ def main() -> None:
             log(f"[cycle] quota preflight unavailable (non-fatal): {exc}")
 
     # --- 3/4) Use queued episode or resolve the story, then render ---
+    # If AI generation/rendering fails, do not persist an advanced story node or day.
+    pre_generation_state = json.loads(json.dumps(state))
     episode = None
     result = None
     if pending and not args.dry_run and not args.prepare_scheduled:
@@ -256,7 +258,13 @@ def main() -> None:
 
         episode = engine.build_episode(state, scn, cfg, recap)
         if bool(cfg.get("ai_story_generation", True)) and (os.environ.get("HF_TOKEN") or "").strip():
-            episode = rewrite_episode(episode, log)
+            try:
+                episode = rewrite_episode(episode, log)
+            except Exception:
+                state.clear()
+                state.update(pre_generation_state)
+                save_state(state)
+                raise
         else:
             episode["ai_story"] = {"provider": "scenario", "status": "not_configured"}
             log("[ai-story] using authored scenario script; set HF_TOKEN to enable AI script refinement")
@@ -268,7 +276,13 @@ def main() -> None:
             (OUT_DIR / "caption.txt").write_text(episode["caption"] + "\n", encoding="utf-8")
             log("[cycle] dry-run complete: stills only")
             return
-        result = render.render_episode(cfg, episode)
+        try:
+            result = render.render_episode(cfg, episode)
+        except Exception:
+            state.clear()
+            state.update(pre_generation_state)
+            save_state(state)
+            raise
 
     # Debug artifacts: upload a rendered file only when this run actually rendered it.
     OUT_DIR.mkdir(parents=True, exist_ok=True)
