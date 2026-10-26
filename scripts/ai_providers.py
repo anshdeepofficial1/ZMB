@@ -42,7 +42,23 @@ def _validate_lines(ep: dict[str, Any], new_lines: Any) -> list[dict[str, Any]]:
                 shot[key] = value
         if not shot.get("place") or not shot.get("beat"):
             raise ValueError(f"local model returned incomplete shot metadata at index {index}")
-        if not isinstance(shot.get("cast", []), list):
+        allowed_cameras = {"static", "push", "pull", "panl", "panr", "tilt", "shake", "creep"}
+        if shot.get("cam") not in allowed_cameras:
+            shot["cam"] = original.get("cam", "push")
+        if shot.get("mood") not in {"calm", "tense", "danger", "hope"}:
+            shot["mood"] = original.get("mood", "tense")
+        if shot.get("time") not in {"night", "dusk", "dawn", "day"}:
+            shot["time"] = original.get("time", "night")
+        cast = shot.get("cast", [])
+        allowed_people = {"max", "ada", "old", "zombie", "biscuit"}
+        allowed_actions = {"idle", "walk", "run", "sneak", "shamble", "trot", "follow", "run_dog"}
+        valid_cast = isinstance(cast, list) and all(
+            isinstance(actor, (list, tuple)) and len(actor) >= 2
+            and str(actor[0]).lower() in allowed_people
+            and str(actor[1]).lower() in allowed_actions
+            for actor in cast
+        )
+        if not valid_cast:
             shot["cast"] = original.get("cast", [])
         if not isinstance(shot.get("fx", "none"), str):
             shot["fx"] = original.get("fx", "none")
