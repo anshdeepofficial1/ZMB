@@ -44,7 +44,7 @@ def rewrite_episode(ep: dict[str, Any], Log=print) -> dict[str, Any]:
         "the meaning/order of all audience choices. Do not invent new choices or change branching. "
         "Max is a young adult survivor with messy dark hair, charcoal hooded jacket and backpack; "
         "Biscuit is his small tan dog with dark ears; Ada is a capable young woman. Non-graphic horror. "
-        "Aim for 75-115 spoken words across the episode, with a strong opening and cliffhanger. "
+        "Aim for 65-90 spoken words across the episode, with a strong opening and cliffhanger. "
         "Each line should fit a short narrated shot. Do not add markdown."
     )
     body = {
