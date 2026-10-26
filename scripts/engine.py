@@ -258,6 +258,7 @@ def commit_episode(
         "post_url": post_url,
         "visual_mode_requested": episode.get("visual_mode_requested", "procedural"),
         "visual_mode_used": episode.get("visual_mode_used", episode.get("visual_mode_requested", "procedural")),
+        "ai_story": episode.get("ai_story"),
     })
     state["last_episode"] = {
         "media_id": media_id,
@@ -265,6 +266,7 @@ def commit_episode(
         "post_url": post_url,
         "visual_mode_requested": episode.get("visual_mode_requested", "procedural"),
         "visual_mode_used": episode.get("visual_mode_used", episode.get("visual_mode_requested", "procedural")),
+        "ai_story": episode.get("ai_story"),
         "node": episode["node"],
         "kind": episode["kind"],
         "vote": episode["vote"],
