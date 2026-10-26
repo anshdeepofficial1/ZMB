@@ -6,6 +6,7 @@ from pathlib import Path
 from urllib.parse import quote
 import requests
 from PIL import Image, ImageDraw, ImageFont, ImageOps
+from ai_providers import generate_hf_image
 from common import ROOT, log, run
 
 ENDPOINT="https://gen.pollinations.ai/image/"
@@ -32,19 +33,38 @@ def build_prompt(ep:dict,line:dict)->str:
       "or storyboard panels.")
 
 def _generate(prompt,key,model,path,seed):
-    r=requests.get(ENDPOINT+quote(prompt,safe=""),
-      params={"model":model,"width":IW,"height":IH,"seed":seed},
-      headers={"Authorization":"Bearer "+key,"Accept":"image/*"},timeout=(20,240))
-    if r.status_code>=400:raise RuntimeError("image provider HTTP "+str(r.status_code))
-    typ=str(r.headers.get("Content-Type","")).lower()
-    if typ and not typ.startswith("image/"):raise RuntimeError("image provider returned non-image content")
-    with Image.open(BytesIO(r.content)) as src:
-      im=ImageOps.fit(src.convert("RGB"),(IW,IH),method=Image.Resampling.LANCZOS,centering=(.5,.48))
-      tmp=path.with_suffix(".tmp.jpg");im.save(tmp,"JPEG",quality=94,optimize=True);tmp.replace(path)
+    hf_token=(os.environ.get("HF_TOKEN") or "").strip()
+    pollinations_key=(key or "").strip()
+    errors=[]
+    if hf_token:
+      try:
+        tmp=path.with_suffix(".tmp.jpg")
+        generate_hf_image(prompt,tmp,seed)
+        with Image.open(tmp) as src:
+          im=ImageOps.fit(src.convert("RGB"),(IW,IH),method=Image.Resampling.LANCZOS,centering=(.5,.48))
+          im.save(path,"JPEG",quality=94,optimize=True)
+        tmp.unlink(missing_ok=True)
+        return "huggingface"
+      except Exception as exc:
+        errors.append("Hugging Face "+type(exc).__name__)
+        path.with_suffix(".tmp.jpg").unlink(missing_ok=True)
+    if pollinations_key:
+      r=requests.get(ENDPOINT+quote(prompt,safe=""),
+        params={"model":model,"width":IW,"height":IH,"seed":seed},
+        headers={"Authorization":"Bearer "+pollinations_key,"Accept":"image/*"},timeout=(20,240))
+      if r.status_code>=400:raise RuntimeError("image provider HTTP "+str(r.status_code)+"; "+ "; ".join(errors))
+      typ=str(r.headers.get("Content-Type","")).lower()
+      if typ and not typ.startswith("image/"):raise RuntimeError("image provider returned non-image content")
+      with Image.open(BytesIO(r.content)) as src:
+        im=ImageOps.fit(src.convert("RGB"),(IW,IH),method=Image.Resampling.LANCZOS,centering=(.5,.48))
+        tmp=path.with_suffix(".tmp.jpg");im.save(tmp,"JPEG",quality=94,optimize=True);tmp.replace(path)
+      return "pollinations"
+    raise RuntimeError("no image provider available; set HF_TOKEN or POLLINATIONS_KEY. "+ "; ".join(errors))
 
 def generate_storyboard_images(cfg,ep,work,Log=log):
     key=(os.environ.get("POLLINATIONS_KEY") or "").strip()
-    if not key:raise RuntimeError("POLLINATIONS_KEY required for AI storyboard mode")
+    if not key and not (os.environ.get("HF_TOKEN") or "").strip():
+      raise RuntimeError("AI storyboard requires HF_TOKEN or POLLINATIONS_KEY")
     model=str(cfg.get("ai_visual_model") or "flux")
     folder=work/"ai_storyboard"/"images";folder.mkdir(parents=True,exist_ok=True)
     out=[];lines=ep.get("lines") or []
@@ -56,13 +76,14 @@ def generate_storyboard_images(cfg,ep,work,Log=log):
       failure=None
       for attempt in range(3):
         try:
-          Log(f"[ai-storyboard] generating scene {i+1}/{len(lines)} ({model})")
-          _generate(prompt,key,model,path,int(digest[:8],16)&0x7fffffff);failure=None;break
+          Log(f"[ai-storyboard] generating scene {i+1}/{len(lines)} (Hugging Face preferred; Pollinations fallback if configured)")
+          provider_used=_generate(prompt,key,model,path,int(digest[:8],16)&0x7fffffff);failure=None;break
         except Exception as exc:
           failure=exc;Log(f"[ai-storyboard] scene {i+1} attempt {attempt+1}/3 failed: {type(exc).__name__}")
           if attempt<2:time.sleep(2+attempt*3)
       if failure:raise RuntimeError(f"AI artwork failed on scene {i+1}; check API key, model access and budget") from failure
       out.append(path)
+      Log(f"[ai-storyboard] scene {i+1} provider={provider_used}")
     if not out:raise RuntimeError("episode has no scenes")
     return out
 
@@ -149,6 +170,7 @@ def render_storyboard(cfg,ep,voices,shots,total,audio,work,out_path,fps,out_w,ou
     except ValueError:dur=0.0
     if not out_path.exists() or out_path.stat().st_size<100000 or dur<=0:raise RuntimeError("AI storyboard output validation failed")
     result={"video_path":str(out_path),"duration":dur,"frames":int(round(dur*fps)),"shots":len(shots),
-      "render_seconds":round(time.time()-started,1),"visual_mode_used":"ai_storyboard"}
+      "render_seconds":round(time.time()-started,1),"visual_mode_used":"ai_storyboard",
+      "ai_story":ep.get("ai_story", {"provider":"scenario","status":"not_configured"})}
     Log(f"[render] AI STORYBOARD DONE {out_path.name} {dur:.1f}s {out_path.stat().st_size/1e6:.2f} MB")
     return result

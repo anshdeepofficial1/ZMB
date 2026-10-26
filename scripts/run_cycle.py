@@ -25,6 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import engine  # noqa: E402
+from ai_providers import rewrite_episode  # noqa: E402
 import publish  # noqa: E402
 import render  # noqa: E402
 import votes as votes_mod  # noqa: E402
@@ -111,11 +112,11 @@ def main() -> None:
 
     if (not args.dry_run
             and str(cfg.get("visual_mode", "procedural")).strip().lower() == "ai_storyboard"
-            and not (os.environ.get("POLLINATIONS_KEY") or "").strip()):
+            and not (os.environ.get("POLLINATIONS_KEY") or "").strip()
+            and not (os.environ.get("HF_TOKEN") or "").strip()):
         raise SystemExit(
-            "[cycle] visual_mode=ai_storyboard but POLLINATIONS_KEY is missing. "
-            "Add a server-side key in GitHub Settings → Secrets and variables → Actions. "
-            "No Reel was rendered or published."
+            "[cycle] visual_mode=ai_storyboard but no AI image provider key is configured. "
+            "Add HF_TOKEN or POLLINATIONS_KEY in GitHub Actions secrets. No Reel was rendered or published."
         )
 
     # Fail before spending minutes rendering when required publishing credentials are absent.
@@ -254,6 +255,11 @@ def main() -> None:
                 log(f"[cycle] resolution → {resolution}")
 
         episode = engine.build_episode(state, scn, cfg, recap)
+        if bool(cfg.get("ai_story_generation", True)) and (os.environ.get("HF_TOKEN") or "").strip():
+            episode = rewrite_episode(episode, log)
+        else:
+            episode["ai_story"] = {"provider": "scenario", "status": "not_configured"}
+            log("[ai-story] using authored scenario script; set HF_TOKEN to enable AI script refinement")
         log(f"[cycle] episode: S{episode['season']} D{episode['day']} "
             f"node={episode['node']} kind={episode['kind']} vote={episode['vote']}")
         if args.stills:

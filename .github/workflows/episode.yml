@@ -35,6 +35,9 @@ jobs:
       IG_USER_ID: ${{ secrets.IG_USER_ID }}
       IG_USERNAME: ${{ secrets.IG_USERNAME }}
       POLLINATIONS_KEY: ${{ secrets.POLLINATIONS_KEY }}
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      HF_STORY_MODEL: ${{ vars.HF_STORY_MODEL }}
+      HF_IMAGE_MODEL: ${{ vars.HF_IMAGE_MODEL }}
       PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
       GITHUB_REPOSITORY: ${{ github.repository }}
       GITHUB_TOKEN: ${{ github.token }}

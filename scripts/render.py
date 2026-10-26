@@ -191,13 +191,13 @@ def render_episode(cfg: dict, ep: dict, *, jobs=None, scale=None, crf=None,
 
     visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
     if visual_mode == "ai_storyboard":
-        if (os.environ.get("POLLINATIONS_KEY") or "").strip():
+        if (os.environ.get("POLLINATIONS_KEY") or "").strip() or (os.environ.get("HF_TOKEN") or "").strip():
             result = render_storyboard(cfg, ep, voices, shots, total, audio, work, out_path,
                                        fps, ow, oh, crf, Log)
             ep["visual_mode_used"] = "ai_storyboard"
             return result
         ep["visual_mode_used"] = "procedural_fallback"
-        Log("[render] no POLLINATIONS_KEY; procedural fallback is only for dry/preview runs.")
+        Log("[render] no AI provider key; procedural renderer used only for preview/local fallback.")
     else:
         ep["visual_mode_used"] = "procedural"
 
