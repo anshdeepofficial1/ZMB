@@ -6,7 +6,7 @@ const fmtMB = b => (b / 1e6).toFixed(1) + " MB";
 const CFG_FIELDS = [
   ["visual_mode", "Visual mode (procedural / ai_storyboard / ai_video)"],
   ["ai_visual_model", "AI image model"],
-  ["ai_video_model", "AI video model (veo / seedance / wan)"],
+  ["ai_video_model", "AI video model ID (e.g. google/veo-3.1-fast)"],
   ["ai_video_clip_seconds", "AI video clip duration (4–8 seconds)"],
   ["publish_time_ist", "Daily publish time (IST, HH:MM)"],
   ["publish_every_hours", "Publish cadence hours"],

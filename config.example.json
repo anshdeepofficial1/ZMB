@@ -56,6 +56,6 @@
   "visual_mode": "ai_storyboard",
   "ai_story_generation": true,
   "ai_visual_model": "flux",
-  "ai_video_model": "veo",
+  "ai_video_model": "google/veo-3.1-fast",
   "ai_video_clip_seconds": 6
 }

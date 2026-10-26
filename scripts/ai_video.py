@@ -1,6 +1,6 @@
 """Optional true AI-motion video renderer for ZMB.
 
-Uses Pollinations' video endpoint (model default: Veo) to generate a short moving
+Uses Pollinations' video endpoint (model default: Google Veo 3.1 Fast) to generate a short moving
 clip per narration beat. This may consume paid provider credits. It is deliberately
 opt-in; ai_storyboard remains the default budget-conscious visual mode.
 """
@@ -38,7 +38,7 @@ def build_video_prompt(episode: dict, line: dict, duration: int) -> str:
         + "Animate natural body movement, walking or running when specified, breathing, blinking, "
         + "subtle head turns, dog movement and drifting environmental atmosphere. "
         + f"Camera direction: {camera}; use smooth film-like camera motion that supports the action. "
-        + "Keep character appearances and clothing consistent throughout this clip. One continuous shot, "
+        + "Keep character appearances and clothing consistent throughout this clip. One single shot, a single continuous take, "
         + "no hard cuts, no montage, no freeze frame, no zoom-only still-image effect, no text, no logo."
     )
 
@@ -146,7 +146,7 @@ def render_ai_video(cfg: dict, episode: dict, voices: list[dict], shots: list,
     key = (os.environ.get("POLLINATIONS_KEY") or "").strip()
     if not key:
         raise RuntimeError("POLLINATIONS_KEY with video-generation permission is required for ai_video mode")
-    model = str(cfg.get("ai_video_model") or "veo")
+    model = str(cfg.get("ai_video_model") or "google/veo-3.1-fast")
     seconds = max(4, min(8, int(cfg.get("ai_video_clip_seconds", 6))))
     base = work / "ai_video"
     source_dir, overlay_dir, clip_dir = base / "source", base / "overlays", base / "clips"
