@@ -84,33 +84,8 @@ def _probe_duration(path: Path) -> float:
 
 def generate_video(prompt: str, key: str, model: str, seconds: int,
                    output: Path, seed: int, Log=log) -> float:
-    params = {
-        "model": model,
-        "duration": seconds,
-        "aspectRatio": "9:16",
-        "seed": seed,
-    }
-    response = requests.get(
-        VIDEO_ENDPOINT + quote(prompt, safe=""),
-        params=params,
-        headers={"Authorization": "Bearer " + key, "Accept": "video/mp4,application/json"},
-        timeout=(30, 600),
-    )
-    if response.status_code >= 400:
-        raise RuntimeError(
-            f"video provider HTTP {response.status_code}; check video permission, selected model and credits"
-        )
-    video_bytes = _extract_video_bytes(response)
-    output.parent.mkdir(parents=True, exist_ok=True)
-    tmp = output.with_suffix(".tmp.mp4")
-    tmp.write_bytes(video_bytes)
-    tmp.replace(output)
-    duration = _probe_duration(output)
-    if output.stat().st_size < 100_000 or duration <= 0:
-        output.unlink(missing_ok=True)
-        raise RuntimeError("video provider response failed MP4 validation")
-    Log(f"[ai-video] source clip ready: {output.name}, {duration:.1f}s")
-    return duration
+    """Legacy hosted video generation is intentionally blocked."""
+    raise RuntimeError("Hosted video inference is disabled; use the existing local procedural renderer")
 
 
 def _render_segment(source: Path, overlay: Path, source_duration: float,
@@ -140,104 +115,6 @@ def _render_segment(source: Path, overlay: Path, source_duration: float,
     Log(f"[ai-video] rendered moving segment {output.name}")
 
 
-def render_ai_video(cfg: dict, episode: dict, voices: list[dict], shots: list,
-                    total: float, audio_path: Path, work: Path, out_path: Path,
-                    fps: int, out_w: int, out_h: int, crf: int, Log=log) -> dict:
-    key = (os.environ.get("POLLINATIONS_KEY") or "").strip()
-    if not key:
-        raise RuntimeError("POLLINATIONS_KEY with video-generation permission is required for ai_video mode")
-    model = str(cfg.get("ai_video_model") or "google/veo-3.1-fast")
-    seconds = max(4, min(8, int(cfg.get("ai_video_clip_seconds", 6))))
-    base = work / "ai_video"
-    source_dir, overlay_dir, clip_dir = base / "source", base / "overlays", base / "clips"
-    source_dir.mkdir(parents=True, exist_ok=True)
-    overlay_dir.mkdir(parents=True, exist_ok=True)
-    clip_dir.mkdir(parents=True, exist_ok=True)
-    source_clips: list[Path] = []
-    source_durations: list[float] = []
-    lines = episode.get("lines") or []
-    started = time.time()
-
-    # One moving clip per narrated beat. Prompt hashes make retries reuse any clip
-    # already generated during the same runner workspace.
-    for index, line in enumerate(lines):
-        prompt = build_video_prompt(episode, line, seconds)
-        digest = hashlib.sha256(prompt.encode("utf-8")).hexdigest()
-        path = source_dir / f"{index:02d}_{digest[:12]}.mp4"
-        duration = _probe_duration(path) if path.exists() and path.stat().st_size > 100_000 else 0.0
-        if duration <= 0:
-            failure = None
-            for attempt in range(3):
-                try:
-                    Log(f"[ai-video] generating moving scene {index + 1}/{len(lines)} with model={model}")
-                    duration = generate_video(
-                        prompt, key, model, seconds, path, int(digest[:8], 16) & 0x7FFFFFFF, Log
-                    )
-                    failure = None
-                    break
-                except Exception as exc:
-                    failure = exc
-                    Log(f"[ai-video] scene {index + 1} attempt {attempt + 1}/3 failed: {type(exc).__name__}")
-                    if attempt < 2:
-                        time.sleep(3 + 5 * attempt)
-            if failure is not None:
-                raise RuntimeError(
-                    f"AI video generation failed on scene {index + 1}; check POLLINATIONS_KEY, "
-                    "video model availability and remaining credits"
-                ) from failure
-        source_clips.append(path)
-        source_durations.append(duration)
-
-    line_index = 0
-    segments: list[Path] = []
-    for index, shot in enumerate(shots):
-        if shot.kind == "title":
-            source_index, overlay_kind, text = 0, "title", ""
-        elif shot.kind == "line":
-            source_index = min(line_index, len(source_clips) - 1)
-            overlay_kind = "line"
-            text = voices[min(line_index, len(voices) - 1)].get("text", shot.text or "")
-            line_index += 1
-        elif shot.kind == "vote":
-            source_index, overlay_kind, text = len(source_clips) - 1, "vote", episode.get("subtitle", "")
-        elif shot.kind == "ending":
-            source_index, overlay_kind, text = len(source_clips) - 1, "ending", episode.get("subtitle", "")
-        else:
-            source_index, overlay_kind, text = len(source_clips) - 1, "line", str(shot.text or "")
-        overlay = _overlay(
-            overlay_dir / f"overlay_{index:02d}.png", episode, overlay_kind, text, out_w, out_h
-        )
-        segment = clip_dir / f"segment_{index:02d}.mp4"
-        _render_segment(
-            source_clips[source_index], overlay, source_durations[source_index],
-            float(shot.dur), segment, fps, out_w, out_h, crf, Log,
-        )
-        segments.append(segment)
-
-    concat = base / "concat.txt"
-    concat.write_text(
-        "".join(f"file '{p.resolve().as_posix()}'\n" for p in segments), encoding="utf-8"
-    )
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    run([
-        "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
-        "-f", "concat", "-safe", "0", "-i", str(concat),
-        "-i", str(audio_path), "-map", "0:v:0", "-map", "1:a:0",
-        "-c:v", "libx264", "-preset", "medium", "-crf", str(crf),
-        "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-        "-c:a", "aac", "-b:a", "160k", "-ac", "2", "-ar", "44100",
-        "-shortest", "-t", f"{total:.3f}", str(out_path),
-    ])
-    actual = _probe_duration(out_path)
-    if not out_path.exists() or out_path.stat().st_size < 100_000 or actual <= 0:
-        raise RuntimeError("AI video Reel failed output validation")
-    result = {
-        "video_path": str(out_path),
-        "duration": actual,
-        "frames": int(round(actual * fps)),
-        "shots": len(shots),
-        "render_seconds": round(time.time() - started, 1),
-        "visual_mode_used": "ai_video",
-    }
-    Log(f"[render] AI VIDEO DONE {out_path.name} {actual:.1f}s {out_path.stat().st_size / 1e6:.2f} MB")
-    return result
+def render_ai_video(*args, **kwargs) -> dict:
+    """Legacy hosted video entry point retained but network calls are disabled."""
+    raise RuntimeError("Hosted video inference is disabled in ZMB local-only mode")
