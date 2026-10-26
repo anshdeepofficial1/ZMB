@@ -53,9 +53,6 @@
   "publish_time_ist": "19:00",
   "publish_every_hours": 24,
   "publish_prepare_hours": 1,
-  "visual_mode": "ai_storyboard",
+  "visual_mode": "procedural",
   "ai_story_generation": true,
-  "ai_visual_model": "flux",
-  "ai_video_model": "google/veo-3.1-fast",
-  "ai_video_clip_seconds": 6
 }
