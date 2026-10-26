@@ -32,60 +32,14 @@ def build_prompt(ep:dict,line:dict)->str:
       "and a calm darker lower section for subtitles. No written text, logos, watermarks, UI, collage, split-screen "
       "or storyboard panels.")
 
-def _generate(prompt,key,model,path,seed):
-    hf_token=(os.environ.get("HF_TOKEN") or "").strip()
-    pollinations_key=(key or "").strip()
-    errors=[]
-    if hf_token:
-      try:
-        tmp=path.with_suffix(".tmp.jpg")
-        generate_hf_image(prompt,tmp,seed)
-        with Image.open(tmp) as src:
-          im=ImageOps.fit(src.convert("RGB"),(IW,IH),method=Image.Resampling.LANCZOS,centering=(.5,.48))
-          im.save(path,"JPEG",quality=94,optimize=True)
-        tmp.unlink(missing_ok=True)
-        return "huggingface"
-      except Exception as exc:
-        errors.append("Hugging Face "+type(exc).__name__)
-        path.with_suffix(".tmp.jpg").unlink(missing_ok=True)
-    if pollinations_key:
-      r=requests.get(ENDPOINT+quote(prompt,safe=""),
-        params={"model":model,"width":IW,"height":IH,"seed":seed},
-        headers={"Authorization":"Bearer "+pollinations_key,"Accept":"image/*"},timeout=(20,240))
-      if r.status_code>=400:raise RuntimeError("image provider HTTP "+str(r.status_code)+"; "+ "; ".join(errors))
-      typ=str(r.headers.get("Content-Type","")).lower()
-      if typ and not typ.startswith("image/"):raise RuntimeError("image provider returned non-image content")
-      with Image.open(BytesIO(r.content)) as src:
-        im=ImageOps.fit(src.convert("RGB"),(IW,IH),method=Image.Resampling.LANCZOS,centering=(.5,.48))
-        tmp=path.with_suffix(".tmp.jpg");im.save(tmp,"JPEG",quality=94,optimize=True);tmp.replace(path)
-      return "pollinations"
-    raise RuntimeError("no image provider available; set HF_TOKEN or POLLINATIONS_KEY. "+ "; ".join(errors))
+def _generate(prompt, key, model, path, seed):
+    """Legacy hosted image generation is deliberately disabled."""
+    raise RuntimeError("Hosted image inference is disabled; use the local procedural renderer")
 
-def generate_storyboard_images(cfg,ep,work,Log=log):
-    key=(os.environ.get("POLLINATIONS_KEY") or "").strip()
-    if not key and not (os.environ.get("HF_TOKEN") or "").strip():
-      raise RuntimeError("AI storyboard requires HF_TOKEN or POLLINATIONS_KEY")
-    model=str(cfg.get("ai_visual_model") or "flux")
-    folder=work/"ai_storyboard"/"images";folder.mkdir(parents=True,exist_ok=True)
-    out=[];lines=ep.get("lines") or []
-    for i,line in enumerate(lines):
-      prompt=build_prompt(ep,line);digest=hashlib.sha256(prompt.encode()).hexdigest()
-      path=folder/f"{i:02d}_{digest[:12]}.jpg"
-      if path.exists() and path.stat().st_size>20000:
-        out.append(path);Log(f"[ai-storyboard] cache hit {i+1}/{len(lines)}");continue
-      failure=None
-      for attempt in range(3):
-        try:
-          Log(f"[ai-storyboard] generating scene {i+1}/{len(lines)} (Hugging Face preferred; Pollinations fallback if configured)")
-          provider_used=_generate(prompt,key,model,path,int(digest[:8],16)&0x7fffffff);failure=None;break
-        except Exception as exc:
-          failure=exc;Log(f"[ai-storyboard] scene {i+1} attempt {attempt+1}/3 failed: {type(exc).__name__}")
-          if attempt<2:time.sleep(2+attempt*3)
-      if failure:raise RuntimeError(f"AI artwork failed on scene {i+1}; check API key, model access and budget") from failure
-      out.append(path)
-      Log(f"[ai-storyboard] scene {i+1} provider={provider_used}")
-    if not out:raise RuntimeError("episode has no scenes")
-    return out
+
+def generate_storyboard_images(cfg, ep, work, Log=log):
+    """Legacy entry point retained for compatibility but cannot call remote services."""
+    raise RuntimeError("Hosted storyboard generation is disabled in local-only mode")
 
 def _font(name,size):
     try:return ImageFont.truetype(str(ROOT/"assets"/"fonts"/name),size)
