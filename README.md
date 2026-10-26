@@ -1,4 +1,4 @@
-# 🧟 ZMB — Zombie Survival (Interactive Animated Instagram Channel, 100% Free Automation)
+# 🧟 ZMB — Zombie Survival (Interactive Animated Instagram Channel)
 
 Ek **fully-automated Instagram Reels channel** jahan **viewers comment karke story decide karte hain**.
 
@@ -104,3 +104,8 @@ GitHub Actions (har 3 ghante, free)
 - Content **fiction** hai — reels par **AI-content disclosure automatically set** hota hai (`is_ai_generated=true`).
 - Pehle hafte **manual push** karna (friends/groups share) — algorithm ko initial signal chahiye. Plan `PLAN.md` mein.
 - GitHub runner par pehli val `dry_run: true` chalakar sanity-check, phir `force_publish` se live jao.
+
+
+## AI storyboard visuals
+
+The selected AI storyboard mode creates a detailed illustration per narration beat, with subtle camera movement and readable subtitles. Add a server-side POLLINATIONS_KEY from https://enter.pollinations.ai/keys. AI requests may consume provider credits. Production stops if the key is missing or generation fails, rather than silently posting the old vector animation.

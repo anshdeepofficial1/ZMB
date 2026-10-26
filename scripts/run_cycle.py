@@ -44,69 +44,45 @@ def _parse_ist_timestamp(value: str, tzinfo) -> datetime | None:
 
 
 def _publish_target(state: dict, cfg: dict, now: datetime, force: bool) -> datetime | None:
-    """Schedule the first post at the configured local time; later posts at 24h cadence.
-
-    The workflow starts preparation once the previous post is 23h old, then renders
-    and hosts the video before waiting for the 24h target. This keeps the heavy work
-    inside the final hour and prevents a run at a random checkpoint from posting.
-    """
-    if force:
-        return now
-
-    interval_hours = max(1, int(cfg.get("publish_every_hours", 24)))
-    prepare_hours = max(0, min(interval_hours - 1, int(cfg.get("publish_prepare_hours", 1))))
-    history = state.get("history") or []
-    last_item = history[-1] if history else None
-
-    if last_item:
-        raw_timestamp = last_item.get("posted_at_ist") or last_item.get("posted_at_utc")
-        previous = _parse_ist_timestamp(raw_timestamp, now.tzinfo) if raw_timestamp else None
-        if previous is None and last_item.get("posted_ist_date"):
-            # Backward-compatible fallback for older state records that saved only
-            # the date. Assume the configured daily posting time for that old post.
-            try:
-                hour_text, minute_text = str(cfg.get("publish_time_ist", "20:00")).split(":", 1)
-                previous = datetime.fromisoformat(
-                    f"{last_item['posted_ist_date']}T{int(hour_text):02d}:{int(minute_text):02d}:00"
-                ).replace(tzinfo=now.tzinfo)
-            except (TypeError, ValueError):
-                previous = None
-
-        if previous is None:
-            log("[cycle] cannot parse previous publish time; safe fallback is next configured posting window")
-            return None
-
-        target = previous + timedelta(hours=interval_hours)
-        earliest_start = target - timedelta(hours=prepare_hours)
-        if now < earliest_start:
-            remaining = earliest_start - now
-            log(f"[cycle] next Reel preparation opens in {remaining.total_seconds() / 3600:.1f}h; no render yet")
-            return None
-        if now < target:
-            log(f"[cycle] inside final {prepare_hours}h preparation window; target publish time {target.isoformat()}")
-            return target
-        log(f"[cycle] target time passed by {(now - target).total_seconds() / 60:.1f} min; publishing as soon as ready")
-        return now
-
-    # Initial launch: use a fixed, researched baseline rather than posting at the
-    # first arbitrary workflow checkpoint. Once history exists, preserve 24h cadence.
+    """Fixed daily IST slot: prepare one hour early and avoid posting very late."""
+    if force: return now
+    interval_hours=max(1,int(cfg.get("publish_every_hours",24)))
+    days=max(1,int(round(interval_hours/24)))
+    prep_hours=max(0,min(interval_hours-1,int(cfg.get("publish_prepare_hours",1))))
+    from datetime import time as clock_time
     try:
-        hour_text, minute_text = str(cfg.get("publish_time_ist", "20:00")).split(":", 1)
-        target = now.replace(
-            hour=int(hour_text), minute=int(minute_text), second=0, microsecond=0
-        )
-    except (TypeError, ValueError):
-        target = now.replace(hour=20, minute=0, second=0, microsecond=0)
-
-    prep_start = target - timedelta(hours=prepare_hours)
-    if now < prep_start:
-        log(f"[cycle] first-post preparation opens at {prep_start.isoformat()}; no render yet")
+        hh,mm=str(cfg.get("publish_time_ist","19:00")).split(":",1)
+        slot=clock_time(hour=int(hh),minute=int(mm))
+    except (TypeError,ValueError): slot=clock_time(hour=19,minute=0)
+    hist=state.get("history") or []
+    last=hist[-1] if hist else None
+    previous=None
+    if last:
+        raw=last.get("posted_at_ist") or last.get("posted_at_utc")
+        previous=_parse_ist_timestamp(raw,now.tzinfo) if raw else None
+        if previous is None and last.get("posted_ist_date"):
+            try: previous=datetime.fromisoformat(f"{last['posted_ist_date']}T{slot.hour:02d}:{slot.minute:02d}:00").replace(tzinfo=now.tzinfo)
+            except (TypeError,ValueError): previous=None
+        if previous is None:
+            log("[cycle] previous publish timestamp unreadable; skipping schedule decision")
+            return None
+        target_date=previous.date()+timedelta(days=days)
+    else: target_date=now.date()
+    target=datetime.combine(target_date,slot,tzinfo=now.tzinfo)
+    while previous is not None and target<=previous: target+=timedelta(days=days)
+    if now>target+timedelta(hours=1):
+        target+=timedelta(days=days)
+        log(f"[cycle] publish window missed; next fixed target is {target.isoformat()}")
+    prep=target-timedelta(hours=prep_hours)
+    if now<prep:
+        remaining=prep-now
+        log(f"[cycle] next Reel preparation opens in {remaining.total_seconds()/3600:.1f}h; no render yet")
         return None
-    if now > target + timedelta(hours=1):
-        log(f"[cycle] first-post window for today was missed; will try tomorrow near {cfg.get('publish_time_ist', '20:00')} IST")
-        return None
-    return target if now < target else now
-
+    if now<target:
+        log(f"[cycle] preparation window open; publish target {target.isoformat()}")
+        return target
+    log(f"[cycle] target passed by {(now-target).total_seconds()/60:.1f} min; publishing within grace window")
+    return now
 
 def main() -> None:
     ap = argparse.ArgumentParser()
@@ -132,6 +108,15 @@ def main() -> None:
 
     token = (os.environ.get("IG_ACCESS_TOKEN") or "").strip()
     ig_user_id = (os.environ.get("IG_USER_ID") or "").strip()
+
+    if (not args.dry_run
+            and str(cfg.get("visual_mode", "procedural")).strip().lower() == "ai_storyboard"
+            and not (os.environ.get("POLLINATIONS_KEY") or "").strip()):
+        raise SystemExit(
+            "[cycle] visual_mode=ai_storyboard but POLLINATIONS_KEY is missing. "
+            "Add a server-side key in GitHub Settings → Secrets and variables → Actions. "
+            "No Reel was rendered or published."
+        )
 
     # Fail before spending minutes rendering when required publishing credentials are absent.
     if not args.dry_run and not args.prepare_scheduled:
@@ -350,11 +335,16 @@ def main() -> None:
         return
 
     media_id = publish.publish_reel(client, cfg, ig_user_id, episode, media_url)
-
-    # --- 6) state save ---
+    post_url = None
+    try:
+        details = client.get(media_id, fields="permalink")
+        post_url = details.get("permalink")
+        if post_url: log(f"[publish] Instagram permalink recorded: {post_url}")
+    except Exception as exc:
+        log(f"[publish] permalink lookup skipped (non-fatal): {exc}")
     posted_at = ist_now()
     today = posted_at.date().isoformat()
-    engine.commit_episode(state, episode, media_id, today, posted_at.isoformat())
+    engine.commit_episode(state, episode, media_id, today, posted_at.isoformat(), post_url=post_url)
     save_state(state)
     if pending and pending_path.exists():
         pending_path.unlink()

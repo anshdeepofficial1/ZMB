@@ -25,6 +25,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import animate as an  # noqa: E402
+from ai_storyboard import render_storyboard  # noqa: E402
 import characters as ch  # noqa: E402
 import engine  # noqa: E402
 import scenes as sc  # noqa: E402
@@ -187,6 +188,18 @@ def render_episode(cfg: dict, ep: dict, *, jobs=None, scale=None, crf=None,
     Log(f"[render] timeline: {len(shots)} shots, {total:.1f}s "
         f"({len(shots) + 1} cards incl.), fps={fps}, {iw}x{ih} -> {ow}x{oh}, jobs={jobs}")
     audio = build_master_audio(voices, lead, outro, work, total, cfg)
+
+    visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
+    if visual_mode == "ai_storyboard":
+        if (os.environ.get("POLLINATIONS_KEY") or "").strip():
+            result = render_storyboard(cfg, ep, voices, shots, total, audio, work, out_path,
+                                       fps, ow, oh, crf, Log)
+            ep["visual_mode_used"] = "ai_storyboard"
+            return result
+        ep["visual_mode_used"] = "procedural_fallback"
+        Log("[render] no POLLINATIONS_KEY; procedural fallback is only for dry/preview runs.")
+    else:
+        ep["visual_mode_used"] = "procedural"
 
     Texts = an.Texts(svgrender.font_map(ROOT))
     cache: dict = {}

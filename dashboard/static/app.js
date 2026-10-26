@@ -4,13 +4,23 @@ const el = t => document.createElement(t);
 const fmtMB = b => (b / 1e6).toFixed(1) + " MB";
 
 const CFG_FIELDS = [
-  ["post_to_instagram", "post_to_instagram"], ["caption_footer", "caption_footer"],
-  ["publish_after_ist_hour", "publish_hour_ist"], ["first_comment", "first_comment"],
-  ["hashtags", "hashtags (comma)"], ["music_file", "music_file"],
-  ["caption_size", "caption_size"], ["render.width", "render.width"],
-  ["render.height", "render.height"], ["render.out_w", "render.out_w"],
-  ["render.out_h", "render.out_h"], ["render.fps", "render.fps"],
-  ["render.jobs", "render.jobs"], ["render.crf", "render.crf"],
+  ["visual_mode", "Visual mode (procedural / ai_storyboard)"],
+  ["ai_visual_model", "AI image model"],
+  ["publish_time_ist", "Daily publish time (IST, HH:MM)"],
+  ["publish_every_hours", "Publish cadence hours"],
+  ["publish_prepare_hours", "Preparation window hours"],
+  ["voice", "Narration voice"],
+  ["voice_rate", "Narration speed"],
+  ["hashtags_per_post", "Hashtags per post"],
+  ["music_volume", "Background music volume"],
+  ["render.width", "Internal render width"],
+  ["render.height", "Internal render height"],
+  ["render.out_width", "Output width"],
+  ["render.out_height", "Output height"],
+  ["render.fps", "Output FPS"],
+  ["render.jobs", "Frame render workers"],
+  ["render.crf", "Video quality CRF"],
+  ["render.caption_size", "Caption size"]
 ];
 const STATE_KEYS = ["post_to_instagram","caption_footer","publish_after_ist_hour",
   "first_comment","hashtags","music_file","caption_size"];

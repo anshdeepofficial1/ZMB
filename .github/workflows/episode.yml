@@ -1,19 +1,13 @@
 name: Episode Cycle
 
 on:
-  # Temporary one-time prep trigger for final caption polish.
-  push:
-    branches: [main]
-    paths:
-      - ".github/workflows/episode.yml"
   schedule:
-    # UTC cron, IST = UTC+5:30. Vote checks during the day; every 30 min during
-    # the 18:30-00:30 IST launch window so a Reel can be prepared at T-1h and
-    # published at the 24h target. Once history exists, random checkpoints never post.
+    # UTC -> IST: prepare at 17:30/18:00, post at 19:00, retry 19:30/20:00.
     - cron: "30 2,7 * * *"
     - cron: "0 5,11 * * *"
-    - cron: "*/30 13-18 * * *"
-    - cron: "0 19 * * *"
+    - cron: "0,30 12 * * *"
+    - cron: "30 13 * * *"
+    - cron: "0,30 14 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -30,7 +24,7 @@ permissions:
 
 concurrency:
   group: episode-cycle
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   cycle:
@@ -92,12 +86,10 @@ jobs:
         env:
           DRY: ${{ github.event.inputs.dry_run }}
           FORCE: ${{ github.event.inputs.force_publish }}
-          PREPARE: ${{ github.event_name == 'push' }}
         run: |
           ARGS=""
           if [ "$DRY" = "true" ]; then ARGS="$ARGS --dry-run"; fi
           if [ "$FORCE" = "true" ]; then ARGS="$ARGS --force-publish"; fi
-          if [ "$PREPARE" = "true" ]; then ARGS="$ARGS --prepare-scheduled"; fi
           python scripts/run_cycle.py $ARGS
 
       - name: Upload reel artifact (debug)

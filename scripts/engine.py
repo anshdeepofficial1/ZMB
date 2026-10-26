@@ -221,6 +221,7 @@ def build_episode(state: dict, scn: dict, cfg: dict, recap: str | None = None) -
         "stats": dict(state.get("stats", {})),
         "stats_labels": dict(cfg.get("stats_labels", {})),
         "handle": cfg.get("handle", ""),
+        "visual_mode_requested": cfg.get("visual_mode", "procedural"),
         "video_name": f"reel_s{season}_d{day:03d}.mp4",
         "caption": build_caption(cfg, state, node, choices, hashtags, recap),
         "first_comment": first_comment(choices),
@@ -240,7 +241,8 @@ def substitute_shots(value, state: dict):
 
 
 def commit_episode(
-    state: dict, episode: dict, media_id: str, ist_date: str, posted_at_ist: str | None = None
+    state: dict, episode: dict, media_id: str, ist_date: str,
+    posted_at_ist: str | None = None, post_url: str | None = None
 ) -> None:
     state["day"] = episode["day"]
     state.setdefault("history", []).append({
@@ -253,10 +255,16 @@ def commit_episode(
         "video": episode["video_name"],
         "posted_ist_date": ist_date,
         "posted_at_ist": posted_at_ist,
+        "post_url": post_url,
+        "visual_mode_requested": episode.get("visual_mode_requested", "procedural"),
+        "visual_mode_used": episode.get("visual_mode_used", episode.get("visual_mode_requested", "procedural")),
     })
     state["last_episode"] = {
         "media_id": media_id,
         "posted_at_ist": posted_at_ist,
+        "post_url": post_url,
+        "visual_mode_requested": episode.get("visual_mode_requested", "procedural"),
+        "visual_mode_used": episode.get("visual_mode_used", episode.get("visual_mode_requested", "procedural")),
         "node": episode["node"],
         "kind": episode["kind"],
         "vote": episode["vote"],

@@ -66,6 +66,15 @@ IG_USER_ID=17841...
 
 ---
 
+## AI storyboard visuals (needed for selected high-quality mode)
+
+1. Open https://enter.pollinations.ai/keys.
+2. Create a server-side secret key with image-generation permission and a budget you are comfortable with.
+3. In this repository, open Settings → Secrets and variables → Actions → New repository secret.
+4. Name it POLLINATIONS_KEY and paste the key as the value.
+
+AI requests may consume provider credits. Never put the key in chat, source code, browser-side JavaScript or a committed file. Production publishing stops if the key is absent or image generation fails, so the old vector visuals are not silently published again.
+
 ## PART C — GitHub Repo (30 min)
 
 ### C1. Repo banao (⚠️ PUBLIC karo — ye zaroori hai)

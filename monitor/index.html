@@ -1,157 +1,29 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#090b12">
-<title>ZMB · Command Center</title>
-<style>
-:root{color-scheme:dark;--bg:#090b12;--panel:#111521;--panel2:#151b2a;--line:#283044;--text:#edf1fa;--muted:#98a3b8;--green:#8af0b2;--amber:#ffd27d;--red:#ff8995;--blue:#8fb8ff;--radius:18px}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 15% -10%,#1d2440 0,transparent 42%),radial-gradient(ellipse at 95% 15%,#17352b 0,transparent 30%),var(--bg);color:var(--text);font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}.wrap{max-width:1220px;margin:auto;padding:28px 22px 56px}
-header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:25px}.brand{display:flex;gap:14px;align-items:center}.logo{width:50px;height:50px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#c0ffdb,#50c98d);color:#07140d;font-weight:950;font-size:21px;box-shadow:0 0 35px #50c98d24}.eyebrow{font-size:11px;letter-spacing:.18em;color:var(--green);font-weight:800;text-transform:uppercase}.brand h1{font-size:23px;letter-spacing:-.035em;margin:1px 0 0}.header-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-button,.button{border:1px solid var(--line);background:#171d2c;color:var(--text);padding:10px 14px;border-radius:11px;font:inherit;font-weight:700;cursor:pointer;display:inline-flex;gap:8px;align-items:center}button:hover,.button:hover{background:#20283b;text-decoration:none}.tiny{font-size:12px;color:var(--muted)}.live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--green);margin-right:7px;box-shadow:0 0 12px #8af0b2}
-.hero{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;padding:26px;border:1px solid #384158;border-radius:24px;background:linear-gradient(115deg,#151b2acc,#10271fbc);margin-bottom:17px}.hero h2{margin:5px 0 8px;font-size:clamp(25px,4vw,39px);letter-spacing:-.045em;line-height:1.12}.hero p{margin:0;color:var(--muted);max-width:650px}.hero-side{min-width:185px;text-align:right}.status{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:#0c101a8c;padding:7px 10px;border-radius:999px;font-size:12px;font-weight:800}.status.success{color:var(--green);border-color:#2e6248}.status.pending{color:var(--amber);border-color:#745b31}.status.failure{color:var(--red);border-color:#713640}
-.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px;margin:0 0 18px}.metric,.panel{border:1px solid var(--line);background:linear-gradient(160deg,#141a28f0,#0e121cf0);border-radius:var(--radius);padding:18px;min-width:0}.metric .label{font-size:12px;color:var(--muted);margin-bottom:8px}.metric .value{font-size:24px;font-weight:850;letter-spacing:-.035em;overflow-wrap:anywhere}.metric .sub{font-size:12px;color:var(--muted);margin-top:5px}
-.content-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:16px;align-items:start}.panel{margin-bottom:16px}.panel-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:15px}.panel h3{margin:0;font-size:16px;letter-spacing:-.02em}.panel p{color:var(--muted);margin:5px 0}.label{font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:800}
-.run-step{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid #252c3d}.run-step:last-child{border-bottom:0}.step-icon{flex:none;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;background:#1c2537;color:var(--blue);font-size:13px;font-weight:900}.step-icon.success{color:var(--green);background:#142a22}.step-icon.failure{color:var(--red);background:#321a22}.step-icon.pending{color:var(--amber)}.step-main{flex:1;min-width:0}.step-title{font-weight:750;overflow-wrap:anywhere}.step-sub{font-size:12px;color:var(--muted);margin-top:2px}.run-list{display:grid;gap:9px}.run-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border-radius:12px;background:#0b101a;border:1px solid #252d40}.run-item strong{font-size:13px;display:block}.run-item .tiny{margin-top:3px}.run-badge{font-size:11px;font-weight:800;white-space:nowrap;padding:5px 8px;border-radius:100px;background:#1c2537;color:var(--muted)}.run-badge.success{background:#142a22;color:var(--green)}.run-badge.failure{background:#321a22;color:var(--red)}.run-badge.pending{background:#342a16;color:var(--amber)}
-.preview{overflow:hidden;border-radius:14px;background:#06080d;border:1px solid var(--line);aspect-ratio:9/16;max-height:480px;display:grid;place-items:center}.preview video{width:100%;height:100%;object-fit:contain}.preview-placeholder{text-align:center;padding:25px;color:var(--muted)}.caption{white-space:pre-wrap;overflow-wrap:anywhere;background:#090e17;border:1px solid #242c3d;padding:14px;border-radius:12px;font:13px/1.65 ui-monospace,SFMono-Regular,Menlo,monospace;color:#d7e0f1}
-.schedule-time{font-size:clamp(24px,3vw,31px);letter-spacing:-.04em;font-weight:900;margin:7px 0 2px}.schedule-date{color:var(--muted);font-weight:700}.divider{height:1px;background:var(--line);margin:16px 0}.footer{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:6px 4px;color:var(--muted);font-size:12px}.error{padding:12px 14px;border:1px solid #713640;color:var(--red);background:#26141a;border-radius:12px;margin:10px 0}.empty{color:var(--muted);padding:17px;text-align:center;border:1px dashed var(--line);border-radius:12px}
-@media(max-width:850px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}.content-grid{grid-template-columns:1fr}.hero{flex-direction:column}.hero-side{text-align:left}.preview{max-height:390px}}@media(max-width:480px){.wrap{padding:18px 13px 35px}header{align-items:flex-start}.brand h1{font-size:19px}.logo{width:43px;height:43px}.grid{gap:9px}.metric,.panel{padding:14px}.metric .value{font-size:21px}.header-actions .tiny{display:none}}
-</style>
-</head>
-<body>
-<div class="wrap">
-  <header>
-    <div class="brand"><div class="logo">Z</div><div><div class="eyebrow">Zombie survival automation</div><h1>Command Center</h1></div></div>
-    <div class="header-actions"><span class="tiny"><span class="live-dot"></span><span id="last-refresh">Connecting…</span></span><button id="refresh">↻ Refresh</button></div>
-  </header>
-
-  <section class="hero">
-    <div><div class="eyebrow">Publishing control room / read-only</div><h2>Every episode.<br>On schedule.</h2><p>Live view of GitHub Actions, the prepared Reel, publishing time and story progress. GitHub runs the automation; this page only monitors it.</p></div>
-    <div class="hero-side"><div id="overall-status" class="status pending">● Connecting</div><p class="tiny" id="account-label" style="margin-top:10px">@zmbstories · IST</p><p class="tiny" id="refresh-note">Auto-refresh every 3 minutes</p></div>
-  </section>
-
-  <section class="grid">
-    <div class="metric"><div class="label">Latest cycle</div><div class="value" id="metric-run">—</div><div class="sub" id="metric-run-sub">Loading GitHub Actions</div></div>
-    <div class="metric"><div class="label">Next publish</div><div class="value" id="metric-next">—</div><div class="sub" id="metric-next-sub">Checking queue</div></div>
-    <div class="metric"><div class="label">Episodes published</div><div class="value" id="metric-posted">0</div><div class="sub" id="metric-posted-sub">From saved story state</div></div>
-    <div class="metric"><div class="label">Story position</div><div class="value" id="metric-story">S1 · D0</div><div class="sub" id="metric-story-sub">Waiting for first post</div></div>
-  </section>
-
-  <div id="global-error"></div>
-  <section class="content-grid">
-    <div>
-      <section class="panel">
-        <div class="panel-head"><h3>Current pipeline</h3><a href="https://github.com/anshdeepofficial1/ZMB/actions" target="_blank" rel="noreferrer">Open all logs ↗</a></div>
-        <div class="tiny" id="active-run-label">Fetching latest run…</div>
-        <div class="divider"></div>
-        <div id="steps"><div class="empty">Connecting to GitHub Actions…</div></div>
-      </section>
-      <section class="panel">
-        <div class="panel-head"><h3>Recent workflow runs</h3><a href="https://github.com/anshdeepofficial1/ZMB/actions" target="_blank" rel="noreferrer">GitHub Actions ↗</a></div>
-        <div id="runs" class="run-list"><div class="empty">Loading run history…</div></div>
-      </section>
-    </div>
-    <div>
-      <section class="panel">
-        <div class="panel-head"><h3>Queued Reel</h3><span class="status pending" id="queue-badge">Checking</span></div>
-        <div id="schedule-box"><div class="empty">Checking the queue…</div></div>
-        <div class="divider"></div>
-        <div id="video-area"><div class="preview"><div class="preview-placeholder">The Reel preview will appear here when a video is queued.</div></div></div>
-        <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap" id="video-links"></div>
-      </section>
-      <section class="panel">
-        <div class="panel-head"><h3>Caption & hashtags</h3><span class="tiny">From queued episode</span></div>
-        <div id="caption-area" class="caption">No queued caption found.</div>
-      </section>
-      <section class="panel">
-        <div class="panel-head"><h3>Story state</h3><a href="https://github.com/anshdeepofficial1/ZMB/blob/main/state/state.json" target="_blank" rel="noreferrer">View JSON ↗</a></div>
-        <div id="story-state"><div class="empty">Loading story state…</div></div>
-      </section>
-    </div>
-  </section>
-  <footer class="footer"><span>Read-only monitor · No Instagram token stored here</span><span>Source: <a href="https://github.com/anshdeepofficial1/ZMB" target="_blank" rel="noreferrer">anshdeepofficial1/ZMB ↗</a></span></footer>
-</div>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#080b12"><title>ZMB Stories — Command Center</title><style>
+:root{color-scheme:dark;--bg:#080b12;--panel:#111725;--line:#2a3448;--text:#edf2fb;--muted:#9ba8bd;--green:#8ee8b7;--amber:#ffd28b;--red:#ff939b;--r:20px}*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% -8%,#293552 0,transparent 38%),radial-gradient(ellipse at 94% 0%,#48221d 0,transparent 30%),var(--bg);color:var(--text);font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,sans-serif}a{color:var(--green);text-decoration:none}.wrap{max-width:1200px;margin:auto;padding:26px 20px 50px}header,.brand,.actions,.panelhead,.run,.row,.foot{display:flex;align-items:center;justify-content:space-between;gap:12px}header{margin-bottom:22px}.brand{justify-content:flex-start}.mark{width:50px;height:50px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#ffb07d,#ff3e43 58%,#5c1925);font-size:23px;font-weight:1000;color:#160a0c}.eyebrow,.label{font-size:11px;text-transform:uppercase;letter-spacing:.14em;font-weight:850;color:#ffaf88}.brand h1{font-size:23px;margin:2px 0}.muted,.tiny,.sub{font-size:12px;color:var(--muted)}button,.btn{border:1px solid var(--line);background:#1a2333;color:var(--text);padding:10px 14px;border-radius:12px;font:inherit;font-weight:750;cursor:pointer}.hero{display:flex;justify-content:space-between;gap:20px;padding:26px;border:1px solid #3a465d;border-radius:25px;background:linear-gradient(120deg,#1a2234ed,#251a1df2);margin-bottom:15px}.hero h2{font-size:clamp(28px,4vw,42px);line-height:1.1;letter-spacing:-.05em;margin:7px 0}.hero p{max-width:700px;color:var(--muted);margin:0}.hero-side{text-align:right;min-width:200px}.badge,.status{display:inline-block;padding:7px 10px;border:1px solid var(--line);border-radius:99px;font-size:12px;font-weight:850;background:#0b1019;color:var(--muted)}.ok{color:var(--green)!important}.warn{color:var(--amber)!important}.bad{color:var(--red)!important}.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:15px}.metric,.panel{border:1px solid var(--line);border-radius:18px;background:linear-gradient(155deg,#141b2af2,#0d121df2);padding:17px;min-width:0}.value{font-size:clamp(20px,2.4vw,28px);font-weight:900;letter-spacing:-.04em;overflow-wrap:anywhere;margin-top:6px}.cols{display:grid;grid-template-columns:1fr 1fr;gap:15px}.panel{margin-bottom:15px}.panel h3{font-size:16px;margin:0}.divider{height:1px;background:var(--line);margin:15px 0}.row{justify-content:flex-start;padding:10px 0;border-bottom:1px solid #242d40;align-items:flex-start}.row:last-child{border:0}.dot{flex:none;width:28px;height:28px;border-radius:9px;background:#1b2637;display:grid;place-items:center}.rowmain{flex:1;min-width:0}.rowtitle{font-weight:800;overflow-wrap:anywhere}.run{padding:10px;border:1px solid #273249;border-radius:11px;background:#0b1019;margin:8px 0}.run strong{font-size:13px}.preview{overflow:hidden;display:grid;place-items:center;background:#05070b;border:1px solid var(--line);border-radius:15px;aspect-ratio:9/16;max-height:520px}.preview video{width:100%;height:100%;object-fit:contain}.placeholder,.empty{text-align:center;padding:18px;color:var(--muted)}.caption{white-space:pre-wrap;overflow-wrap:anywhere;background:#090e17;border:1px solid #273249;border-radius:12px;padding:13px;font:13px/1.6 ui-monospace,monospace}.error{background:#2a171c;border:1px solid #75383f;color:#ffb7bc;padding:12px;border-radius:11px;margin:10px 0}.foot{padding:8px 2px;color:var(--muted);font-size:12px}@media(max-width:800px){.hero{flex-direction:column}.hero-side{text-align:left}.cols{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,minmax(0,1fr)}}@media(max-width:500px){.wrap{padding:15px 12px}.brand h1{font-size:19px}.actions .muted{display:none}.metric,.panel{padding:13px}.hero{padding:19px}}
+</style></head><body><div class="wrap">
+<header><div class="brand"><div class="mark">Z</div><div><div class="eyebrow">ZMB Stories / Zombie survival</div><h1>Command Center</h1></div></div><div class="actions"><span class="muted" id="refreshTime">Connecting…</span><button id="refresh">↻ Refresh</button></div></header>
+<section class="hero"><div><div class="eyebrow">Read-only automation monitor</div><h2>Your story.<br>Your survival.</h2><p>Tracks saved publication history, queued Reels, visual mode and GitHub Actions. A green workflow means the job completed, not necessarily that Instagram published a Reel.</p></div><div class="hero-side"><span id="mainStatus" class="badge">● Checking status</span><p class="tiny">@zmbstories · Asia/Kolkata</p><p class="tiny">Auto-refresh every 3 minutes</p></div></section>
+<section class="metrics"><div class="metric"><div class="label">Next publish slot</div><div class="value" id="nextTime">—</div><div class="sub" id="nextDate">Checking</div></div><div class="metric"><div class="label">Reels published</div><div class="value" id="postCount">—</div><div class="sub">Saved publish history</div></div><div class="metric"><div class="label">Latest cycle</div><div class="value" id="runNumber">—</div><div class="sub" id="runStatus">Checking Actions</div></div><div class="metric"><div class="label">Visual engine</div><div class="value" id="visualMode">—</div><div class="sub" id="visualDetail">Reading history</div></div></section><div id="globalError"></div>
+<section class="cols"><div><section class="panel"><div class="panelhead"><h3>Publishing status</h3><a href="https://github.com/anshdeepofficial1/ZMB/actions">Open Actions ↗</a></div><div id="publishStatus"><div class="empty">Checking…</div></div></section><section class="panel"><div class="panelhead"><h3>Recent automation runs</h3><a href="https://github.com/anshdeepofficial1/ZMB/actions">All logs ↗</a></div><div id="runs">Loading runs…</div><div class="divider"></div><div id="steps"></div></section><section class="panel"><div class="panelhead"><h3>Story status</h3><a href="https://github.com/anshdeepofficial1/ZMB/blob/main/state/state.json">Open state ↗</a></div><div id="stateInfo">Loading…</div></section></div>
+<div><section class="panel"><div class="panelhead"><h3 id="videoTitle">Next Reel</h3><span class="status" id="queueBadge">Checking</span></div><div id="scheduleBox">Checking queue…</div><div class="divider"></div><div class="preview" id="preview"><div class="placeholder">A preview appears here while a Reel is queued.</div></div><div id="videoLinks"></div></section><section class="panel"><h3>Caption & hashtags</h3><div id="caption" class="caption">No queued caption.</div></section><section class="panel"><h3>Daily schedule</h3><div class="value">7:00 PM IST</div><div class="sub">Prepare the next Reel at approximately 6:00 PM.</div><div class="divider"></div><p class="tiny">Tuesday 7 PM is a research-backed starting point from a large Instagram engagement study. Tune it with your own Instagram Insights; generic time slots don't guarantee reach.</p></section></div></section>
+<footer class="foot"><span>Read-only · No API secret is shipped to this website.</span><span><a href="https://github.com/anshdeepofficial1/ZMB">anshdeepofficial1/ZMB ↗</a></span></footer></div>
 <script>
-(function(){
-"use strict";
-const OWNER="anshdeepofficial1", REPO="ZMB", BASE="https://api.github.com/repos/"+OWNER+"/"+REPO;
-const RAW="https://raw.githubusercontent.com/"+OWNER+"/"+REPO+"/main/";
-const $=id=>document.getElementById(id);
-const fmtDate=value=>{if(!value)return "Not set";const d=new Date(value);return Number.isNaN(+d)?"Unknown":new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",weekday:"long",day:"2-digit",month:"short",year:"numeric"}).format(d)};
-const fmtTime=value=>{if(!value)return "Not set";const d=new Date(value);return Number.isNaN(+d)?"Unknown":new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",hour12:true}).format(d)+" IST"};
-const fmtDateTime=value=>fmtDate(value)+" · "+fmtTime(value);
-const ago=value=>{if(!value)return "";const m=Math.max(0,Math.round((Date.now()-new Date(value).getTime())/60000));if(m<1)return "just now";if(m<60)return m+" min ago";const h=Math.floor(m/60);return h<24?h+"h "+m%60+"m ago":Math.floor(h/24)+"d ago"};
-const escapeHTML=value=>String(value==null?"":value).replace(/[&<>"']/g,ch=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch]));
-function statusClass(s){if(["success","completed"].includes(s))return "success";if(["failure","failed","cancelled","timed_out","action_required"].includes(s))return "failure";if(["in_progress","queued","pending","waiting","requested"].includes(s))return "pending";return ""}
-function niceStatus(s){return String(s||"unknown").replaceAll("_"," ")}
-async function getJSON(url,raw=false){const res=await fetch(url+(url.includes("?")?"&":"?")+"t="+Date.now(),{cache:"no-store",headers:raw?{}:{"Accept":"application/vnd.github+json"}});if(!res.ok)throw new Error("HTTP "+res.status+" loading "+url.split("?")[0]);return await res.json()}
-function statusPill(text,cls){return '<span class="status '+cls+'">'+escapeHTML(text)+'</span>'}
-async function loadQueue(){
-  try{
-    const q=await getJSON(RAW+"state/pending_episode.json",true);
-    $("queue-badge").className="status pending";$("queue-badge").textContent="Queued";
-    $("metric-next").textContent=fmtTime(q.publish_at_ist).replace(" IST","");
-    $("metric-next-sub").textContent=fmtDate(q.publish_at_ist);
-    $("schedule-box").innerHTML='<div class="label">Scheduled publish time</div><div class="schedule-time">'+escapeHTML(fmtTime(q.publish_at_ist))+'</div><div class="schedule-date">'+escapeHTML(fmtDate(q.publish_at_ist))+'</div><div class="divider"></div><div class="tiny">Prepared '+escapeHTML(ago(q.prepared_at_ist))+'</div><p><strong>'+escapeHTML(q.episode?.video_name||"Queued Reel")+'</strong> · Season '+escapeHTML(q.episode?.season??"—")+' / Day '+escapeHTML(q.episode?.day??"—")+'</p><p class="tiny">The file is hosted on GitHub. Instagram has not confirmed publication yet.</p>';
-    if(q.video_url){$("video-area").innerHTML='<div class="preview"><video controls playsinline preload="metadata" src="'+escapeHTML(q.video_url)+'"></video></div>';$("video-links").innerHTML='<a class="button" href="'+escapeHTML(q.video_url)+'" target="_blank" rel="noreferrer">Open video ↗</a>';}
-    $("caption-area").textContent=q.episode?.caption||"No caption saved.";
-    $("account-label").textContent=(q.episode?.handle||"@zmbstories")+" · IST";
-  }catch(e){
-    $("queue-badge").className="status";$("queue-badge").textContent="No queued file";
-    $("metric-next").textContent="Not queued";$("metric-next-sub").textContent="Check recent cycle";
-    $("schedule-box").innerHTML='<div class="empty">No pending_episode.json was found. A queued Reel may already have been published or may not be prepared yet.</div>';
-    $("video-area").innerHTML='<div class="preview"><div class="preview-placeholder">No pending video available.</div></div>';
-    $("video-links").innerHTML="";
-    $("caption-area").textContent="No queued caption found.";
-  }
-}
-async function loadState(){
- try{
-   const s=await getJSON(RAW+"state/state.json",true);
-   $("metric-posted").textContent=String((s.history||[]).length);
-   $("metric-story").textContent="S"+(s.season??1)+" · D"+(s.day??0);
-   $("metric-story-sub").textContent=(s.location||s.node||"Story state loaded");
-   const st=s.stats||{};
-   const statHTML=Object.keys(st).map(k=>'<div class="run-item"><div><strong>'+escapeHTML(k.toUpperCase())+'</strong><div class="tiny">Survival stat</div></div><span class="run-badge">'+escapeHTML(st[k])+'</span></div>').join("");
-   const latest=(s.history||[]).slice(-3).reverse();
-   $("story-state").innerHTML=statHTML+'<div class="divider"></div><div class="tiny">Season '+escapeHTML(s.season??1)+' · Day '+escapeHTML(s.day??0)+' · Node '+escapeHTML(s.node||"intro")+'</div>'+(latest.length?'<div class="divider"></div><div class="label">Recent published history</div>'+latest.map(h=>'<div class="run-step"><div class="step-icon success">✓</div><div class="step-main"><div class="step-title">'+escapeHTML(h.video||("Day "+h.day))+'</div><div class="step-sub">'+escapeHTML(h.posted_at_ist||h.posted_ist_date||"Timestamp not saved")+'</div></div></div>').join(""):'<p class="tiny">No published episodes are recorded yet.</p>');
- }catch(e){$("story-state").innerHTML='<div class="empty">Could not load saved story state.</div>';}
-}
-async function loadRuns(){
- const data=await getJSON(BASE+"/actions/runs?per_page=12");
- const all=data.workflow_runs||[];
- const run=all.find(r=>r.status==="in_progress")||all.find(r=>/Episode Cycle/i.test(r.name))||all[0];
- if(!run){$("steps").innerHTML='<div class="empty">No GitHub Actions runs found yet.</div>';return}
- $("metric-run").textContent="#"+run.run_number;
- $("metric-run-sub").textContent=niceStatus(run.status==="completed"?run.conclusion:run.status)+" · "+ago(run.updated_at||run.created_at);
- $("overall-status").className="status "+statusClass(run.status==="completed"?run.conclusion:run.status);
- $("overall-status").textContent="● "+niceStatus(run.status==="completed"?run.conclusion:run.status);
- $("active-run-label").innerHTML='<a target="_blank" rel="noreferrer" href="'+escapeHTML(run.html_url)+'">Run #'+escapeHTML(run.run_number)+' · '+escapeHTML(run.name)+' ↗</a> <span class="tiny">· '+escapeHTML(ago(run.updated_at||run.created_at))+'</span>';
- $("runs").innerHTML=all.slice(0,8).map(r=>'<div class="run-item"><div><strong>'+escapeHTML(r.name)+' #'+escapeHTML(r.run_number)+'</strong><div class="tiny">'+escapeHTML(ago(r.updated_at||r.created_at))+' · '+escapeHTML(r.event)+'</div></div><a class="run-badge '+statusClass(r.status==="completed"?r.conclusion:r.status)+'" target="_blank" rel="noreferrer" href="'+escapeHTML(r.html_url)+'">'+escapeHTML(niceStatus(r.status==="completed"?r.conclusion:r.status))+' ↗</a></div>').join("");
- try{
-   const jd=await getJSON(BASE+"/actions/runs/"+run.id+"/jobs");
-   const jobs=jd.jobs||[];
-   const steps=jobs.flatMap(j=>(j.steps||[]).map(s=>({...s,jobName:j.name})));
-   $("steps").innerHTML=steps.length?steps.map(s=>{
-     const sc=statusClass(s.conclusion||s.status);
-     const icon=sc==="success"?"✓":sc==="failure"?"!":s.status==="in_progress"?"↻":"·";
-     return '<div class="run-step"><div class="step-icon '+sc+'">'+icon+'</div><div class="step-main"><div class="step-title">'+escapeHTML(s.name)+'</div><div class="step-sub">'+escapeHTML(niceStatus(s.conclusion||s.status))+(s.started_at?' · '+escapeHTML(ago(s.started_at)):"")+'</div></div></div>';
-   }).join(""):'<div class="empty">GitHub has not published step details yet. Open the run for more information.</div>';
- }catch(e){$("steps").innerHTML='<div class="empty">Step detail is temporarily unavailable. Use the GitHub logs link above.</div>';}
-}
-async function refresh(){
- $("refresh").disabled=true;$("refresh").textContent="↻ Updating";
- $("global-error").innerHTML="";
- try{await Promise.all([loadQueue(),loadState(),loadRuns()]);}
- catch(e){$("global-error").innerHTML='<div class="error">GitHub status is temporarily unavailable: '+escapeHTML(e.message)+'. The source workflows continue independently; try Refresh again.</div>';}
- finally{$("last-refresh").textContent="Updated "+new Intl.DateTimeFormat("en-IN",{timeZone:"Asia/Kolkata",hour:"2-digit",minute:"2-digit",second:"2-digit"}).format(new Date())+" IST";$("refresh").disabled=false;$("refresh").textContent="↻ Refresh";}
-}
-$("refresh").addEventListener("click",refresh);
-refresh();
-setInterval(refresh,180000);
-})();
-</script>
-</body>
-</html>
+(function(){"use strict";
+var API="https://api.github.com/repos/anshdeepofficial1/ZMB",RAW="https://raw.githubusercontent.com/anshdeepofficial1/ZMB/main/",$=function(id){return document.getElementById(id)},state=null,queue=null,config=null,latest=null,qerror=null;
+function esc(v){return String(v==null?"":v).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]})}
+function fmt(v,o){var d=new Date(v);return !v||isNaN(+d)?"Not set":new Intl.DateTimeFormat("en-IN",Object.assign({timeZone:"Asia/Kolkata"},o||{})).format(d)}
+function date(v){return fmt(v,{weekday:"short",day:"2-digit",month:"short",year:"numeric"})}function time(v){return fmt(v,{hour:"numeric",minute:"2-digit",hour12:true})+" IST"}
+function ago(v){var m=Math.max(0,Math.round((Date.now()-new Date(v).getTime())/60000));return m<60?m+"m ago":m<1440?Math.floor(m/60)+"h ago":Math.floor(m/1440)+"d ago"}
+async function json(url){var r=await fetch(url+(url.includes("?")?"&":"?")+"_="+Date.now(),{cache:"no-store",headers:{"Accept":"application/vnd.github+json"}});if(!r.ok)throw Error("HTTP "+r.status);return r.json()}
+function nextSlot(){var hm=String((config&&config.publish_time_ist)||"19:00").split(":").map(Number),hist=(state&&state.history)||[],last=hist.length?hist[hist.length-1]:null,today=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date()),day=today;
+if(last){var p=String(last.posted_at_ist||last.posted_ist_date||"").slice(0,10).split("-").map(Number);if(p.length===3&&p.every(Number.isFinite)){var d=new Date(Date.UTC(p[0],p[1]-1,p[2]+1));day=d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+"-"+String(d.getUTCDate()).padStart(2,"0")}}
+var h=hm[0]||19,m=Number.isFinite(hm[1])?hm[1]:0,t=new Date(day+"T"+String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":00+05:30");
+while(t<=new Date()){var n=new Date(t.getTime()+86400000),x=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Kolkata",year:"numeric",month:"2-digit",day:"2-digit"}).format(n);t=new Date(x+"T"+String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":00+05:30")}return t}
+async function loadQueue(){queue=null;qerror=null;try{var r=await fetch(RAW+"state/pending_episode.json?_="+Date.now(),{cache:"no-store"});if(r.status===404){$("queueBadge").textContent="No queue";$("videoTitle").textContent="Latest published Reel";$("scheduleBox").textContent="No episode is queued."; $("preview").innerHTML='<div class="placeholder">No queued preview.</div>';$("videoLinks").innerHTML="";$("caption").textContent="No queued caption.";return}if(!r.ok)throw Error("HTTP "+r.status);queue=await r.json();var late=new Date(queue.publish_at_ist)<=new Date();$("queueBadge").textContent=late?"Overdue":"Scheduled";$("queueBadge").className="status "+(late?"bad":"warn");$("videoTitle").textContent="Queued Reel";$("scheduleBox").innerHTML='<div class="label">Publish target</div><div class="value">'+esc(time(queue.publish_at_ist))+'</div><div class="sub">'+esc(date(queue.publish_at_ist))+'</div><p>'+esc(queue.episode&&queue.episode.video_name||"Queued episode")+' · S'+esc(queue.episode&&queue.episode.season)+' D'+esc(queue.episode&&queue.episode.day)+'</p>'+(late?'<div class="error">Target passed but the queue still exists. Check the latest cycle log.</div>':'<p class="tiny">Waiting for the scheduled publishing cycle.</p>');if(queue.video_url){$("preview").innerHTML='<video controls playsinline preload="metadata" src="'+esc(queue.video_url)+'"></video>';$("videoLinks").innerHTML='<a class="btn" href="'+esc(queue.video_url)+'" target="_blank">Open video ↗</a>'}$("caption").textContent=queue.episode&&queue.episode.caption||"No caption saved."}catch(e){qerror=e.message;$("queueBadge").textContent="Status failed";$("queueBadge").className="status bad";$("scheduleBox").innerHTML='<div class="error">Queue lookup failed: '+esc(e.message)+'. Not treating this as an empty queue.</div>'}}
+function showState(){var h=(state&&state.history)||[];$("postCount").textContent=h.length;$("stateInfo").innerHTML='<div><strong>S'+esc(state.season)+' · D'+esc(state.day)+'</strong><p class="tiny">Current node: '+esc(state.node)+' · Arc: '+esc(state.arc)+'</p></div><div class="divider"></div>'+(h.slice(-5).reverse().map(function(x){return '<div class="row"><span class="dot ok">✓</span><div class="rowmain"><strong>'+esc(x.video||("Day "+x.day))+'</strong><div class="tiny">'+esc(x.posted_at_ist||x.posted_ist_date||"No timestamp")+'</div><div class="tiny">Media ID '+esc(x.media_id||"unknown")+' · '+esc(x.visual_mode_used||"legacy procedural")+'</div>'+(x.post_url?'<a href="'+esc(x.post_url)+'" target="_blank">Open Reel ↗</a>':'')+'</div></div>'}).join("")||'<p class="tiny">No published history.</p>')}
+function visual(){var h=(state&&state.history)||[],last=h.length?h[h.length-1]:null,m=(queue&&queue.episode&&queue.episode.visual_mode_used)||(last&&last.visual_mode_used)||"legacy_procedural";$("visualMode").textContent=m==="ai_storyboard"?"AI storyboard":m==="procedural_fallback"?"Fallback":"Procedural";$("visualDetail").textContent=m==="ai_storyboard"?"Illustrated scenes and subtle camera motion":last&&last.visual_mode_used?"Last render: "+last.visual_mode_used:"First Reel used the original vector renderer"}
+async function runs(){var d=await json(API+"/actions/runs?per_page=12"),all=d.workflow_runs||[],list=all.filter(function(x){return /Episode Cycle/i.test(x.name||"")});latest=list.find(function(x){return x.status==="in_progress"})||list[0]||all[0]||null;if(!latest){$("runNumber").textContent="—";$("runStatus").textContent="No runs";return}var result=latest.status==="completed"?latest.conclusion:latest.status;$("runNumber").textContent="#"+latest.run_number;$("runStatus").textContent=result+" · "+ago(latest.updated_at||latest.created_at);$("runs").innerHTML=all.slice(0,7).map(function(x){var v=x.status==="completed"?x.conclusion:x.status;return '<div class="run"><div><strong>'+esc(x.name)+' #'+esc(x.run_number)+'</strong><div class="tiny">'+esc(ago(x.updated_at||x.created_at))+'</div></div><a class="status" href="'+esc(x.html_url)+'" target="_blank">'+esc(v)+' ↗</a></div>'}).join("");try{var j=await json(API+"/actions/runs/"+latest.id+"/jobs"),steps=(j.jobs||[]).flatMap(function(x){return x.steps||[]});$("steps").innerHTML=steps.map(function(x){return '<div class="row"><span class="dot">'+(x.conclusion==="success"?"✓":"·")+'</span><div class="rowmain">'+esc(x.name)+'<div class="tiny">'+esc(x.conclusion||x.status)+'</div></div></div>'}).join("")}catch(e){$("steps").textContent="Step details unavailable; open logs."}}
+function published(){var h=(state&&state.history)||[],last=h.length?h[h.length-1]:null;var html='<div class="row"><span class="dot '+(last?"ok":"")+'">'+(last?"✓":"·")+'</span><div class="rowmain"><strong>'+(last?"Last Reel recorded as published":"No published Reel recorded")+'</strong><div class="tiny">'+(last?esc(last.posted_at_ist||last.posted_ist_date):"Workflow success alone is not publication proof")+'</div></div></div>';html+=queue?'<div class="row"><span class="dot">◷</span><div class="rowmain"><strong>Next Reel '+(new Date(queue.publish_at_ist)<=new Date()?"overdue":"queued")+'</strong><div class="tiny">'+esc(time(queue.publish_at_ist))+' · '+esc(date(queue.publish_at_ist))+'</div></div></div>':'<div class="row"><span class="dot">◷</span><div class="rowmain"><strong>No current queue</strong><div class="tiny">Next daily slot is an estimate until queue is created.</div></div></div>';$("publishStatus").innerHTML=html}
+async function refresh(){$("refresh").disabled=true;try{await Promise.all([json(RAW+"state/state.json").then(function(x){state=x}),json(RAW+"config.example.json").then(function(x){config=x}),loadQueue(),runs()]);showState();visual();published();var n=queue?new Date(queue.publish_at_ist):nextSlot();$("nextTime").textContent=time(n);$("nextDate").textContent=date(n)+(queue?" · queue "+(new Date(queue.publish_at_ist)<=new Date()?"overdue":"pending"):" · estimate");var cls=qerror?"bad":queue?(new Date(queue.publish_at_ist)<=new Date()?"bad":"warn"):(state.history||[]).length?"ok":"warn";$("mainStatus").className="badge "+cls;$("mainStatus").textContent=qerror?"Queue check failed":queue?(new Date(queue.publish_at_ist)<=new Date()?"Queued Reel overdue":"Reel scheduled"):(state.history||[]).length?"Last publication recorded":"No publication recorded";$("globalError").textContent=""}catch(e){$("globalError").innerHTML='<div class="error">Could not refresh status: '+esc(e.message)+'. Try again.</div>';$("mainStatus").className="badge bad";$("mainStatus").textContent="Status incomplete"}finally{$("refreshTime").textContent="Updated "+fmt(new Date(),{hour:"2-digit",minute:"2-digit"})+" IST";$("refresh").disabled=false}}
+$("refresh").addEventListener("click",refresh);refresh();setInterval(refresh,180000);
+})();</script></body></html>

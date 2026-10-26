@@ -40,6 +40,16 @@ class PublishScheduleTests(unittest.TestCase):
         now = self.ts(26, 20, 5)
         self.assertEqual(_publish_target(state, self.cfg, now, False), now)
 
+    def test_late_previous_post_keeps_next_day_fixed_slot(self):
+        self.cfg["publish_time_ist"] = "19:00"
+        state = {"history": [{"posted_at_ist": "2026-10-26T22:39:17+05:30"}]}
+        self.assertEqual(_publish_target(state, self.cfg, self.ts(27, 18, 0), False), self.ts(27, 19, 0))
+
+    def test_missed_slot_skips_overnight_posting(self):
+        self.cfg["publish_time_ist"] = "19:00"
+        state = {"history": [{"posted_at_ist": "2026-10-25T19:00:00+05:30"}]}
+        self.assertIsNone(_publish_target(state, self.cfg, self.ts(26, 21, 30), False))
+
     def test_legacy_state_uses_configured_publish_time(self):
         state = {"history": [{"posted_ist_date": "2026-10-25"}]}
         now = self.ts(26, 19, 0)
