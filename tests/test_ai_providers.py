@@ -48,7 +48,7 @@ class LocalAIProviderTests(TestCase):
         self.assertEqual(result["ai_story"]["status"], "success")
 
     def test_local_model_failure_is_marked_and_keeps_authored_lines(self):
-        with patch.dict(sys.modules, {"llama_cpp": SimpleNamespace(Llama=Mock(side_effect=RuntimeError("no model")))}):
+        with patch.dict(sys.modules, {"llama_cpp": SimpleNamespace(Llama=Mock(side_effect=RuntimeError("no model")))}), patch.object(ai_providers, "_model_path", return_value=Path("/tmp/model.gguf")):
             result = ai_providers.rewrite_episode(self.episode, lambda *_: None)
         self.assertEqual(result["lines"], self.episode["lines"])
         self.assertEqual(result["ai_story"]["status"], "fallback")
