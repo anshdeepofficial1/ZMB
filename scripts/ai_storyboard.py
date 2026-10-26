@@ -169,6 +169,7 @@ def render_storyboard(cfg,ep,voices,shots,total,audio,work,out_path,fps,out_w,ou
     try:dur=float((probe.stdout or "0").strip())
     except ValueError:dur=0.0
     if not out_path.exists() or out_path.stat().st_size<100000 or dur<=0:raise RuntimeError("AI storyboard output validation failed")
+    if dur < 30 or dur > 60:raise RuntimeError(f"AI Reel duration must be 30-60 seconds; rendered {dur:.1f}s. Adjust narration/card timing and retry.")
     result={"video_path":str(out_path),"duration":dur,"frames":int(round(dur*fps)),"shots":len(shots),
       "render_seconds":round(time.time()-started,1),"visual_mode_used":"ai_storyboard",
       "ai_story":ep.get("ai_story", {"provider":"scenario","status":"not_configured"})}
