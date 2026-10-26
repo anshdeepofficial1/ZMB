@@ -111,17 +111,9 @@ def main() -> None:
     ig_user_id = (os.environ.get("IG_USER_ID") or "").strip()
 
     visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
-    if not args.dry_run and visual_mode == "ai_storyboard":
-        if not (os.environ.get("POLLINATIONS_KEY") or "").strip() and not (os.environ.get("HF_TOKEN") or "").strip():
-            raise SystemExit(
-                "[cycle] visual_mode=ai_storyboard but no AI image provider key is configured. "
-                "Add HF_TOKEN or POLLINATIONS_KEY in GitHub Actions secrets. No Reel was rendered or published."
-            )
-    if not args.dry_run and visual_mode == "ai_video" and not (os.environ.get("POLLINATIONS_KEY") or "").strip():
-        raise SystemExit(
-            "[cycle] visual_mode=ai_video needs POLLINATIONS_KEY with video-generation permission. "
-            "This mode can consume paid provider credits. No Reel was rendered or published."
-        )
+    if visual_mode in {"ai_storyboard", "ai_video"}:
+        log(f"[cycle] remote visual mode '{visual_mode}' is disabled; using the existing local procedural animation engine")
+        cfg["visual_mode"] = "procedural"
 
     # Fail before spending minutes rendering when required publishing credentials are absent.
     if not args.dry_run and not args.prepare_scheduled:
@@ -261,17 +253,11 @@ def main() -> None:
                 log(f"[cycle] resolution → {resolution}")
 
         episode = engine.build_episode(state, scn, cfg, recap)
-        if bool(cfg.get("ai_story_generation", True)) and (os.environ.get("HF_TOKEN") or "").strip():
-            try:
-                episode = rewrite_episode(episode, log)
-            except Exception:
-                state.clear()
-                state.update(pre_generation_state)
-                save_state(state)
-                raise
+        if bool(cfg.get("ai_story_generation", True)):
+            episode = rewrite_episode(episode, log)
         else:
-            episode["ai_story"] = {"provider": "scenario", "status": "not_configured"}
-            log("[ai-story] using authored scenario script; set HF_TOKEN to enable AI script refinement")
+            episode["ai_story"] = {"provider": "local-llama.cpp", "status": "disabled"}
+            log("[local-ai] disabled by config; using authored scenario script")
         log(f"[cycle] episode: S{episode['season']} D{episode['day']} "
             f"node={episode['node']} kind={episode['kind']} vote={episode['vote']}")
         if args.stills:
