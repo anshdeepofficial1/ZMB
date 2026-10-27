@@ -45,3 +45,50 @@ jobs:
 
       - name: Scheduler regression tests
         run: python -m unittest discover -s tests -v
+
+  preview-day2:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Python setup
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install dependencies
+        run: pip install --prefer-binary --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu -r scripts/requirements.txt
+
+      - name: Restore local model cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: zmb-qwen-1-5b-q4km-91cad51170dc346986eccefdc2dd33a9da36ead9
+
+      - name: Install renderer dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          ffmpeg -version | head -n 1
+
+      - name: Render Day 2 preview (no Instagram publishing)
+        env:
+          ZMB_LOCAL_AI_ENABLED: "1"
+        run: python scripts/run_cycle.py --dry-run
+
+      - name: Upload Day 2 preview
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zmb-day2-preview
+          path: |
+            out/*.mp4
+            out/caption.txt
+            out/episode.json
+          if-no-files-found: error
+          retention-days: 5
