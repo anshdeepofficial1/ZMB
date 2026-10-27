@@ -11,6 +11,12 @@ on:
       - ".github/workflows/validate.yml"
       - ".github/workflows/episode.yml"
   workflow_dispatch:
+    inputs:
+      render_preview:
+        description: "Render a Day 2 preview MP4 (slow; never publishes)"
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -47,6 +53,7 @@ jobs:
         run: python -m unittest discover -s tests -v
 
   preview-day2:
+    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.render_preview) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[render-day2-preview]')) }}
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 120
