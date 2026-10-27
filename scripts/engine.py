@@ -119,6 +119,9 @@ def recap_line(res: dict | None) -> str | None:
         return None
     if res.get("awaiting_arc"):
         return "That is the end of the season. The next one is being written right now."
+    # Ordinary story nodes advance automatically and do not have a vote tally.
+    if res.get("kind") not in ("vote", "ending"):
+        return None
     if res.get("fallback") or int(res.get("total", 0)) <= 0:
         return "Not enough votes came in, so the story chose its own path. Comment to decide next time."
     return f"Last time, {res['pct']} percent of you said: {res['winner_text']}."
