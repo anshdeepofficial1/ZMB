@@ -71,9 +71,13 @@ def _publish_target(state: dict, cfg: dict, now: datetime, force: bool) -> datet
     else: target_date=now.date()
     target=datetime.combine(target_date,slot,tzinfo=now.tzinfo)
     while previous is not None and target<=previous: target+=timedelta(days=days)
-    if now>target+timedelta(hours=1):
-        target+=timedelta(days=days)
-        log(f"[cycle] publish window missed; next fixed target is {target.isoformat()}")
+    # Never skip a calendar day's post just because GitHub Actions started late.
+    # Advance only across dates that are already in the past; if today's slot has
+    # passed, publish today rather than silently moving the target to tomorrow.
+    while target.date() < now.date():
+        target += timedelta(days=days)
+    if now > target:
+        log(f"[cycle] today's publish slot passed; publishing late instead of skipping: {target.isoformat()}")
     prep=target-timedelta(hours=prep_hours)
     if now<prep:
         remaining=prep-now
