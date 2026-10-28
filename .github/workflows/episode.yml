@@ -2,12 +2,14 @@ name: Episode Cycle
 
 on:
   schedule:
-    # UTC -> IST: prepare at 17:30/18:00, post at 19:00, retry 19:30/20:00.
-    - cron: "30 2,7 * * *"
-    - cron: "0 5,11 * * *"
-    - cron: "0,30 12 * * *"
-    - cron: "30 13 * * *"
-    - cron: "0,30 14 * * *"
+    # India-local times. Prepare at 18:17; retry/publish at 19:17 and
+    # retry through 20:47 if GitHub or Instagram is temporarily delayed.
+    - cron: "17 18 * * *"
+      timezone: "Asia/Kolkata"
+    - cron: "17,47 19 * * *"
+      timezone: "Asia/Kolkata"
+    - cron: "17,47 20 * * *"
+      timezone: "Asia/Kolkata"
   workflow_dispatch:
     inputs:
       dry_run:
