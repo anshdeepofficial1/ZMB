@@ -1,9 +1,9 @@
 {
   "schema": 2,
   "season": 1,
-  "day": 1,
+  "day": 2,
   "arc": "road",
-  "node": "intro",
+  "node": "store_sound",
   "location": "an empty highway at 2:47 in the morning",
   "stats": {
     "hp": 100,
@@ -22,29 +22,83 @@
       "video": "reel_s1_d001.mp4",
       "posted_ist_date": "2026-10-26",
       "posted_at_ist": "2026-10-26T22:39:17.146242+05:30"
+    },
+    {
+      "season": 1,
+      "day": 2,
+      "arc": "road",
+      "node": "store_sound",
+      "kind": "vote",
+      "media_id": "18180705694436308",
+      "video": "reel_s1_d002.mp4",
+      "posted_ist_date": "2026-10-28",
+      "posted_at_ist": "2026-10-28T22:40:06.559773+05:30",
+      "post_url": "https://www.instagram.com/reel/DfC70gflckc/",
+      "visual_mode_requested": "procedural",
+      "visual_mode_used": "procedural",
+      "ai_story": {
+        "provider": "local-llama.cpp",
+        "model": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+        "status": "fallback",
+        "error": "ValueError"
+      }
     }
   ],
   "last_episode": {
-    "media_id": "18142002565619707",
-    "posted_at_ist": "2026-10-26T22:39:17.146242+05:30",
-    "node": "intro",
-    "kind": "story",
-    "vote": false,
-    "choices": [],
+    "media_id": "18180705694436308",
+    "posted_at_ist": "2026-10-28T22:40:06.559773+05:30",
+    "post_url": "https://www.instagram.com/reel/DfC70gflckc/",
+    "visual_mode_requested": "procedural",
+    "visual_mode_used": "procedural",
+    "ai_story": {
+      "provider": "local-llama.cpp",
+      "model": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+      "status": "fallback",
+      "error": "ValueError"
+    },
+    "node": "store_sound",
+    "kind": "vote",
+    "vote": true,
+    "choices": [
+      {
+        "key": "run",
+        "text": "RUN - slip out and drive away",
+        "labels": [
+          "run",
+          "1",
+          "escape",
+          "leave",
+          "flee",
+          "sneak"
+        ]
+      },
+      {
+        "key": "check",
+        "text": "CHECK - open the door",
+        "labels": [
+          "check",
+          "2",
+          "open",
+          "look",
+          "enter",
+          "stay"
+        ]
+      }
+    ],
     "votes": {},
     "voters": {},
     "closed": false
   },
   "recent_hashtags": [
-    "#zombiehorror",
-    "#animatedstory",
-    "#chooseyourownadventure",
-    "#interactivefiction",
-    "#zombiesurvival",
     "#zombieapocalypse",
     "#survivalreels",
     "#survivalstory",
     "#horroranimation",
-    "#horrorstory"
+    "#horrorstory",
+    "#survivalreels",
+    "#interactivefiction",
+    "#survivalstory",
+    "#horroranimation",
+    "#animatedstory"
   ]
 }
