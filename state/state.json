@@ -1,9 +1,9 @@
 {
   "schema": 2,
   "season": 1,
-  "day": 3,
+  "day": 4,
   "arc": "road",
-  "node": "run_away",
+  "node": "motel_arrive",
   "location": "an empty highway at 2:47 in the morning",
   "stats": {
     "hp": 100,
@@ -62,12 +62,32 @@
         "status": "fallback",
         "error": "ValueError"
       }
+    },
+    {
+      "season": 1,
+      "day": 4,
+      "arc": "road",
+      "node": "motel_arrive",
+      "kind": "story",
+      "media_id": "18076657244747299",
+      "video": "reel_s1_d004.mp4",
+      "posted_ist_date": "2026-10-31",
+      "posted_at_ist": "2026-10-31T22:58:23.036048+05:30",
+      "post_url": "https://www.instagram.com/reel/DfKsWB6ge21/",
+      "visual_mode_requested": "procedural",
+      "visual_mode_used": "procedural",
+      "ai_story": {
+        "provider": "local-llama.cpp",
+        "model": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+        "status": "fallback",
+        "error": "ValueError"
+      }
     }
   ],
   "last_episode": {
-    "media_id": "18140603017545871",
-    "posted_at_ist": "2026-10-30T23:49:43.510406+05:30",
-    "post_url": "https://www.instagram.com/reel/DfINbKID6Gw/",
+    "media_id": "18076657244747299",
+    "posted_at_ist": "2026-10-31T22:58:23.036048+05:30",
+    "post_url": "https://www.instagram.com/reel/DfKsWB6ge21/",
     "visual_mode_requested": "procedural",
     "visual_mode_used": "procedural",
     "ai_story": {
@@ -76,7 +96,7 @@
       "status": "fallback",
       "error": "ValueError"
     },
-    "node": "run_away",
+    "node": "motel_arrive",
     "kind": "story",
     "vote": false,
     "choices": [],
@@ -85,15 +105,15 @@
     "closed": false
   },
   "recent_hashtags": [
-    "#survivalreels",
-    "#interactivefiction",
-    "#survivalstory",
-    "#horroranimation",
-    "#animatedstory",
     "#zombiesurvival",
     "#chooseyourownadventure",
     "#zombiehorror",
     "#interactivefiction",
+    "#survivalreels",
+    "#zombieapocalypse",
+    "#horrorstory",
+    "#zombiesurvival",
+    "#chooseyourownadventure",
     "#survivalreels"
   ]
 }
