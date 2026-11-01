@@ -1,9 +1,9 @@
 {
   "schema": 2,
   "season": 1,
-  "day": 4,
+  "day": 5,
   "arc": "road",
-  "node": "motel_arrive",
+  "node": "motel_door",
   "location": "an empty highway at 2:47 in the morning",
   "stats": {
     "hp": 100,
@@ -82,12 +82,32 @@
         "status": "fallback",
         "error": "ValueError"
       }
+    },
+    {
+      "season": 1,
+      "day": 5,
+      "arc": "road",
+      "node": "motel_door",
+      "kind": "vote",
+      "media_id": "17919440766462951",
+      "video": "reel_s1_d005.mp4",
+      "posted_ist_date": "2026-11-01",
+      "posted_at_ist": "2026-11-01T23:42:17.311125+05:30",
+      "post_url": "https://www.instagram.com/reel/DfNWKPKkpdk/",
+      "visual_mode_requested": "procedural",
+      "visual_mode_used": "procedural",
+      "ai_story": {
+        "provider": "local-llama.cpp",
+        "model": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+        "status": "fallback",
+        "error": "ValueError"
+      }
     }
   ],
   "last_episode": {
-    "media_id": "18076657244747299",
-    "posted_at_ist": "2026-10-31T22:58:23.036048+05:30",
-    "post_url": "https://www.instagram.com/reel/DfKsWB6ge21/",
+    "media_id": "17919440766462951",
+    "posted_at_ist": "2026-11-01T23:42:17.311125+05:30",
+    "post_url": "https://www.instagram.com/reel/DfNWKPKkpdk/",
     "visual_mode_requested": "procedural",
     "visual_mode_used": "procedural",
     "ai_story": {
@@ -96,24 +116,49 @@
       "status": "fallback",
       "error": "ValueError"
     },
-    "node": "motel_arrive",
-    "kind": "story",
-    "vote": false,
-    "choices": [],
+    "node": "motel_door",
+    "kind": "vote",
+    "vote": true,
+    "choices": [
+      {
+        "key": "open",
+        "text": "OPEN - pull the stranger inside",
+        "labels": [
+          "open",
+          "1",
+          "help",
+          "door",
+          "lets",
+          "pull"
+        ]
+      },
+      {
+        "key": "quiet",
+        "text": "STAY QUIET - wait for daylight",
+        "labels": [
+          "quiet",
+          "2",
+          "stay",
+          "wait",
+          "hide",
+          "ignore"
+        ]
+      }
+    ],
     "votes": {},
     "voters": {},
     "closed": false
   },
   "recent_hashtags": [
-    "#zombiesurvival",
-    "#chooseyourownadventure",
-    "#zombiehorror",
-    "#interactivefiction",
-    "#survivalreels",
     "#zombieapocalypse",
     "#horrorstory",
     "#zombiesurvival",
     "#chooseyourownadventure",
+    "#survivalreels",
+    "#animatedstory",
+    "#survivalstory",
+    "#horroranimation",
+    "#horrorstory",
     "#survivalreels"
   ]
 }
