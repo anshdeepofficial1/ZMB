@@ -58,5 +58,6 @@
   "publishing_enabled": false,
   "enforce_visual_contract": true,
   "cinematic_assets_root": "assets/cinematic",
-  "max_publish_late_minutes": 115
+  "max_publish_late_minutes": 115,
+  "cinematic_release_approved": false
 }
