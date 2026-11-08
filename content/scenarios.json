@@ -42,10 +42,10 @@
         "intro": {
           "kind": "story",
           "subtitle": "The Last Light",
-          "hook": "At 2:47 AM, Max's car dies on a deserted highway. His headlights flicker. Something waits inside the only lit gas station.",
+          "hook": "2:47 AM. A lone car dies on a fogbound highway. Across the road, something moves behind the only lit gas-station door.",
           "lines": [
             {
-              "text": "At 2:47 AM, Max drives alone through thick highway fog.",
+              "text": "2:47 AM. Max drives alone. His headlights start flickering.",
               "shot": {
                 "place": "highway",
                 "cast": [
@@ -66,7 +66,7 @@
               }
             },
             {
-              "text": "The engine suddenly coughs. The headlights flicker. His car jerks to a stop.",
+              "text": "The engine coughs. The car slows... and dies.",
               "shot": {
                 "place": "highway",
                 "cast": [
@@ -87,7 +87,7 @@
               }
             },
             {
-              "text": "Max turns the key again. Nothing. The dashboard goes dark. Biscuit whimpers.",
+              "text": "Max turns the key. Nothing. Biscuit whines.",
               "shot": {
                 "place": "highway",
                 "cast": [
@@ -108,7 +108,7 @@
               }
             },
             {
-              "text": "He grabs his backpack, steps onto the empty highway, and switches on his flashlight.",
+              "text": "He grabs his pack, steps outside, and switches on his flashlight.",
               "shot": {
                 "place": "highway",
                 "cast": [
@@ -129,7 +129,7 @@
               }
             },
             {
-              "text": "Far ahead, one gas station is still glowing through the fog.",
+              "text": "Ahead, one gas station still has power.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
@@ -150,7 +150,7 @@
               }
             },
             {
-              "text": "A human shadow moves behind the locked glass door. Max freezes.",
+              "text": "Behind its locked glass door, a human shadow moves.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
@@ -171,7 +171,7 @@
               }
             },
             {
-              "text": "Three slow knocks. Then the door handle begins to turn—by itself.",
+              "text": "Three slow knocks. The door handle turns. From inside.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
@@ -197,10 +197,10 @@
         "store_sound": {
           "kind": "vote",
           "subtitle": "Staff Only",
-          "hook": "The station goes silent after three knocks. Food is inside, but so is whatever moved behind that locked door.",
+          "hook": "The locked station door was moving from inside. Max finds an unlocked loading entrance. Should he risk going deeper?",
           "lines": [
             {
-              "text": "The knocking stops. Max enters the deserted station. It's far too quiet.",
+              "text": "The knocking stops. Max finds an unlocked back door and slips inside.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
