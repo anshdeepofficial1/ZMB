@@ -69,7 +69,7 @@ jobs:
           python -c "import json; c=json.load(open('config.example.json')); assert c['publishing_enabled'] is False and c['cinematic_release_approved'] is False"
 
   preview-day1:
-    if: ${{ (github.event_name == 'pull_request' && github.head_ref == 'rebuild/comfyui-cinematic-assets') || (github.event_name == 'workflow_dispatch' && inputs.render_preview) }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.render_preview }}
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 120
