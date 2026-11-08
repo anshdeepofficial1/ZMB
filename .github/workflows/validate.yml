@@ -9,6 +9,9 @@ on:
       - "scripts/**"
       - "skills/**"
       - "content/cast_bible.json"
+      - "content/prop_bible.json"
+      - "content/shot_directions.json"
+      - "workflows/zmb/**"
       - "content/scenarios.json"
       - "config.example.json"
       - "tests/**"
@@ -17,7 +20,7 @@ on:
   workflow_dispatch:
     inputs:
       render_preview:
-        description: "Render a Day 2 preview MP4 (slow; never publishes)"
+        description: "Render an offline Day 1 preview MP4 (slow; never publishes)"
         required: false
         type: boolean
         default: false
@@ -53,11 +56,20 @@ jobs:
       - name: Story engine self-test
         run: python scripts/engine.py --selftest
 
-      - name: Scheduler regression tests
+      - name: Scheduler, cinematic and safety regression tests
         run: python -m unittest discover -s tests -v
 
+      - name: Offline prompt-generation smoke test (never calls GPU or Instagram)
+        run: |
+          python scripts/visual_manifest.py --day1
+          python scripts/comfyui_cinematic.py --day1 --dry-run
+
+      - name: Ensure publishing is disabled
+        run: |
+          python -c "import json; c=json.load(open('config.example.json')); assert c['publishing_enabled'] is False and c['cinematic_release_approved'] is False"
+
   preview-day1:
-    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.render_preview) }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.render_preview }}
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 120
