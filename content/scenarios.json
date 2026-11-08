@@ -41,32 +41,53 @@
       "nodes": {
         "intro": {
           "kind": "story",
-          "subtitle": "The Empty Highway",
-          "hook": "At 2:47 AM, Max's engine dies on an empty road. One gas station is still lit.",
+          "subtitle": "The Last Light",
+          "hook": "At 2:47 AM, Max's car dies on a deserted highway. His headlights flicker. Something waits inside the only lit gas station.",
           "lines": [
             {
-              "text": "2:47 AM. Max's engine coughs, sputters, and dies.",
+              "text": "At 2:47 AM, Max drives alone through thick highway fog.",
               "shot": {
                 "place": "highway",
                 "cast": [
                   [
                     "max",
-                    "sit"
+                    "drive"
                   ],
                   [
                     "biscuit",
                     "sit"
                   ]
                 ],
-                "cam": "push",
+                "cam": "panr",
                 "fx": "fog",
                 "mood": "tense",
                 "time": "night",
-                "beat": "breakdown"
+                "beat": "car_driving"
               }
             },
             {
-              "text": "Inside, Biscuit whines. No signal, no help, no plan.",
+              "text": "The engine suddenly coughs. The headlights flicker. His car jerks to a stop.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "drive"
+                  ],
+                  [
+                    "biscuit",
+                    "scared"
+                  ]
+                ],
+                "cam": "shake",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night",
+                "beat": "engine_stall"
+              }
+            },
+            {
+              "text": "Max turns the key again. Nothing. The dashboard goes dark. Biscuit whimpers.",
               "shot": {
                 "place": "highway",
                 "cast": [
@@ -79,7 +100,7 @@
                     "scared"
                   ]
                 ],
-                "cam": "static",
+                "cam": "push",
                 "fx": "fog",
                 "mood": "tense",
                 "time": "night",
@@ -87,7 +108,28 @@
               }
             },
             {
-              "text": "Then Max spots it: one gas station still glowing in the dark.",
+              "text": "He grabs his backpack, steps onto the empty highway, and switches on his flashlight.",
+              "shot": {
+                "place": "highway",
+                "cast": [
+                  [
+                    "max",
+                    "walk"
+                  ],
+                  [
+                    "biscuit",
+                    "follow"
+                  ]
+                ],
+                "cam": "pull",
+                "fx": "fog",
+                "mood": "tense",
+                "time": "night",
+                "beat": "flashlight_exit"
+              }
+            },
+            {
+              "text": "Far ahead, one gas station is still glowing through the fog.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
@@ -108,28 +150,7 @@
               }
             },
             {
-              "text": "He grabs his backpack and climbs out. 'Stay close, Biscuit.'",
-              "shot": {
-                "place": "highway",
-                "cast": [
-                  [
-                    "max",
-                    "walk"
-                  ],
-                  [
-                    "biscuit",
-                    "follow"
-                  ]
-                ],
-                "cam": "panr",
-                "fx": "fog",
-                "mood": "tense",
-                "time": "night",
-                "beat": "backpack_exit"
-              }
-            },
-            {
-              "text": "The station is lit, but a shadow moves behind the locked door.",
+              "text": "A human shadow moves behind the locked glass door. Max freezes.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
@@ -144,30 +165,30 @@
                 ],
                 "cam": "creep",
                 "fx": "fog",
-                "mood": "danger",
+                "mood": "tense",
                 "time": "night",
                 "beat": "door_shadow"
               }
             },
             {
-              "text": "RUN to escape or CHECK the door? Follow and vote on tomorrow's Reel.",
+              "text": "Three slow knocks. Then the door handle begins to turn—by itself.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
                   [
                     "max",
-                    "point"
+                    "crouch"
                   ],
                   [
                     "biscuit",
-                    "sit"
+                    "scared"
                   ]
                 ],
-                "cam": "static",
+                "cam": "push",
                 "fx": "fog",
-                "mood": "hope",
+                "mood": "tense",
                 "time": "night",
-                "beat": "choice_teaser"
+                "beat": "door_handle"
               }
             }
           ],
@@ -176,10 +197,10 @@
         "store_sound": {
           "kind": "vote",
           "subtitle": "Staff Only",
-          "hook": "The store has food for weeks. And something is dragging its feet behind the STAFF ONLY door.",
+          "hook": "The station goes silent after three knocks. Food is inside, but so is whatever moved behind that locked door.",
           "lines": [
             {
-              "text": "The gas station is empty. Too empty.",
+              "text": "The knocking stops. Max enters the deserted station. It's far too quiet.",
               "shot": {
                 "place": "gas_station",
                 "cast": [
