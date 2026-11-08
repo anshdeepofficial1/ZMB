@@ -247,13 +247,11 @@ def generate_shot(ltx_root: Path, shot: dict, profile: Profile, *,
                 f"in {render_dir}"
             )
         first = files[0]
-        stage = video.with_suffix(".mp4.partial")
-        shutil.copyfile(first, stage)
         # The official model may generate sub-720p. Label its true native
         # resolution in provenance; never misrepresent scaling as native 1080p.
         subprocess.run([
             "ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
-            "-i", str(stage), "-vf",
+            "-i", str(first), "-vf",
             "scale=1080:1920:flags=lanczos,setsar=1",
             "-r", "24", "-an", "-c:v", "libx264",
             "-preset", "slow", "-crf", "17", "-pix_fmt", "yuv420p",
@@ -312,7 +310,8 @@ def main() -> None:
         cmd = build_command(root, shot, profile, ROOT / "work" / "ltx-test")
         if args.dry_run:
             print(json.dumps({
-                "shot": shot["id"], "action": shot["physical_direction"],
+                "shot": shot["id"], "beat": shot["beat"],
+                "action": shot["physical_direction"],
                 "frame_input": shot["image_path"], "model": profile.yaml,
                 "native_resolution": f"{profile.width}x{profile.height}",
                 "fps": profile.fps, "frames": int(cmd[cmd.index("--num_frames")+1]),
