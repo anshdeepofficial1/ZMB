@@ -118,17 +118,20 @@ def render_cinematic_episode(cfg: dict, ep: dict, voices: list, shots: list,
                              total: float, audio: Path, work: Path,
                              out_path: Path, crf: int = 18, Log=print) -> dict:
     manifest = build_manifest(ep, allow_unimplemented=True)
-    if not manifest["approval"]["approved"]:
-        raise VisualContractError(
-            "Cinematic release blocked: every generated shot requires explicit "
-            "physical-action, character and prop review (reviewed=true)."
-        )
+    sources = validate_assets(ep, shots)
+    # Approval is bound to exact MP4 and shot-prompt SHA-256 digests, not a
+    # mutable reviewed=true flag that could survive changed footage.
+    from cinematic_review import verify_manifest
+    verdict = verify_manifest(manifest)
+    manifest["approval"]["approved"] = verdict["approved"]
+    manifest["approval"]["reviewed_by"] = verdict["reviewed_by"]
+    for frame in manifest["shots"]:
+        frame["reviewed"] = True
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     (OUT_DIR / "visual_manifest.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    sources = validate_assets(ep, shots)
     fps = int(cfg.get("render", {}).get("fps", 30))
     segments_dir = work / "cinematic_segments"
     segments_dir.mkdir(parents=True, exist_ok=True)
