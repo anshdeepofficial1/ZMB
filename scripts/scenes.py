@@ -220,13 +220,8 @@ def highway(tname, mood="calm", seed=1):
         road += rect(WORLD_X0 + 20 + i * 80, GROUND + 44, 44, 7, "#d9d2b4", op=0.55)
     road += rect(WORLD_X0, GROUND + 104, WORLD_W, 12, shade(T["near"], -0.35))
     road += rect(WORLD_X0, GROUND + 116, WORLD_W, 1920 - (GROUND + 116), shade(T["near"], -0.5))
-    # Max ki gaadi — kahani yahi shuru hoti hai; actors ke bagal mein parked:
-    hero = car(40, GROUND + 4, 240, "#8b97a6")
-    hero += line(227, 1218, 268, 1148, "#3d434c", 9)       # khula bonnet
-    hero += ell(300, 1172, 62, 22, "#aeb8c2", op=0.30)     # engine smoke
-    hero += ell(366, 1120, 88, 28, "#aeb8c2", op=0.22)
-    hero += ell(448, 1064, 116, 34, "#aeb8c2", op=0.15)
-    road += hero
+    # Do not permanently paint a stalled hero car into every highway scene.
+    # The shot director is responsible for moving/parked cars per event.
     road += grass_tufts(seed + 11, WORLD_X0, WORLD_X0 + WORLD_W, GROUND + 130, 1760, 90,
                         shade(T["ground"], 0.1), 1.5)
     L.append((0.86, road))
