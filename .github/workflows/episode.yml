@@ -78,8 +78,8 @@ jobs:
           python -m compileall -q scripts
           python scripts/engine.py --selftest
 
-      - name: Render preview only (never publish)
-        run: python scripts/run_cycle.py --dry-run
+      - name: Render cinematic Day 1 draft only (never publish)
+        run: python scripts/preview_day1.py --video
 
       - name: Upload reel artifact (debug)
         if: always()
@@ -90,5 +90,7 @@ jobs:
             out/*.mp4
             out/caption.txt
             out/episode.json
+            out/day1_visual_manifest.json
+            out/stills/*.png
           if-no-files-found: ignore
           retention-days: 5
