@@ -8,7 +8,9 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from visual_manifest import day1_episode, build_manifest, VisualContractError
-from render_cinematic import required_clips, validate_assets, build_subtitles
+from render_cinematic import required_clips, validate_assets, build_subtitles, _probe_video
+from unittest.mock import patch
+import render_cinematic as cinematic
 
 
 class DayOneVisualContractTests(unittest.TestCase):
@@ -95,6 +97,44 @@ class DayOneVisualContractTests(unittest.TestCase):
         self.assertTrue(str(required[0][1]).endswith("road/intro/00.mp4"))
         with self.assertRaisesRegex(VisualContractError, "Missing scene-specific"):
             validate_assets(ep, shots)
+
+    def test_reject_horizontal_and_low_resolution_cinematic_footage(self):
+        import json as _json
+        class Result:
+            def __init__(self, width, height):
+                self.stdout = _json.dumps({
+                    "streams": [{"codec_type": "video", "width": width,
+                                 "height": height, "avg_frame_rate": "30/1"}],
+                    "format": {"duration": "4.0"},
+                })
+        with patch.object(cinematic, "run", return_value=Result(1920, 1080)):
+            with self.assertRaisesRegex(VisualContractError, "portrait 9:16"):
+                _probe_video(Path("landscape.mp4"))
+        with patch.object(cinematic, "run", return_value=Result(360, 640)):
+            with self.assertRaisesRegex(VisualContractError, "720x1280"):
+                _probe_video(Path("lowres.mp4"))
+        with patch.object(cinematic, "run", return_value=Result(1080, 1920)):
+            info = _probe_video(Path("good.mp4"))
+            self.assertEqual(info["width"], 1080)
+            self.assertEqual(info["fps"], 30.0)
+
+    def test_reject_duplicate_scene_mp4_bytes_and_short_footage(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            base = root / "road" / "intro"
+            base.mkdir(parents=True)
+            (base/"00.mp4").write_bytes(b"actualclip" * 200)
+            (base/"01.mp4").write_bytes(b"actualclip" * 200)
+            shots=[SimpleNamespace(kind="line", dur=3.0),
+                   SimpleNamespace(kind="line", dur=3.0)]
+            fake={"duration": 4.0, "width":1080, "height":1920, "fps":30.0}
+            with patch.object(cinematic, "CINEMATIC_ROOT", root), patch.object(cinematic, "_probe_video", return_value=fake):
+                with self.assertRaisesRegex(VisualContractError, "duplicate cinematic"):
+                    validate_assets(day1_episode(), shots)
+            (base/"01.mp4").write_bytes(b"unique" * 200)
+            with patch.object(cinematic, "CINEMATIC_ROOT", root), patch.object(cinematic, "_probe_video", return_value={**fake,"duration":2.0}):
+                with self.assertRaisesRegex(VisualContractError, "too short|only 2.00s"):
+                    validate_assets(day1_episode(), shots)
 
     def test_ass_captions_follow_shot_start_time(self):
         shots = [SimpleNamespace(kind="line", start=2.5, dur=3, end=5.5)]
