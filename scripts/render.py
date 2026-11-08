@@ -191,6 +191,15 @@ def render_episode(cfg: dict, ep: dict, *, jobs=None, scale=None, crf=None,
     audio = build_master_audio(voices, lead, outro, work, total, cfg)
 
     visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
+    if bool(cfg.get("enforce_visual_contract", True)):
+        from visual_manifest import build_manifest
+        build_manifest(ep, allow_unimplemented=(visual_mode == "cinematic_assets"))
+    if visual_mode == "cinematic_assets":
+        from render_cinematic import render_cinematic_episode
+        return render_cinematic_episode(
+            cfg, ep, voices, shots, total, audio, work, out_path,
+            crf=crf, Log=Log,
+        )
     if visual_mode in {"ai_storyboard", "ai_video"}:
         Log(f"[render] remote visual mode '{visual_mode}' disabled; retaining the local procedural animation engine")
     ep["visual_mode_used"] = "procedural_local_ai" if ep.get("ai_story", {}).get("status") == "success" else "procedural"
