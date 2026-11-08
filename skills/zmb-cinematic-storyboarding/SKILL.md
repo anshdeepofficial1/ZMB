@@ -20,8 +20,8 @@ stop and mark **requires new shot asset**.
 
 ## Canonical characters
 
-Read \`content/cast_bible.json\` first. Create and approve one clean reference image
-per recurring character at the exact \`reference\` paths. Reuse those assets for
+Read `content/cast_bible.json` first. Create and approve one clean reference image
+per recurring character at the exact `reference` paths. Reuse those assets for
 every shot's reference conditioning (e.g. IPAdapter/consistent-character workflow
 in ComfyUI). Never generate a new identity each scene. Keep Max's charcoal
 jacket, brown cargo trousers, and brown pack stable; Biscuit is a small tan dog,
@@ -29,18 +29,18 @@ not a robot. Assets must be original/licensed.
 
 ## Story and shot planning
 
-1. Read \`content/scenarios.json\` and determine continuity from the previous node.
+1. Read `content/scenarios.json` and determine continuity from the previous node.
 2. Write concise, visual narration: subject → action → result → escalating threat.
 3. Give each spoken line its own shot: physical location, time, camera, cast,
    props, concrete beat/action, FX, and precise cause/effect.
-4. Generate \`out/day1_visual_manifest.json\` via
-   \`python scripts/visual_manifest.py --day1\`.
-5. Use the exact \`prompt\` fields. Provide the same reference image for each
+4. Generate `out/day1_visual_manifest.json` via
+   `python scripts/visual_manifest.py --day1`.
+5. Use the exact `prompt` fields. Provide the same reference image for each
    recurring character in the actual image/video generation workflow.
 6. For vehicles, use a single approved vehicle model/reference; all angles must
    match. Wheels must rotate while driving and stop when parked.
 7. Produce unique 9:16 clips matching the narration timestamps; keep generated
-   clips under \`assets/cinematic/<arc>/<node>/<index>.mp4\`.
+   clips under `assets/cinematic/<arc>/<node>/<index>.mp4`.
 8. Preview with the episode's real narration, captions, and audio before release.
 
 ## Image-to-video options
@@ -54,6 +54,18 @@ only for local draft previews, not as a silent substitute for missing cinematic 
 A ComfyUI workflow must be validated on the deployment actually used; models,
 conditioning nodes, and endpoints vary. Do not claim working AI video until its
 output passes clip, character, motion, and lip/narration checks.
+
+## Real generation and review
+
+Read `workflows/zmb/README.md` for the real ComfyUI API workflow
+integration and setup. `python scripts/comfyui_cinematic.py --day1 --dry-run`
+checks prompt directions, while `--server ... --bindings ...` performs
+actual generation only on a working authorized ComfyUI GPU server.
+
+**Do not claim finished video until original reference stills, all unique
+motion clips and their manual SHA-256-bound review receipts exist.**
+A screenshot, still-frame slideshow, a mock video, or an arbitrary clip
+is not a passing implementation.
 
 ## Acceptance gates
 
