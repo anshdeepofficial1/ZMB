@@ -1,10 +1,14 @@
 name: Validate Python and Scheduler
 
 on:
+  pull_request:
+    branches: [main]
   push:
     branches: [main]
     paths:
       - "scripts/**"
+      - "skills/**"
+      - "content/cast_bible.json"
       - "content/scenarios.json"
       - "config.example.json"
       - "tests/**"
