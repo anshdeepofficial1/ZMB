@@ -16,8 +16,8 @@ For a reference workflow, see [ComfyUI Wan 2.2 5B TI2V](https://comfy.org/hub/wo
 It supports text-to-video and image-to-video. Model files and video
 conditioning nodes must actually be installed. Export the **API format**
 node graph, not the editor UI format. Official ComfyUI docs list
-\`POST /prompt\`, \`GET /history/{prompt_id}\`, \`POST /upload/image\`, and
-\`GET /view\`; the ZMB adapter uses these real endpoints.
+`POST /prompt`, `GET /history/{prompt_id}`, `POST /upload/image`, and
+`GET /view`; the ZMB adapter uses these real endpoints.
 
 **Do not open an unauthenticated ComfyUI instance to the public internet.**
 Run localhost, VPN, or a secure, authenticated reverse proxy. Only the
@@ -29,13 +29,13 @@ one or spends credits by itself.
 Before generating any footage, create **original** approved 9:16 character
 reference files at:
 
-- \`assets/character_refs/max.png\`
-- \`assets/character_refs/biscuit.png\`
-- \`assets/character_refs/ada.png\`
-- \`assets/character_refs/otto.png\`
-- \`assets/character_refs/zombie.png\`
+- `assets/character_refs/max.png`
+- `assets/character_refs/biscuit.png`
+- `assets/character_refs/ada.png`
+- `assets/character_refs/otto.png`
+- `assets/character_refs/zombie.png`
 
-Descriptions are pinned in \`content/cast_bible.json\`. Max's face, clothes,
+Descriptions are pinned in `content/cast_bible.json`. Max's face, clothes,
 proportions and hair must remain unchanged. Biscuit must be a living tan dog,
 not a robot. The same approved blue-grey sedan must appear in driving, crash,
 parked, exterior, and interior shots. Add a separate sedan conditioning
@@ -54,11 +54,11 @@ rather than silently render inconsistent characters.
    conditioning, a LoadImage input for the scene's initial frame, reference
    conditioning inputs, and a SaveVideo output node producing **MP4**.
 3. Save the exported graphs, for example
-   \`workflows/zmb/image_api.json\` and \`workflows/zmb/video_api.json\`.
-4. Create a private or local \`workflows/zmb/bindings.json\` mapping the
+   `workflows/zmb/image_api.json` and `workflows/zmb/video_api.json`.
+4. Create a private or local `workflows/zmb/bindings.json` mapping the
    *real* node IDs and input keys, in this exact shape:
 
-\`\`\`json
+```json
 {
   "image": {
     "workflow_file": "workflows/zmb/image_api.json",
@@ -87,7 +87,7 @@ rather than silently render inconsistent characters.
     "output_node": "58"
   }
 }
-\`\`\`
+```
 
 **Node IDs in the example are illustrative and NOT expected to match your
 actual exported model workflows.** Inspect the exported files and replace
@@ -96,24 +96,48 @@ node does not exist, the adapter fails immediately.
 
 ## Commands
 
-\`\`\`powershell
+```powershell
 python scripts/comfyui_cinematic.py --day1 --dry-run
 python scripts/comfyui_cinematic.py --day1 --server http://127.0.0.1:8188 --bindings workflows/zmb/bindings.json --shot 0
 python scripts/comfyui_cinematic.py --day1 --server http://127.0.0.1:8188 --bindings workflows/zmb/bindings.json --resume
 python scripts/audit_story_coverage.py
-\`\`\`
+```
 
 Generated outputs are in:
-\`assets/cinematic/road/intro/00.png\`,
-\`assets/cinematic/road/intro/00.mp4\`, and corresponding numbered files.
-Each MP4 has a \`.provenance.json\` containing input prompt/required props,
-content hashes, and \`UNREVIEWED\` status.
+`assets/cinematic/road/intro/00.png`,
+`assets/cinematic/road/intro/00.mp4`, and corresponding numbered files.
+Each MP4 has a `.provenance.json` containing input prompt/required props,
+content hashes, and `UNREVIEWED` status.
 
 **Nothing is ready to post yet.** A human must inspect real clips for
 identity consistency, correct narration, visible physical action, lighting,
 motion and story continuity. Only after passing all gates can the
 release-approval flag change. The repository's Instagram publishing lock
 remains OFF.
+
+## Real footage review and release gating
+
+**Video generation does not equal approval.** After manually watching each
+generated MP4 together with its matching narration and prompts, a named
+reviewer must explicitly attest to all five criteria for the *exact* file.
+
+```powershell
+python scripts/cinematic_review.py --day1 --shot 0 --reviewer "Editor" --confirm-all-checks
+python scripts/cinematic_review.py --day1 --verify
+```
+
+This writes `assets/cinematic/road/intro/00.review.json` containing the MP4
+SHA-256, exact narration+physical-prompt SHA-256, reviewer identity, time,
+and every completed check. If the clip is replaced or the story is edited,
+the existing receipt is invalid and publishing is blocked.
+
+Review the actual source clip; the 2D procedural MP4 is **only a debugging
+preview** and cannot be accepted as a professional replacement.
+
+Generated videos may be too large for ordinary GitHub repository commits.
+Deploy the vetted clip assets to a controlled production artifact storage
+location before enabling automatic editing and publishing. This storage and
+ComfyUI GPU are **not yet connected**.
 
 ## Quality checklist for Day 1
 
