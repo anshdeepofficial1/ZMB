@@ -152,6 +152,10 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     break
                 current.append(tokens[end_index])
                 end_index += 1
+                # Never carry the start of a new sentence into the prior
+                # caption. Short complete phrases feel editorial, not karaoke.
+                if current[-1].rstrip().endswith((".", "!", "?", "…")):
+                    break
             if not current:
                 raise VisualContractError("cannot place spoken subtitle in safe caption box")
             phrase = words[i:end_index]
