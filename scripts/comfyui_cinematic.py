@@ -213,7 +213,8 @@ def sha256(path: Path) -> str:
 
 
 def validate_generation_preflight(shots: list, bindings: dict, cast: dict, props: dict) -> None:
-    """Fail BEFORE GPU job submission if any character, car or place lacks refs."""
+    """Fail BEFORE GPU job submission unless every required reference is approved."""
+    from reference_review import verify_reference
     for stage_name in ("image", "video"):
         stage = bindings[stage_name]
         flow = ROOT / stage["workflow_file"]
@@ -230,13 +231,9 @@ def validate_generation_preflight(shots: list, bindings: dict, cast: dict, props
             identity = cast.get(role) or props.get(role)
             if not identity:
                 raise VisualContractError(f"Missing identity record: {role}")
-            ref = ROOT / identity["reference"]
-            if not ref.is_file():
-                raise VisualContractError(
-                    f"Missing approved reference for {role}: {ref}"
-                )
-            if ref.stat().st_size < 100:
-                raise VisualContractError(f"Reference image is empty: {ref}")
+            # A PNG file alone is not an approved identity. Both image bytes
+            # and the identity definition must match the review receipt.
+            verify_reference(role, identity, root=ROOT)
             for stage_name in ("image", "video"):
                 spec = bindings[stage_name]
                 if role not in (spec.get("reference_nodes") or {}):
@@ -255,9 +252,11 @@ def generate_shot(
     video = Path(shot["video_path"])
     # Explicit reference conditioning is required for every character.
     references = {}
+    from reference_review import verify_reference
     for character in shot["characters"]:
         role = character["id"]
         reference = ROOT / cast[role]["reference"]
+        verify_reference(role, cast[role], root=ROOT)
         if role not in references:
             if not reference.is_file():
                 raise VisualContractError(
@@ -270,6 +269,7 @@ def generate_shot(
         if role in references:
             continue
         reference = ROOT / props[role]["reference"]
+        verify_reference(role, props[role], root=ROOT)
         if not reference.is_file():
             raise VisualContractError(
                 f"Missing approved recurring prop {role} reference: {reference}"
