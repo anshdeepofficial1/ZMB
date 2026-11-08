@@ -27,7 +27,7 @@ from uuid import uuid4
 import requests
 
 from visual_manifest import (
-    ROOT, CINEMATIC_ROOT, CAST_BIBLE, build_manifest, day1_episode,
+    ROOT, CINEMATIC_ROOT, CAST_BIBLE, PROP_BIBLE, build_manifest, day1_episode,
     VisualContractError,
 )
 
@@ -212,8 +212,43 @@ def sha256(path: Path) -> str:
     return hasher.hexdigest()
 
 
+def validate_generation_preflight(shots: list, bindings: dict, cast: dict, props: dict) -> None:
+    """Fail BEFORE GPU job submission if any character, car or place lacks refs."""
+    for stage_name in ("image", "video"):
+        stage = bindings[stage_name]
+        flow = ROOT / stage["workflow_file"]
+        if not flow.is_file():
+            raise VisualContractError(f"Required {stage_name} API workflow missing: {flow}")
+        workflow = json.loads(flow.read_text(encoding="utf-8"))
+        set_input(workflow, stage["prompt"], "preflight-test")
+        if stage_name == "video":
+            set_input(workflow, stage["source_image"], "preflight-test.png")
+    for shot in shots:
+        required = {person["id"] for person in shot["characters"]}
+        required |= {asset["id"] for asset in shot.get("prop_references", [])}
+        for role in required:
+            identity = cast.get(role) or props.get(role)
+            if not identity:
+                raise VisualContractError(f"Missing identity record: {role}")
+            ref = ROOT / identity["reference"]
+            if not ref.is_file():
+                raise VisualContractError(
+                    f"Missing approved reference for {role}: {ref}"
+                )
+            if ref.stat().st_size < 100:
+                raise VisualContractError(f"Reference image is empty: {ref}")
+            for stage_name in ("image", "video"):
+                spec = bindings[stage_name]
+                if role not in (spec.get("reference_nodes") or {}):
+                    raise VisualContractError(
+                        f"{stage_name} workflow does not condition on {role}"
+                    )
+                wf = json.loads((ROOT / spec["workflow_file"]).read_text(encoding="utf-8"))
+                set_input(wf, spec["reference_nodes"][role], "preflight-test.png")
+
+
 def generate_shot(
-    client: ComfyClient, shot: dict, bindings: dict, cast: dict,
+    client: ComfyClient, shot: dict, bindings: dict, cast: dict, props: dict,
     *, resume: bool = False,
 ) -> dict:
     still = Path(shot["image_path"])
@@ -230,6 +265,16 @@ def generate_shot(
                     "Create and manually approve identities before generation."
                 )
             references[role] = client.upload_image(reference)
+    for prop in shot.get("prop_references", []):
+        role = prop["id"]
+        if role in references:
+            continue
+        reference = ROOT / props[role]["reference"]
+        if not reference.is_file():
+            raise VisualContractError(
+                f"Missing approved recurring prop {role} reference: {reference}"
+            )
+        references[role] = client.upload_image(reference)
     if not (resume and still.is_file() and still.stat().st_size > 1024):
         image_cfg = bindings["image"]
         image_flow = prepare_workflow(
@@ -295,11 +340,13 @@ def main():
     bindings = load_bindings(ROOT / args.bindings)
     if not args.server:
         parser.error("--server or ZMB_COMFYUI_URL required for real generation")
+    cast = json.loads(CAST_BIBLE.read_text(encoding="utf-8"))
+    props = json.loads(PROP_BIBLE.read_text(encoding="utf-8"))["props"]
+    validate_generation_preflight(shots, bindings, cast, props)
     client = ComfyClient(args.server, token=os.environ.get(args.token_env, ""))
     client.health()
-    cast = json.loads(CAST_BIBLE.read_text(encoding="utf-8"))
     for shot in shots:
-        result = generate_shot(client, shot, bindings, cast, resume=args.resume)
+        result = generate_shot(client, shot, bindings, cast, props, resume=args.resume)
         print(f"GENERATED, NOT REVIEWED: {result['shot_id']} "
               f"mp4 sha256={result['video_sha256'][:16]}")
     print("Assets generated, but publishing remains BLOCKED until every clip is reviewed.")
