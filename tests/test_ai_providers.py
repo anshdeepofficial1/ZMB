@@ -42,10 +42,13 @@ class LocalAIProviderTests(TestCase):
         self.assertEqual(len(result["lines"]), 2)
         self.assertEqual(result["choices"], self.episode["choices"])
         self.assertEqual(result["caption"], "unchanged")
-        self.assertEqual(result["lines"][0]["shot"]["cast"], [["max", "sneak"]])
-        self.assertEqual(result["lines"][0]["shot"]["fx"], "fog")
+        # Candidates may never rewrite the physical cast/action/shots.
+        self.assertEqual(result["lines"], self.episode["lines"])
+        self.assertNotIn("fx", result["lines"][0]["shot"])
         self.assertEqual(result["ai_story"]["provider"], "local-llama.cpp")
-        self.assertEqual(result["ai_story"]["status"], "success")
+        self.assertEqual(result["ai_story"]["status"], "review_required")
+        self.assertEqual(result["ai_story"]["suggestions"][0],
+                         "Max freezes as a shadow crosses the motel door.")
 
     def test_local_model_failure_is_marked_and_keeps_authored_lines(self):
         with patch.dict(sys.modules, {"llama_cpp": SimpleNamespace(Llama=Mock(side_effect=RuntimeError("no model")))}), patch.object(ai_providers, "_model_path", return_value=Path("/tmp/model.gguf")):
@@ -53,6 +56,14 @@ class LocalAIProviderTests(TestCase):
         self.assertEqual(result["lines"], self.episode["lines"])
         self.assertEqual(result["ai_story"]["status"], "fallback")
         self.assertEqual(result["ai_story"]["error"], "RuntimeError")
+
+    def test_model_cannot_mutate_approved_shot_metadata(self):
+        original=self.episode["lines"]
+        proposal=[{"text":"He approaches a totally different building.","shot":{"place":"alien_ship","cast":[["max","run"]] }},
+                  {"text":"Biscuit barks.","shot":{"beat":"moonwalk"}}]
+        mapped=ai_providers._validate_lines(self.episode,proposal)
+        self.assertEqual(mapped[0]["shot"], original[0]["shot"])
+        self.assertEqual(mapped[1]["shot"], original[1]["shot"])
 
     def test_invalid_line_count_is_rejected(self):
         with self.assertRaises(ValueError):
