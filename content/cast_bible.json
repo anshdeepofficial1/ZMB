@@ -1,0 +1,22 @@
+{
+  "max": {
+    "visual_identity": "Young adult male survivor, dark messy short hair, distinctive tired eyes, charcoal grey hooded jacket with faded rust-red seam stripe, dark shirt, brown cargo pants, worn lace-up boots, brown utility backpack. Same face, hairstyle, height, outfit, and silhouette in every shot.",
+    "reference": "assets/character_refs/max.png"
+  },
+  "biscuit": {
+    "visual_identity": "Small tan mixed-breed dog with two darker floppy ears, dark muzzle markings, red cloth collar and distinctive cream chest. Consistent canine anatomy and proportions in every shot, never a robot.",
+    "reference": "assets/character_refs/biscuit.png"
+  },
+  "ada": {
+    "visual_identity": "Young adult woman survivor with shoulder-length dark hair tied low, olive green field jacket, navy blue scarf, charcoal work trousers, grey boots and a small blue utility bag. Same face and silhouette in every shot.",
+    "reference": "assets/character_refs/ada.png"
+  },
+  "old": {
+    "visual_identity": "Otto, older male truck driver, weathered face, short silver beard, faded navy work cap, heavy brown canvas jacket, blue jeans. Same face and clothes in every shot.",
+    "reference": "assets/character_refs/otto.png"
+  },
+  "zombie": {
+    "visual_identity": "Human zombie with pale ashen skin, worn dark clothing, slow unnatural posture and eyes obscured by shadow. Non-graphic survival horror.",
+    "reference": "assets/character_refs/zombie.png"
+  }
+}
