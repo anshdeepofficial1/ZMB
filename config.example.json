@@ -14,7 +14,7 @@
     "gap_seconds": 0.45,
     "choice_card_seconds": 3.6,
     "ending_card_seconds": 4.2,
-    "title_card_seconds": 3,
+    "title_card_seconds": 0,
     "caption_max_words": 7,
     "caption_max_width": 1020
   },
@@ -54,5 +54,8 @@
   "publish_every_hours": 24,
   "publish_prepare_hours": 1,
   "visual_mode": "procedural",
-  "ai_story_generation": true
+  "ai_story_generation": true,
+  "publishing_enabled": false,
+  "enforce_visual_contract": true,
+  "cinematic_assets_root": "assets/cinematic"
 }
