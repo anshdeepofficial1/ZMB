@@ -2,7 +2,7 @@
   "handle": "@zmbstories",
   "timezone": "Asia/Kolkata",
   "voice": "en-US-ChristopherNeural",
-  "voice_rate": "-4%",
+  "voice_rate": "+0%",
   "render": {
     "width": 720,
     "height": 1280,
@@ -20,7 +20,7 @@
   },
   "min_votes": 10,
   "cta_vote": "Comment 1 or 2. The winning choice shapes the next episode.",
-  "cta_story": "Tomorrow, choose RUN or CHECK. Follow @zmbstories and vote on the next Reel.",
+  "cta_story": "The door was locked. What do you think is inside? Follow for tomorrow's reveal.",
   "fiction_disclaimer": "A fictional animated story. No real zombies were harmed.",
   "hashtag_pool": [
     "#zombieapocalypse",
