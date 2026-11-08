@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from visual_manifest import STORY, IMPLEMENTED_VECTOR_BEATS
+from visual_manifest import STORY, DIRECTIONS, CINEMATIC_ROOT, IMPLEMENTED_VECTOR_BEATS
 
 
 def scan() -> list[dict]:
@@ -31,11 +31,32 @@ def scan() -> list[dict]:
 
 
 if __name__ == "__main__":
-    missing = scan()
-    for row in missing:
-        print(f"{row['arc']}/{row['node']} [{row['line']}]: "
-              f"{row['narration'][:100]}")
-    print(f"\nINCOMPLETE LINES: {len(missing)}")
-    if missing:
+    scene = json.loads(STORY.read_text(encoding="utf-8"))["arcs"]
+    directions = json.loads(DIRECTIONS.read_text(encoding="utf-8"))["arcs"]
+    missing_direction = []
+    missing_media = []
+    total = 0
+    for arc, arc_data in scene.items():
+        for node, data in arc_data["nodes"].items():
+            lines = data.get("lines") or []
+            refs = directions.get(arc, {}).get(node, [])
+            if len(refs) != len(lines):
+                missing_direction.append(f"{arc}/{node}: direction count mismatch")
+                continue
+            for index, ref in enumerate(refs):
+                total += 1
+                if not ref.get("action") or not ref.get("props"):
+                    missing_direction.append(f"{arc}/{node}/{index}")
+                clip = CINEMATIC_ROOT / arc / node / f"{index:02d}.mp4"
+                if not clip.is_file():
+                    missing_media.append(str(clip.relative_to(CINEMATIC_ROOT)))
+    unmapped_vector = scan()
+    print(f"Directed spoken shots: {total}")
+    print(f"Missing physical directions: {len(missing_direction)}")
+    print(f"Missing real cinematic MP4 clips: {len(missing_media)}")
+    print(f"Shots without verified vector action renderer: {len(unmapped_vector)}")
+    if missing_direction or missing_media:
+        print("NOT READY: Cinematic release remains blocked")
         raise SystemExit(1)
-    print("ALL NARRATION LINES HAVE VERIFIED VECTOR VISUAL BEATS")
+    print("All lines have media files; still require human footage review")
+
