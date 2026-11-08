@@ -382,13 +382,17 @@
               }
             },
             {
-              "text": "The car starts on the first try. Sometimes luck is a plan.",
+              "text": "The car starts on the second try. Max slams the door and drives.",
               "shot": {
                 "place": "highway",
                 "cast": [
                   [
                     "max",
                     "drive"
+                  ],
+                  [
+                    "biscuit",
+                    "sit"
                   ]
                 ],
                 "cam": "panl",
@@ -398,7 +402,7 @@
               }
             },
             {
-              "text": "At sunrise, Max checks the bag. Fuel: enough. Food: almost nothing.",
+              "text": "A woman waves them down through the fog. Her name is Ada, and she carries a radio.",
               "shot": {
                 "place": "highway",
                 "cast": [
@@ -407,8 +411,12 @@
                     "idle"
                   ],
                   [
+                    "ada",
+                    "point"
+                  ],
+                  [
                     "biscuit",
-                    "sit"
+                    "scared"
                   ]
                 ],
                 "cam": "static",
@@ -418,17 +426,21 @@
               }
             },
             {
-              "text": "But they are alive. And ahead, a motel sign is still glowing.",
+              "text": "Ada climbs in. At sunrise, the three of them spot a glowing motel sign.",
               "shot": {
                 "place": "highway",
                 "cast": [
                   [
                     "max",
-                    "walk"
+                    "drive"
+                  ],
+                  [
+                    "ada",
+                    "sit"
                   ],
                   [
                     "biscuit",
-                    "follow"
+                    "sit"
                   ]
                 ],
                 "cam": "pull",
@@ -466,7 +478,7 @@
               }
             },
             {
-              "text": "Inside: a girl, crouched behind the crates, holding a box cutter. Alive.",
+              "text": "Inside, a woman crouches behind the crates with a box cutter. She is alive.",
               "shot": {
                 "place": "store",
                 "cast": [
@@ -530,7 +542,7 @@
               }
             },
             {
-              "text": "Her name is Ada. Two days alone in here. And in her bag: a shortwave radio.",
+              "text": "Her name is Ada. She has survived alone for two days—and carries a shortwave radio.",
               "shot": {
                 "place": "store",
                 "cast": [
@@ -572,6 +584,10 @@
                 "cast": [
                   [
                     "max",
+                    "walk"
+                  ],
+                  [
+                    "ada",
                     "walk"
                   ],
                   [
