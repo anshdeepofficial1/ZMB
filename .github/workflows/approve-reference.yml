@@ -1,0 +1,89 @@
+name: Approve generated character reference (GitHub only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "GitHub cinematic run ID containing generated reference PNGs"
+        required: true
+        type: string
+      role:
+        description: "Exact identity to approve after viewing its generated PNG"
+        required: true
+        type: choice
+        options: [max, biscuit, ada, old, zombie, sedan, station]
+      review_confirmation:
+        description: "Enter I_REVIEWED_ACTUAL_REFERENCE after examining the PNG"
+        required: true
+        type: string
+        default: "NO"
+      replace_existing:
+        description: "Explicitly replace an existing SHA-approved identity"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: zmb-reference-approval
+  cancel-in-progress: false
+
+jobs:
+  approved-reference:
+    if: ${{ inputs.review_confirmation == 'I_REVIEWED_ACTUAL_REFERENCE' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ZMB_PUBLISH_ENABLED: "0"
+      IG_ACCESS_TOKEN: ""
+      IG_USER_ID: ""
+    steps:
+      - name: Checkout draft cinematic implementation
+        uses: actions/checkout@v7
+        with:
+          ref: rebuild/comfyui-cinematic-assets
+
+      - name: Fetch generated reference images from selected GitHub run
+        uses: actions/download-artifact@v7
+        with:
+          name: zmb-cinematic-unreviewed-${{ inputs.source_run_id }}
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: fetched
+
+      - name: Install reference validation
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+
+      - name: Approve one inspected identity SHA
+        env:
+          REQUEST_ROLE: ${{ inputs.role }}
+          REPLACE_IMAGE: ${{ inputs.replace_existing }}
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet Pillow requests
+          ROLE="$REQUEST_ROLE"
+          mapfile -t FOUND < <(find fetched -type f -path "*/references/$ROLE.png" | sort)
+          if [[ "${#FOUND[@]}" -ne 1 ]]; then
+            echo "::error::Expected exactly one generated $ROLE reference in this run artifact."
+            exit 1
+          fi
+          mkdir -p "out/reference_candidates/$ROLE"
+          cp "${FOUND[0]}" "out/reference_candidates/$ROLE/candidate_01.png"
+          EXTRA=()
+          if [[ "$REPLACE_IMAGE" == "true" ]]; then EXTRA+=(--replace); fi
+          python scripts/reference_review.py --role "$ROLE" \
+            --candidate "out/reference_candidates/$ROLE/candidate_01.png" \
+            --reviewer "$GITHUB_ACTOR" --confirm-reviewed "${EXTRA[@]}"
+          python scripts/reference_review.py --role "$ROLE" --verify
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/character_refs assets/prop_refs
+          git commit -m "identity: approve SHA-locked $ROLE cinematic reference"
+          git push origin HEAD:rebuild/comfyui-cinematic-assets
+          echo "Reviewed $ROLE reference committed on the cinematic development branch." >> "$GITHUB_STEP_SUMMARY"
+          echo "This does not approve clips or authorize Instagram publishing." >> "$GITHUB_STEP_SUMMARY"
