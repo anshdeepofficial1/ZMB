@@ -1,28 +1,15 @@
 name: Episode Cycle
 
 on:
-  schedule:
-    # India-local times. Prepare at 18:17; retry/publish at 19:17 and
-    # retry through 20:47 if GitHub or Instagram is temporarily delayed.
-    - cron: "17 18 * * *"
-      timezone: "Asia/Kolkata"
-    - cron: "17,47 19 * * *"
-      timezone: "Asia/Kolkata"
-    - cron: "17,47 20 * * *"
-      timezone: "Asia/Kolkata"
   workflow_dispatch:
     inputs:
       dry_run:
         description: "Dry run (sirf video render, koi post nahi)"
         type: boolean
-        default: false
-      force_publish:
-        description: "Force publish (time/date gate bypass)"
-        type: boolean
-        default: false
+        default: true
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: episode-cycle
@@ -37,6 +24,7 @@ jobs:
       IG_USER_ID: ${{ secrets.IG_USER_ID }}
       IG_USERNAME: ${{ secrets.IG_USERNAME }}
       ZMB_LOCAL_AI_ENABLED: "1"
+      ZMB_PUBLISH_ENABLED: "0"
       PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
       GITHUB_REPOSITORY: ${{ github.repository }}
       GITHUB_TOKEN: ${{ github.token }}
@@ -90,15 +78,8 @@ jobs:
           python -m compileall -q scripts
           python scripts/engine.py --selftest
 
-      - name: Run cycle
-        env:
-          DRY: ${{ github.event.inputs.dry_run }}
-          FORCE: ${{ github.event.inputs.force_publish }}
-        run: |
-          ARGS=""
-          if [ "$DRY" = "true" ]; then ARGS="$ARGS --dry-run"; fi
-          if [ "$FORCE" = "true" ]; then ARGS="$ARGS --force-publish"; fi
-          python scripts/run_cycle.py $ARGS
+      - name: Render preview only (never publish)
+        run: python scripts/run_cycle.py --dry-run
 
       - name: Upload reel artifact (debug)
         if: always()
@@ -111,34 +92,3 @@ jobs:
             out/episode.json
           if-no-files-found: ignore
           retention-days: 5
-
-      - name: Commit state
-        if: ${{ always() && github.event.inputs.dry_run != 'true' }}
-        run: |
-          set -euo pipefail
-          git config user.name "zombie-bot"
-          git config user.email "zombie-bot@users.noreply.github.com"
-          git add state/
-          if git diff --cached --quiet; then
-            echo "No state changes"
-            exit 0
-          fi
-
-          git commit -m "state: update $(date -u +%FT%TZ)"
-          # Another commit may reach main while this long render is running.
-          # Rebase the state commit on the newest main before pushing, rather than
-          # silently losing state or leaving a successful Instagram post unrecorded.
-          for attempt in 1 2 3; do
-            git fetch origin main
-            if ! git rebase origin/main; then
-              git rebase --abort || true
-              echo "::error::State rebase conflicted; refusing to overwrite main"
-              exit 1
-            fi
-            if git push origin HEAD:refs/heads/main; then
-              exit 0
-            fi
-            sleep 2
-          done
-          echo "::error::Could not push state after 3 attempts"
-          exit 1
