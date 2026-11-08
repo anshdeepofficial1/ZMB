@@ -54,7 +54,7 @@
   "publish_every_hours": 24,
   "publish_prepare_hours": 1,
   "visual_mode": "procedural",
-  "ai_story_generation": true,
+  "ai_story_generation": false,
   "publishing_enabled": false,
   "enforce_visual_contract": true,
   "cinematic_assets_root": "assets/cinematic",
