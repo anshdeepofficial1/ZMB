@@ -82,7 +82,8 @@ jobs:
           python scripts/reference_review.py --role "$ROLE" --verify
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add assets/character_refs assets/prop_refs
+          CANONICAL="$(ROLE_TO_FIND="$ROLE" python -c 'from reference_candidates import subjects; import os; print(subjects()[os.environ["ROLE_TO_FIND"]]["reference"])')"
+          git add -- "$CANONICAL" "${CANONICAL%.png}.reference.json"
           git commit -m "identity: approve SHA-locked $ROLE cinematic reference"
           git push origin HEAD:rebuild/comfyui-cinematic-assets
           echo "Reviewed $ROLE reference committed on the cinematic development branch." >> "$GITHUB_STEP_SUMMARY"
