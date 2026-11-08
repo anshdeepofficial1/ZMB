@@ -1,4 +1,4 @@
-"""Isolated Day 1 cinematic reboot preview. NEVER modifies live state or posts.
+"""Legacy 2D schematic debug preview ONLY. NEVER a cinematic release or a post.
 
 Examples:
   python scripts/preview_day1.py --stills
@@ -20,6 +20,8 @@ def preview(video: bool = False, stills: bool = False) -> dict:
         raise ValueError("select --video or --stills")
     cfg = load_config()
     cfg = dict(cfg)  # Do not mutate any actual config.
+    # This explicitly opts into the obsolete vector schematic for debugging;
+    # production config now defaults to actual approved cinematic assets.
     cfg["visual_mode"] = "procedural"
     cfg["enforce_visual_contract"] = True
     cfg["publishing_enabled"] = False
