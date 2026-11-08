@@ -41,8 +41,8 @@ not a robot. The same approved blue-grey sedan must appear in driving, crash,
 parked, exterior, and interior shots. Add a separate sedan conditioning
 reference to both stage workflows before the next release.
 
-**Every character visibly present in a shot must have a reference node
-bound in both image and video workflows.** This adapter will error otherwise,
+**Every visible character, hero sedan and gas station must have a reference
+node bound in both image and video workflows.** This adapter will error otherwise,
 rather than silently render inconsistent characters.
 
 ## Connect your own ComfyUI API workflows
@@ -69,7 +69,9 @@ rather than silently render inconsistent characters.
       "biscuit": ["91", "image"],
       "ada": ["92", "image"],
       "old": ["93", "image"],
-      "zombie": ["94", "image"]
+      "zombie": ["94", "image"],
+      "sedan": ["95", "image"],
+      "station": ["96", "image"]
     },
     "output_node": "9"
   },
@@ -93,6 +95,36 @@ rather than silently render inconsistent characters.
 actual exported model workflows.** Inspect the exported files and replace
 every binding with your real input and output node IDs. If the needed
 node does not exist, the adapter fails immediately.
+
+## Step 1 — Create the original reference assets (before video)
+
+No characters, vehicles or environments are approved yet. The first task is to
+generate *candidate images*, not to claim that such approved files already exist.
+
+```powershell
+python scripts/reference_candidates.py --all --dry-run
+python scripts/reference_candidates.py --role max --count 3 --server http://127.0.0.1:8188 --bindings workflows/zmb/bindings.json
+```
+
+Repeat for `biscuit`, `ada`, `old`, `zombie`, `sedan` and `station`.
+For reference creation, only the `image` stage of bindings.json is needed.
+
+The model writes **unreviewed** candidate PNGs under
+`out/reference_candidates/<role>/candidate_01.png`. Watch every result to
+choose a consistent original look. When you have actually inspected one
+candidate, approve it with the independent explicit action:
+
+```powershell
+python scripts/reference_review.py --role max --candidate out/reference_candidates/max/candidate_01.png --reviewer "Editor" --confirm-reviewed
+python scripts/reference_review.py --role max --verify
+```
+
+This promotes only that checked file to
+`assets/character_refs/max.png` with a matching `.reference.json` receipt.
+The same approach applies to `assets/prop_refs/hero_sedan.png` and
+`assets/prop_refs/gas_station.png`. If reference bytes or identity definitions
+change, approval is invalid. Only after all needed roles are reviewed can
+`comfyui_cinematic.py` generate shot footage.
 
 ## Commands
 
