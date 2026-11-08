@@ -107,6 +107,8 @@ def main() -> None:
     # HARD PAUSE: both config AND environment must explicitly permit publishing.
     publishing_allowed = (
         cfg.get("publishing_enabled") is True
+        and cfg.get("cinematic_release_approved") is True
+        and str(cfg.get("visual_mode", "")) == "cinematic_assets"
         and os.environ.get("ZMB_PUBLISH_ENABLED", "").strip() == "1"
     )
     if not publishing_allowed and not args.dry_run and not args.stills:
