@@ -1,0 +1,6 @@
+# GitHub-hosted CPU orchestrator; the paid GPU model runs at fal.ai
+requests>=2.32.0,<3
+Pillow>=10.0,<13
+edge-tts>=7.0,<9
+resvg-py>=0.5.0
+fal-client>=0.9.0
