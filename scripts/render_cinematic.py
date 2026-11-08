@@ -117,7 +117,7 @@ ScaledBorderAndShadow: yes
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: ZMB,Barlow,65,&H00FFFFFF,&H0000CFF6,&H80000000,&H90000000,-1,0,0,0,100,100,0,0,1,3,1,2,80,80,325,1
+Style: ZMB,DejaVu Sans,61,&H00F4F4F0,&H00A9CEF1,&H800B0B12,&H990A111B,-1,0,0,0,100,100,0.4,0,3,9,0,2,96,230,410,1
 
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
@@ -129,19 +129,45 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     for shot, voice in zip(line_shots, voices):
         words = voice.get("words") or []
         if not words:
-            events.append((shot.start, shot.end, voice.get("text", "")))
-            continue
-        for i in range(0, len(words), 5):
-            phrase = words[i:i+5]
+            raise VisualContractError("missing TTS word timings; captions must align with speech")
+        # Edge TTS sometimes strips punctuation from WordBoundary tokens.
+        # Restore it only when the narrated source maps 1:1 to speech words.
+        from string import punctuation
+        source_words = str(voice.get("text", "")).split()
+        if len(source_words) == len(words) and all(
+            source_words[i].strip(punctuation).casefold()
+            == str(word.get("w", "")).strip(punctuation).casefold()
+            for i, word in enumerate(words)
+        ):
+            tokens = source_words
+        else:
+            tokens = [str(word.get("w", "")) for word in words]
+        i = 0
+        while i < len(words):
+            end_index = i
+            current = []
+            while end_index < len(words) and len(current) < 4:
+                candidate = " ".join(current + [tokens[end_index]])
+                if current and len(candidate) > 29:
+                    break
+                current.append(tokens[end_index])
+                end_index += 1
+            if not current:
+                raise VisualContractError("cannot place spoken subtitle in safe caption box")
+            phrase = words[i:end_index]
             start = shot.start + float(phrase[0].get("start", 0))
-            end = min(shot.end, shot.start + float(phrase[-1].get("end", shot.dur)) + 0.12)
-            events.append((start, max(start + 0.16, end),
-                           " ".join(str(w["w"]) for w in phrase)))
+            end = min(shot.end, shot.start + float(phrase[-1].get("end", shot.dur)) + 0.10)
+            if end <= start or start >= shot.end:
+                raise VisualContractError("TTS timing extends outside narrated scene")
+            events.append((start, max(start + 0.12, end), " ".join(current)))
+            i = end_index
     for start, end, string in events:
+        if len(string) > 39:
+            raise VisualContractError("subtitle line too long for phone safe zone")
         header += (
             "Dialogue: 0," + _ass_clock(start) + ","
             + _ass_clock(end) + ",ZMB,,0,0,0,,"
-            + _ass_escape(string) + "\n"
+            + r"{\fad(65,100)}" + _ass_escape(string) + "\n"
         )
     path.write_text(header, encoding="utf-8")
 
@@ -260,7 +286,9 @@ def render_cinematic_episode(cfg: dict, ep: dict, voices: list, shots: list,
     run([
         "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
         "-f", "concat", "-safe", "0", "-i", str(concat_file),
-        "-i", str(audio), "-vf", f"ass={subtitles.name}",
+        "-i", str(audio), "-vf",
+        f"eq=contrast=1.065:saturation=1.12:brightness=0.008,"
+        f"colorbalance=bs=0.022:gs=0.006:rs=0.006,ass={subtitles.name}",
         "-c:v", "libx264", "-preset", "medium", "-crf", str(crf),
         "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k",
         "-movflags", "+faststart", "-shortest", str(out_path),
