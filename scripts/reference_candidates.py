@@ -17,7 +17,7 @@ import os
 from pathlib import Path
 
 from comfyui_cinematic import (
-    ComfyClient, load_bindings, prepare_workflow, select_output,
+    ComfyClient, prepare_workflow, select_output,
 )
 from visual_manifest import CAST_BIBLE, PROP_BIBLE, ROOT, VisualContractError
 
@@ -101,10 +101,16 @@ def main():
         return
     if not args.server:
         ap.error("real generation requires --server or ZMB_COMFYUI_URL")
-    bindings = load_bindings(ROOT / args.bindings)
+    # Bootstrap needs ONLY an image workflow: nobody should have to build
+    # a video model before they can create their first canonical character.
+    bindings = json.loads((ROOT / args.bindings).read_text(encoding="utf-8"))
+    image_stage = bindings.get("image") or {}
+    for required in ("workflow_file", "prompt", "output_node"):
+        if not image_stage.get(required):
+            raise VisualContractError(f"reference image workflow missing {required}")
     client = ComfyClient(args.server, token=os.environ.get(args.token_env, ""))
     client.health()
-    generate_candidates(client, bindings["image"], known, roles, args.count)
+    generate_candidates(client, image_stage, known, roles, args.count)
     print("Candidates generated; select and approve real images individually BEFORE video generation.")
 
 
