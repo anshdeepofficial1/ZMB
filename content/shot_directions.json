@@ -5,7 +5,7 @@
     "road": {
       "intro": [
         {
-          "action": "A fixed smoky-blue sedan drives along a foggy highway at 2:47 AM; lane markings slide backward, headlights illuminate the wet asphalt, wheels rotate",
+          "action": "Same fixed steel-blue sedan drives through moonlit fog on a deserted highway; rolling wheels and moving lane stripes show motion, while headlights visibly flicker at 2:47 AM",
           "props": [
             "sedan",
             "headlights",
@@ -78,10 +78,11 @@
       ],
       "store_sound": [
         {
-          "action": "Max and Biscuit walk cautiously from station forecourt inside the quiet store after knocks stop",
+          "action": "Max and Biscuit circle around back of the gas station and locate an unlocked steel loading entrance; Max opens it and slips inside as the knocking ends",
           "props": [
-            "station entrance",
-            "glass door",
+            "gas station",
+            "rear loading door",
+            "steel handle",
             "Biscuit"
           ],
           "reviewed": false
