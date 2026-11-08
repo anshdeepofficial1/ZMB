@@ -69,6 +69,19 @@ class BindingsTests(unittest.TestCase):
         with self.assertRaisesRegex(VisualContractError, "no output"):
             cc.select_output(record, "9", ".mp4")
 
+    def test_image_only_stage_does_not_require_unused_video_model(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=Path(tmp,"image_only_bindings.json")
+            path.write_text(json.dumps({
+                "image":{"workflow_file":"image_api.json",
+                         "prompt":["6","text"],"output_node":"9"}
+            }))
+            bindings=cc.load_bindings(path,require_video=False)
+            self.assertIn("image",bindings)
+            self.assertNotIn("video",bindings)
+            with self.assertRaisesRegex(VisualContractError,"missing 'video'"):
+                cc.load_bindings(path)
+
     def test_bindings_must_have_video_source_image(self):
         with tempfile.TemporaryDirectory() as tmp:
             p = Path(tmp, "config.json")
@@ -163,6 +176,51 @@ class ComfyAPITests(unittest.TestCase):
                     cc.validate_generation_preflight(
                         assets, spec, {}, {"sedan": {"reference": "missing_hero_sedan.png"}}
                     )
+
+    def test_image_only_writes_scene_png_without_fake_video(self):
+        from PIL import Image
+        from reference_review import verify_reference
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            Image.new("RGB",(640,1152)).save(root/"max.png")
+            flow={
+                "6":{"inputs":{"text":""}},
+                "10":{"inputs":{"image":"original.png"}},
+                "9":{"inputs":{"filename_prefix":"ref"}},
+            }
+            (root/"image_api.json").write_text(json.dumps(flow))
+            shot={
+                "id":"s1_d001_00","prompt":"Real person in an actual driving scene",
+                "image_path":str(root/"00.png"),"video_path":str(root/"00.mp4"),
+                "characters":[{"id":"max"}],"prop_references":[],
+                "narration":"He drives.","physical_direction":"Real driving action.",
+                "required_props":["car"],
+            }
+            bindings={
+                "image":{
+                    "workflow_file":"image_api.json",
+                    "prompt":["6","text"],"reference_nodes":{"max":["10","image"]},
+                    "output_node":"9",
+                }
+            }
+            cast={"max":{"reference":"max.png","visual_identity":"Max real face"}}
+            class FakeClient:
+                def upload_image(self,path):
+                    return Path(path).name
+                def execute(self,flow):
+                    return {"outputs":{"9":{"images":[{"filename":"scene.png","type":"output"}]}}}
+                def download(self,source,dest):
+                    Image.new("RGB",(704,1248),(50,50,50)).save(dest)
+            with patch.object(cc,"ROOT",root), patch(
+                "reference_review.verify_reference",
+                return_value={"file_sha256":"approved"}
+            ):
+                p=cc.generate_shot(FakeClient(),shot,bindings,cast,{},
+                                   image_only=True)
+            self.assertTrue((root/"00.png").is_file())
+            self.assertFalse((root/"00.mp4").exists())
+            self.assertEqual(p["approval"],"UNREVIEWED")
+            self.assertFalse(p["publishing_authorized"])
 
     def test_generated_provenance_is_unreviewed(self):
         import inspect
