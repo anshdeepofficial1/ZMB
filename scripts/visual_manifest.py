@@ -14,6 +14,7 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 CAST_BIBLE = ROOT / "content" / "cast_bible.json"
 STORY = ROOT / "content" / "scenarios.json"
+DIRECTIONS = ROOT / "content" / "shot_directions.json"
 CINEMATIC_ROOT = ROOT / "assets" / "cinematic"
 
 # Each supported visual event has a concrete renderer or separately generated
@@ -51,13 +52,18 @@ def _characters(shot: dict, bible: dict) -> list[dict]:
     return cast
 
 
-def _validate_line(index: int, line: dict, allow_unimplemented: bool):
+def _validate_line(index: int, line: dict, allow_unimplemented: bool, direction: dict | None = None):
     text = str(line.get("text") or "").strip()
     shot = line.get("shot") or {}
     beat = str(shot.get("beat") or "").strip()
     if not text or not shot.get("place"):
         raise VisualContractError(f"line {index}: missing narration or location")
-    if not beat:
+    has_directed_asset = bool(
+        allow_unimplemented and direction
+        and len(str(direction.get("action", "")).strip()) >= 15
+        and direction.get("props")
+    )
+    if not beat and not has_directed_asset:
         raise VisualContractError(
             f"line {index}: no physical action/visual beat for '{text[:75]}'"
         )
@@ -65,6 +71,10 @@ def _validate_line(index: int, line: dict, allow_unimplemented: bool):
         raise VisualContractError(
             f"line {index}: visual beat '{beat}' has no verified vector renderer"
         )
+    if has_directed_asset:
+        # External cinematic assets can depict actions not supported by SVG.
+        # Required props are included in the shot prompt and reviewed on film.
+        return
     lowered = text.lower()
     for triggers, valid_beats in VISUAL_OBLIGATIONS:
         if any(term in lowered for term in triggers) and beat not in valid_beats:
@@ -78,13 +88,22 @@ def build_manifest(
     episode: dict[str, Any], *, allow_unimplemented: bool = False
 ) -> dict[str, Any]:
     bible = json.loads(CAST_BIBLE.read_text(encoding="utf-8"))
+    directions = json.loads(DIRECTIONS.read_text(encoding="utf-8"))["arcs"]
+    node_directions = directions.get(episode["arc"], {}).get(episode["node"], [])
+    if len(node_directions) != len(episode.get("lines") or []):
+        raise VisualContractError("shot direction count differs from spoken lines")
     manifest_shots = []
     for index, line in enumerate(episode.get("lines") or []):
-        _validate_line(index, line, allow_unimplemented)
+        direction = node_directions[index]
+        _validate_line(index, line, allow_unimplemented, direction)
         meta = line["shot"]
         shot_id = f"s{episode['season']}_d{int(episode['day']):03d}_{index:02d}"
         characters = _characters(meta, bible)
-        action = meta["beat"].replace("_", " ")
+        action = str(direction.get("action", "")).strip()
+        props = direction.get("props") or []
+        if not action or not props:
+            raise VisualContractError(f"line {index}: physical direction missing")
+        beat = str(meta.get("beat") or "cinematic_asset_only")
         place = meta["place"].replace("_", " ")
         text = line["text"]
         prompt = (
@@ -95,6 +114,7 @@ def build_manifest(
             f"LOCATION: {place}; TIME: {meta.get('time','night')}; "
             f"MOOD: {meta.get('mood','tense')}. "
             f"VISIBLE PHYSICAL ACTION: {action}. "
+            f"REQUIRED PHYSICAL PROPS: {', '.join(props)}. "
             f"SHOT MUST DEPICT THIS EXACT NARRATED EVENT: {text} "
             "Camera is deliberately staged so all mentioned objects and the "
             "subject's interaction with them are visible. "
@@ -110,7 +130,9 @@ def build_manifest(
         )
         manifest_shots.append({
             "id": shot_id, "index": index, "narration": text,
-            "location": meta["place"], "beat": meta["beat"],
+            "location": meta["place"], "beat": beat,
+            "physical_direction": action, "required_props": props,
+            "reviewed": bool(direction.get("reviewed", False)),
             "camera": meta.get("cam", "push"),
             "fx": meta.get("fx", "none"),
             "characters": characters,
@@ -139,6 +161,7 @@ def build_manifest(
                 "physically correct vehicle motion and props",
                 "matching location, continuity, and lighting",
                 "no scene substitutions",
+                "every frame-to-voice match manually reviewed",
             ],
             "approved": False,
         },
