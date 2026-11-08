@@ -4,6 +4,9 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+import shutil
+import subprocess
+from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -97,6 +100,51 @@ class GitHubCloudPlanTests(unittest.TestCase):
                     cloud.download_provider_asset("http://localhost:8080/private",
                                                    Path(tmp)/"vid.mp4",".mp4")
                 caller.assert_not_called()
+
+    @unittest.skipUnless(
+        shutil.which("ffmpeg") and shutil.which("ffprobe") and
+        Path("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf").exists(),
+        "requires FFmpeg + DejaVu; exercised on GitHub Actions Ubuntu",
+    )
+    def test_synthetic_technical_ffmpeg_draft_is_watermarked_and_audio_muxed(self):
+        # This intentionally tests assembly only, NOT image/video generation.
+        # Never mistake this generated colour clip for professional footage.
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            work=root/"work"
+            work.mkdir()
+            source=root/"fake-scene.mp4"
+            silence=root/"synthetic.wav"
+            subprocess.run([
+                "ffmpeg","-y","-hide_banner","-loglevel","error",
+                "-f","lavfi","-i","color=c=0x18344a:s=720x1280:r=25",
+                "-t","2","-an","-c:v","libx264","-preset","ultrafast",
+                "-pix_fmt","yuv420p",str(source),
+            ],check=True,timeout=60)
+            subprocess.run([
+                "ffmpeg","-y","-hide_banner","-loglevel","error",
+                "-f","lavfi","-i","anullsrc=r=24000:cl=mono",
+                "-t","2","-ac","1","-c:a","pcm_s16le",str(silence),
+            ],check=True,timeout=60)
+            shot=SimpleNamespace(kind="line",start=0.0,end=2.0,dur=2.0)
+            voices=[{"text":"Max drives the car.",
+                     "words":[{"w":"Max","start":0.0,"end":0.30},
+                              {"w":"drives","start":0.36,"end":0.7},
+                              {"w":"the","start":0.8,"end":1.0},
+                              {"w":"car","start":1.1,"end":1.4}]}]
+            with patch.object(cloud, "WORK", work):
+                draft=cloud.assemble_draft(
+                    {"title_card":False},[(shot,source)],
+                    voices,2.0,silence,root/"out",
+                )
+            self.assertTrue(draft.is_file())
+            self.assertIn("UNREVIEWED",draft.name)
+            self.assertGreater(draft.stat().st_size,1024)
+            from render_cinematic import _probe_video
+            info=_probe_video(draft)
+            self.assertEqual(info["width"],1080)
+            self.assertEqual(info["height"],1920)
+            self.assertAlmostEqual(info["duration"],2.0,delta=0.9)
 
     def test_empty_story_draft_cannot_be_promoted_to_reel_output(self):
         import inspect
