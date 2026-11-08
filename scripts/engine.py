@@ -161,7 +161,7 @@ def build_caption(cfg: dict, state: dict, node: dict, choices: list[dict], hasht
             f"Follow {handle} for the next episode." if handle else "Follow for the next episode.",
         ]
     else:
-        lines += [cfg.get("cta_story", "Follow @zmbstories to find out what happens next.")]
+        lines += [substitute(node.get("cta") or cfg.get("cta_story", "Follow for the next chapter."), state)]
     lines += ["", cfg.get("fiction_disclaimer", "A fictional animated story."), "", " ".join(hashtags)]
     caption = "\n".join(line for line in lines if line is not None).strip()
     return caption[:2190] + "\u2026" if len(caption) > 2200 else caption
