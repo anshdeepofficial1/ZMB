@@ -181,6 +181,7 @@ def validate_gpu(profile: Profile, *, experimental_low_vram: bool = False) -> st
 def verify_source_frame(shot: dict) -> None:
     """No basic cartoons or reference-free text-to-video substitution."""
     from reference_review import verify_reference
+    from first_frame_review import verify_frame
     frame = Path(shot["image_path"])
     if not frame.is_file():
         raise VisualContractError(
@@ -210,6 +211,9 @@ def verify_source_frame(shot: dict) -> None:
         if not identity:
             raise VisualContractError(f"Unknown physical identity for {role}")
         verify_reference(role, identity, root=ROOT)
+    # Scene PNG is NOT interchangeable with a cast portrait. Its own human
+    # review checks this exact physical action, frame geometry and palette.
+    verify_frame(shot)
 
 
 def _sha(path: Path) -> str:
