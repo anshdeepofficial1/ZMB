@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -15,6 +16,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CAST_BIBLE = ROOT / "content" / "cast_bible.json"
 STORY = ROOT / "content" / "scenarios.json"
 DIRECTIONS = ROOT / "content" / "shot_directions.json"
+PROP_BIBLE = ROOT / "content" / "prop_bible.json"
 CINEMATIC_ROOT = ROOT / "assets" / "cinematic"
 
 # Each supported visual event has a concrete renderer or separately generated
@@ -88,6 +90,7 @@ def build_manifest(
     episode: dict[str, Any], *, allow_unimplemented: bool = False
 ) -> dict[str, Any]:
     bible = json.loads(CAST_BIBLE.read_text(encoding="utf-8"))
+    prop_bible = json.loads(PROP_BIBLE.read_text(encoding="utf-8"))["props"]
     directions = json.loads(DIRECTIONS.read_text(encoding="utf-8"))["arcs"]
     node_directions = directions.get(episode["arc"], {}).get(episode["node"], [])
     if len(node_directions) != len(episode.get("lines") or []):
@@ -106,6 +109,19 @@ def build_manifest(
         beat = str(meta.get("beat") or "cinematic_asset_only")
         place = meta["place"].replace("_", " ")
         text = line["text"]
+        # Recurring environments and vehicles must use the SAME approved
+        # reference image in every scene, including car interiors.
+        scene_words = " ".join([text, action, *props]).lower()
+        prop_references = []
+        for prop_id, identity in prop_bible.items():
+            keywords = identity.get("detection_keywords", [])
+            if any(re.search(r"\b" + re.escape(word.lower()) + r"\b", scene_words)
+                   for word in keywords):
+                prop_references.append({
+                    "id": prop_id,
+                    "identity": identity["visual_identity"],
+                    "reference": identity["reference"],
+                })
         prompt = (
             "9:16 cinematic stylized 3D animated survival thriller, professional "
             "film lighting, tactile surfaces, anatomically plausible characters, "
@@ -124,6 +140,10 @@ def build_manifest(
                 f"ACTION: {item['action']}."
                 for item in characters
             )
+            + " ".join(
+                f"RECURRING PROP {asset['id']}: {asset['identity']}"
+                for asset in prop_references
+            )
             + " No extra characters, no objects teleporting or changing state, "
             "consistent vehicle body and color in all angles, no captions, "
             "no watermarks, no invented dialogue."
@@ -136,6 +156,7 @@ def build_manifest(
             "camera": meta.get("cam", "push"),
             "fx": meta.get("fx", "none"),
             "characters": characters,
+            "prop_references": prop_references,
             "prompt": prompt,
             "video_path": str(
                 CINEMATIC_ROOT / episode["arc"] / episode["node"]
