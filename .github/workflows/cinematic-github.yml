@@ -77,6 +77,9 @@ jobs:
           ffmpeg -hide_banner -version | head -n 1
 
       - name: Unit tests and no-Instagram safety check
+        env:
+          # Isolated tests mock the local LLM; this does not run the model.
+          ZMB_LOCAL_AI_ENABLED: "1"
         run: |
           set -euo pipefail
           python -m compileall -q scripts tests
