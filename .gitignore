@@ -9,3 +9,8 @@ work/
 .env
 .DS_Store
 Thumbs.db
+
+# Production credentials and generated video clips
+config.json
+workflows/zmb/bindings.json
+assets/cinematic/
