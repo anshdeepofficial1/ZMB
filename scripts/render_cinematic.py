@@ -6,7 +6,9 @@ flat procedural footage when a required cinematic shot is absent.
 """
 from __future__ import annotations
 
+import hashlib
 import json
+from fractions import Fraction
 from pathlib import Path
 
 from common import OUT_DIR, ROOT, run
@@ -34,12 +36,30 @@ def _probe_video(path: Path) -> dict:
     ])
     info = json.loads(result.stdout)
     streams = info.get("streams") or []
-    if not any(s.get("codec_type") == "video" for s in streams):
-        raise VisualContractError(f"cinematic asset is not a video: {path}")
-    duration = float((info.get("format") or {}).get("duration") or 0)
-    if duration <= 0:
+    video_streams = [s for s in streams if s.get("codec_type") == "video"]
+    if len(video_streams) != 1:
+        raise VisualContractError(f"cinematic clip must have exactly one video stream: {path}")
+    stream = video_streams[0]
+    width, height = int(stream.get("width") or 0), int(stream.get("height") or 0)
+    if width < 720 or height < 1280 or abs(width / height - 9 / 16) > 0.035:
+        raise VisualContractError(
+            f"cinematic clip must be portrait 9:16 at 720x1280+; "
+            f"got {width}x{height} in {path}"
+        )
+    try:
+        fps = float(Fraction(str(stream.get("avg_frame_rate") or "0/1")))
+    except (ValueError, ZeroDivisionError) as exc:
+        raise VisualContractError(f"cinematic clip has unreadable frame rate: {path}") from exc
+    if not 23.5 <= fps <= 120:
+        raise VisualContractError(f"cinematic clip frame rate must be 24-120 fps: {fps}")
+    try:
+        duration = float((info.get("format") or {}).get("duration") or 0)
+    except (TypeError, ValueError) as exc:
+        raise VisualContractError(f"cinematic clip duration unreadable: {path}") from exc
+    if not 0 < duration < 300:
         raise VisualContractError(f"cinematic asset duration invalid: {path}")
-    return {"duration": duration, "streams": streams}
+    return {"duration": duration, "width": width, "height": height, "fps": fps,
+            "streams": streams}
 
 
 def validate_assets(ep: dict, shots: list) -> list[tuple[object, Path]]:
@@ -50,14 +70,22 @@ def validate_assets(ep: dict, shots: list) -> list[tuple[object, Path]]:
             "Missing scene-specific cinematic footage (no fallback allowed):\n"
             + "\n".join(missing)
         )
+    hashes = set()
     for shot, path in selected:
         info = _probe_video(path)
-        if info["duration"] + 0.15 < shot.dur:
+        if info["duration"] + 0.03 < shot.dur:
             raise VisualContractError(
                 f"shot {path.name} is only {info['duration']:.2f}s, "
                 f"but narration/shot needs {shot.dur:.2f}s; "
                 "do not hide gaps using a repeating loop."
             )
+        digest = hashlib.sha256(path.read_bytes()).hexdigest()
+        if digest in hashes:
+            raise VisualContractError(
+                f"duplicate cinematic clip content detected: {path}. "
+                "Each spoken action needs original scene-specific footage."
+            )
+        hashes.add(digest)
     return selected
 
 
