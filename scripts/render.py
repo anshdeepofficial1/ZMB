@@ -101,16 +101,26 @@ def synthesize_voices(cfg: dict, ep: dict, work: Path, Log=log) -> list[dict]:
                 Log(f"    tts retry {attempt + 1} for line {i}: {exc}")
                 time.sleep(1.2 + attempt)
         if not got:
-            Log(f"    tts FAILED line {i} — silent fallback")
-            run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "lavfi",
-                 "-i", f"anullsrc=r=24000:cl=mono", "-t", "3.0", "-c:a", "pcm_s16le", str(mp3)])
+            # Never publish a Reel with fake narration timestamps and silent
+            # filler audio. Missing TTS is a hard quality failure.
+            raise RuntimeError(
+                f"Edge TTS failed for spoken line {i} after 3 attempts; "
+                "refusing to render a silent or misleading episode"
+            )
+        if not words:
+            raise RuntimeError(
+                f"Edge TTS returned no word-level timing for line {i}; "
+                "captions cannot be synchronized reliably"
+            )
         raw = _probe_dur(mp3)
+        if raw < 0.25:
+            raise RuntimeError(f"Edge TTS returned implausibly short audio for line {i}")
         run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", str(mp3),
              "-af", f"apad=pad_dur={gap}", "-ar", "24000", "-ac", "1",
              "-c:a", "pcm_s16le", str(wav)])
         dur = _probe_dur(wav)
-        if not words:
-            words = _estimate_words(text, dur)
+        if dur < raw or dur <= 0:
+            raise RuntimeError(f"Generated narration WAV has invalid duration at line {i}")
         out.append({"text": text, "shot": line.get("shot", {}), "words": words,
                     "dur": dur, "wav": wav, "raw": raw})
     return out
