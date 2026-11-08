@@ -92,7 +92,7 @@ def rewrite_episode(ep: dict[str, Any], Log=print) -> dict[str, Any]:
         "actions idle/walk/run/sneak/shamble/trot/follow/run_dog), fx (short FX name or none), zeds "
         "(integer or null). Preserve existing fields if uncertain. Prefer varied camera language, depth, "
         "readable silhouettes, eyelines, motivated movement and continuity. Max is a young adult survivor "
-        "with messy dark hair, charcoal hooded jacket, backpack and brown cargo trousers. Biscuit is a small "
+        "with messy dark hair, charcoal hooded jacket, brown utility backpack and brown cargo trousers. Biscuit is a small "
         "tan dog with dark ears. Ada wears practical field clothing. Keep horror non-graphic. Do not put "
         "camera/FX instructions in dialogue. No markdown or commentary."
     )
@@ -106,7 +106,7 @@ def rewrite_episode(ep: dict[str, Any], Log=print) -> dict[str, Any]:
         response = llm.create_chat_completion(
             messages=[{"role": "system", "content": system},
                       {"role": "user", "content": json.dumps(payload, ensure_ascii=False)}],
-            temperature=0.55, top_p=0.85, max_tokens=1500,
+            temperature=0.28, top_p=0.78, max_tokens=3200,
             response_format={"type": "json_object"})
         parsed = json.loads(response["choices"][0]["message"]["content"].strip())
         lines = _validate_lines(ep, parsed.get("lines") if isinstance(parsed, dict) else None)
@@ -121,7 +121,7 @@ def rewrite_episode(ep: dict[str, Any], Log=print) -> dict[str, Any]:
         result = dict(ep)
         result["ai_story"] = {"provider": "local-llama.cpp", "model": MODEL_REPO,
                               "status": "fallback", "error": type(exc).__name__}
-        Log(f"[local-ai] unavailable ({type(exc).__name__}); keeping authored script and local renderer")
+        Log(f"[local-ai] unavailable ({type(exc).__name__}): {str(exc)[:250]}; keeping authored script and local renderer")
         return result
 
 def generate_hf_image(*args, **kwargs) -> None:
