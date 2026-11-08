@@ -8,7 +8,7 @@ from types import SimpleNamespace
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from visual_manifest import day1_episode, build_manifest, VisualContractError
-from render_cinematic import required_clips, validate_assets, build_subtitles, _probe_video
+from render_cinematic import required_clips, validate_assets, build_subtitles, _probe_video, _write_card_ass
 from unittest.mock import patch
 import render_cinematic as cinematic
 
@@ -135,6 +135,39 @@ class DayOneVisualContractTests(unittest.TestCase):
             with patch.object(cinematic, "CINEMATIC_ROOT", root), patch.object(cinematic, "_probe_video", return_value={**fake,"duration":2.0}):
                 with self.assertRaisesRegex(VisualContractError, "too short|only 2.00s"):
                     validate_assets(day1_episode(), shots)
+
+    def test_vote_and_ending_graphics_do_not_require_fake_story_clips(self):
+        ep = day1_episode()
+        ep["choices"] = [
+            {"key": "forest", "text": "FOREST - dark shortcut"},
+            {"key": "highway", "text": "HIGHWAY - exposed road"},
+        ]
+        frames = [
+            SimpleNamespace(kind="line", dur=3.0),
+            SimpleNamespace(kind="vote", dur=3.6),
+        ]
+        sources = required_clips(ep, frames)
+        self.assertEqual(len(sources), 1)
+        self.assertEqual(sources[0][0].kind, "line")
+        self.assertTrue(str(sources[0][1]).endswith("road/intro/00.mp4"))
+        with tempfile.TemporaryDirectory() as temp:
+            card = Path(temp) / "card.ass"
+            _write_card_ass(ep, frames[1], card)
+            text = card.read_text(encoding="utf-8")
+            self.assertIn("YOU DECIDE", text)
+            self.assertIn("FOREST - dark shortcut", text)
+            self.assertIn("HIGHWAY - exposed road", text)
+            self.assertIn("COMMENT 1 OR 2", text)
+            ending = SimpleNamespace(kind="ending", dur=4.2)
+            _write_card_ass(ep, ending, card)
+            self.assertIn("CHOOSE THE NEXT CHAPTER", card.read_text(encoding="utf-8"))
+
+    def test_card_fails_without_authored_voting_options(self):
+        ep = day1_episode()
+        with tempfile.TemporaryDirectory() as tmp:
+            with self.assertRaisesRegex(VisualContractError, "no real story choices"):
+                _write_card_ass(ep, SimpleNamespace(kind="vote", dur=3.6),
+                                Path(tmp) / "card.ass")
 
     def test_ass_captions_follow_shot_start_time(self):
         shots = [SimpleNamespace(kind="line", start=2.5, dur=3, end=5.5)]
