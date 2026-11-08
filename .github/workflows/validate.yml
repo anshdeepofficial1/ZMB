@@ -56,8 +56,8 @@ jobs:
       - name: Scheduler regression tests
         run: python -m unittest discover -s tests -v
 
-  preview-day2:
-    if: ${{ (github.event_name == 'workflow_dispatch' && inputs.render_preview) || (github.event_name == 'push' && contains(github.event.head_commit.message, '[render-day2-preview]')) }}
+  preview-day1:
+    if: ${{ github.event_name == 'pull_request' || (github.event_name == 'workflow_dispatch' && inputs.render_preview) }}
     needs: validate
     runs-on: ubuntu-latest
     timeout-minutes: 120
@@ -87,19 +87,20 @@ jobs:
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
           ffmpeg -version | head -n 1
 
-      - name: Render Day 2 preview (no Instagram publishing)
+      - name: Render Day 1 preview (no Instagram publishing)
         env:
           ZMB_LOCAL_AI_ENABLED: "1"
-        run: python scripts/run_cycle.py --dry-run
+        run: python scripts/preview_day1.py --video
 
-      - name: Upload Day 2 preview
+      - name: Upload Day 1 cinematic draft
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: zmb-day2-preview
+          name: zmb-day1-preview
           path: |
             out/*.mp4
             out/caption.txt
             out/episode.json
+            out/day1_visual_manifest.json
           if-no-files-found: error
           retention-days: 5
