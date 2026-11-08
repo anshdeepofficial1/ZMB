@@ -38,6 +38,47 @@ class DayOneVisualContractTests(unittest.TestCase):
         with self.assertRaisesRegex(VisualContractError, "not visibly represented"):
             build_manifest(ep)
 
+    def test_all_137_narrated_lines_have_physical_directions(self):
+        from visual_manifest import DIRECTIONS, STORY
+        directions = json.loads(DIRECTIONS.read_text(encoding="utf-8"))["arcs"]
+        story = json.loads(STORY.read_text(encoding="utf-8"))["arcs"]
+        total = 0
+        for arc_id, arc in story.items():
+            for node_id, node in arc["nodes"].items():
+                expected = len(node.get("lines") or [])
+                actual = directions[arc_id][node_id]
+                self.assertEqual(len(actual), expected, (arc_id, node_id))
+                for line in actual:
+                    self.assertGreaterEqual(len(line["action"]), 15)
+                    self.assertTrue(line["props"])
+                    self.assertFalse(line["reviewed"])
+                total += expected
+        self.assertEqual(total, 137)
+
+    def test_cinematic_future_scene_prompts_are_distinct_and_grounded(self):
+        from visual_manifest import STORY
+        story = json.loads(STORY.read_text(encoding="utf-8"))
+        ep = day1_episode()
+        ep["node"] = "store_sound"
+        ep["lines"] = story["arcs"]["road"]["nodes"]["store_sound"]["lines"]
+        spec = build_manifest(ep, allow_unimplemented=True)
+        self.assertEqual(len(spec["shots"]), 5)
+        self.assertEqual(spec["shots"][2]["beat"], "cinematic_asset_only")
+        self.assertIn("staff door", spec["shots"][2]["physical_direction"].lower())
+        self.assertIn("door", " ".join(spec["shots"][2]["required_props"]).lower())
+
+    def test_publish_guard_blocks_unsafe_production(self):
+        import os
+        import subprocess
+        env = dict(os.environ)
+        env["ZMB_PUBLISH_ENABLED"] = "0"
+        process = subprocess.run(
+            [sys.executable, str(ROOT / "scripts" / "run_cycle.py"), "--force-publish"],
+            capture_output=True, text=True, env=env, check=False
+        )
+        self.assertNotEqual(process.returncode, 0)
+        self.assertIn("PUBLISHING PAUSED", process.stderr + process.stdout)
+
     def test_reject_unmapped_future_story(self):
         from visual_manifest import STORY
         doc = json.loads(STORY.read_text(encoding="utf-8"))
