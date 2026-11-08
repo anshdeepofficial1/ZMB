@@ -14,3 +14,4 @@ Thumbs.db
 config.json
 workflows/zmb/bindings.json
 assets/cinematic/
+.models/
