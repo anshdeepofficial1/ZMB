@@ -77,7 +77,12 @@ def _publish_target(state: dict, cfg: dict, now: datetime, force: bool) -> datet
     while target.date() < now.date():
         target += timedelta(days=days)
     if now > target:
-        log(f"[cycle] today's publish slot passed; publishing late instead of skipping: {target.isoformat()}")
+        minutes_late = (now - target).total_seconds() / 60.0
+        max_late = float(cfg.get("max_publish_late_minutes", 115))
+        if minutes_late > max_late:
+            log(f"[cycle] target missed by {minutes_late:.1f}m (limit {max_late:.1f}m); not publishing overnight")
+            return None
+        log(f"[cycle] today's publish slot passed; publishing late within {max_late:.0f}m: {target.isoformat()}")
     prep=target-timedelta(hours=prep_hours)
     if now<prep:
         remaining=prep-now
