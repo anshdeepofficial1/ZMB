@@ -118,6 +118,11 @@ def render_cinematic_episode(cfg: dict, ep: dict, voices: list, shots: list,
                              total: float, audio: Path, work: Path,
                              out_path: Path, crf: int = 18, Log=print) -> dict:
     manifest = build_manifest(ep, allow_unimplemented=True)
+    if not manifest["approval"]["approved"]:
+        raise VisualContractError(
+            "Cinematic release blocked: every generated shot requires explicit "
+            "physical-action, character and prop review (reviewed=true)."
+        )
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     (OUT_DIR / "visual_manifest.json").write_text(
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
