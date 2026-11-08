@@ -73,12 +73,21 @@ class PublishScheduleTests(unittest.TestCase):
 
 
 class NarrativeVisualBeatTests(unittest.TestCase):
-    def test_breakdown_scene_has_car_driver_and_engine_smoke(self):
-        svg = narrative_beat_layer({"beat": "breakdown"}, 1.25)
-        self.assertIn("ENGINE FAILURE", svg)
-        self.assertIn("zmb-break-window", svg)
-        self.assertIn("M 788 1257", svg)
-        self.assertIn("translate(72 1515)", svg)
+    def test_vehicle_moves_then_stalls_in_distinct_illustrated_shots(self):
+        driving = narrative_beat_layer({"beat": "car_driving"}, 1.25)
+        stopped = narrative_beat_layer({"beat": "engine_stall"}, 2.25)
+        self.assertIn("HIGHWAY", driving)
+        self.assertIn("ENGINE STALLED", stopped)
+        self.assertIn("M 826 1405", driving)
+        self.assertIn("M 838 1410", stopped)
+        self.assertNotEqual(driving, stopped)
+
+    def test_flashlight_and_turning_door_handle_are_visible(self):
+        flashlight = narrative_beat_layer({"beat": "flashlight_exit"}, 1.25)
+        handle = narrative_beat_layer({"beat": "door_handle"}, 1.25)
+        self.assertIn("M 620 1194", flashlight)
+        self.assertIn("rotate(", handle)
+        self.assertIn("M 738 895", handle)
 
     def test_interior_scene_is_a_real_cabin_composition(self):
         svg = narrative_beat_layer({"beat": "car_interior"}, 2.0)
@@ -133,9 +142,10 @@ class NarrativeVisualBeatTests(unittest.TestCase):
         beats = [line.get("shot", {}).get("beat") for line in lines]
         self.assertEqual(
             beats,
-            ["breakdown", "car_interior", "spot_station", "backpack_exit", "door_shadow", "choice_teaser"],
+            ["car_driving", "engine_stall", "car_interior", "flashlight_exit", "spot_station", "door_shadow", "door_handle"],
         )
-        self.assertIn("engine", lines[0]["text"].lower())
+        self.assertIn("drives", lines[0]["text"].lower())
+        self.assertIn("engine", lines[1]["text"].lower())
         self.assertIn("backpack", lines[3]["text"].lower())
 
 
