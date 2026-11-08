@@ -123,10 +123,19 @@ def build_manifest(
                     "reference": identity["reference"],
                 })
         prompt = (
-            "9:16 cinematic stylized 3D animated survival thriller, professional "
-            "film lighting, tactile surfaces, anatomically plausible characters, "
-            "physically consistent environment, clear foreground action, "
-            "true depth of field; NO flat cartoon or text baked into image. "
+            "Vertical 9:16 ORIGINAL PHOTOREALISTIC CINEMA, premium survival-thriller "
+            "film frame. Genuine human anatomy and detailed, natural facial "
+            "features; actual believable dog anatomy, grounded car geometry; "
+            "physically based materials, fine fabric and skin texture, realistic "
+            "cinematic depth-of-field and lens response. Filmic high-contrast "
+            "teal moonlight in the shadows with warm amber station practicals; "
+            "preserve accurate skin tones and readable shadow detail. "
+            "Compose the subject and every action prop in the MIDDLE 70% "
+            "of the vertical frame, not tiny at the bottom below an empty sky. "
+            "Foreground action is physically legible at phone size. "
+            "NEGATIVE: flat cartoon, vector art, stick figures, toy/plastic "
+            "characters, dark empty sky dominating the frame, generic motion, "
+            "UI/HUD, on-frame text or baked captions. "
             f"LOCATION: {place}; TIME: {meta.get('time','night')}; "
             f"MOOD: {meta.get('mood','tense')}. "
             f"VISIBLE PHYSICAL ACTION: {action}. "
@@ -173,7 +182,7 @@ def build_manifest(
             "season": episode["season"], "day": episode["day"],
             "arc": episode["arc"], "node": episode["node"]
         },
-        "style": "consistent cinematic stylized 3D survival film",
+        "style": "photorealistic, warm-amber/teal-moonlight film with constant faces and full-frame action",
         "shots": manifest_shots,
         "approval": {
             "required": [
