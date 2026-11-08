@@ -126,6 +126,44 @@ class ComfyAPITests(unittest.TestCase):
             self.assertFalse(p.exists())
             self.assertFalse(Path(str(p) + ".partial").exists())
 
+    def test_same_sedan_reference_required_for_exterior_and_interior(self):
+        from visual_manifest import build_manifest, day1_episode
+        shots = build_manifest(day1_episode())["shots"]
+        ids = lambda shot: {p["id"] for p in shot["prop_references"]}
+        self.assertIn("sedan", ids(shots[0]))
+        self.assertIn("sedan", ids(shots[1]))
+        self.assertIn("sedan", ids(shots[2]))
+        self.assertIn("station", ids(shots[5]))
+        self.assertIn("station", ids(shots[6]))
+        self.assertIn("RECURRING PROP sedan:", shots[0]["prompt"])
+
+    def test_preflight_refuses_missing_real_car_asset(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            for name in ("image_api.json", "video_api.json"):
+                (root / name).write_text(json.dumps({
+                    "6": {"inputs": {"text": ""}},
+                    "12": {"inputs": {"image": "sample.png"}},
+                    "58": {"inputs": {"filename_prefix": "video"}},
+                }))
+            spec = {
+                "image": {
+                    "workflow_file": "image_api.json",
+                    "prompt": ["6", "text"], "output_node": "58",
+                },
+                "video": {
+                    "workflow_file": "video_api.json",
+                    "prompt": ["6", "text"], "source_image": ["12", "image"],
+                    "output_node": "58",
+                },
+            }
+            assets = [{"characters": [], "prop_references": [{"id": "sedan"}]}]
+            with patch.object(cc, "ROOT", root):
+                with self.assertRaisesRegex(VisualContractError, "approved reference for sedan"):
+                    cc.validate_generation_preflight(
+                        assets, spec, {}, {"sedan": {"reference": "missing_hero_sedan.png"}}
+                    )
+
     def test_generated_provenance_is_unreviewed(self):
         import inspect
         source = inspect.getsource(cc.generate_shot)
