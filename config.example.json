@@ -57,5 +57,6 @@
   "ai_story_generation": true,
   "publishing_enabled": false,
   "enforce_visual_contract": true,
-  "cinematic_assets_root": "assets/cinematic"
+  "cinematic_assets_root": "assets/cinematic",
+  "max_publish_late_minutes": 115
 }
