@@ -86,6 +86,11 @@ jobs:
           python -m unittest discover -s tests -v
           python -c "import json; c=json.load(open('config.example.json')); assert c['publishing_enabled'] is False and c['cinematic_release_approved'] is False"
 
+      - name: Verify actual FFmpeg 9:16 preview assembly with synthetic test media
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -p test_github_cloud_video.py -v
+
       - name: Generate real footage or plan (never publish)
         env:
           REQUEST_MODE: ${{ github.event_name == 'schedule' && 'plan' || inputs.mode }}
