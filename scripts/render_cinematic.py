@@ -21,11 +21,15 @@ def required_clips(ep: dict, shots: list) -> list[tuple[object, Path]]:
     line_index = 0
     for shot in shots:
         if shot.kind == "line":
+            # Only narration lines require scene-specific AI-generated films.
+            # Interactive vote/ending cards are built as honest typography.
             path = base / f"{line_index:02d}.mp4"
             line_index += 1
-        else:
-            path = base / f"{shot.kind}.mp4"
-        paths.append((shot, path))
+            paths.append((shot, path))
+        elif shot.kind not in {"vote", "ending"}:
+            raise VisualContractError(
+                f"unsupported non-narrated cinematic timeline card: {shot.kind}"
+            )
     return paths
 
 
@@ -142,6 +146,64 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
     path.write_text(header, encoding="utf-8")
 
 
+def _write_card_ass(ep: dict, shot, dest: Path) -> None:
+    """Build a readable, non-narrated choice/ending card from actual story keys."""
+    if shot.kind not in {"vote", "ending"}:
+        raise VisualContractError("visual cards are reserved for vote/ending nodes")
+    if not ep.get("choices"):
+        raise VisualContractError("vote/ending card has no real story choices")
+    rows = []
+    for n, choice in enumerate(ep["choices"], 1):
+        label = str(choice.get("text") or choice.get("key") or "").strip()
+        if not label:
+            raise VisualContractError(f"empty choice label on {shot.kind} card")
+        rows.append(f"{n} — {label}")
+    if len(rows) > 3:
+        raise VisualContractError("choice card cannot show more than three readable options")
+    header = "YOU DECIDE" if shot.kind == "vote" else "CHOOSE THE NEXT CHAPTER"
+    footer = "COMMENT 1 OR 2" if len(rows) == 2 else "COMMENT YOUR CHOICE"
+    message = r"\N\N".join([
+        _ass_escape(header),
+        *[_ass_escape(row) for row in rows],
+        _ass_escape(footer),
+    ])
+    seconds = max(0.1, float(shot.dur))
+    ass = (
+        "[Script Info]\nScriptType: v4.00+\nPlayResX: 1080\n"
+        "PlayResY: 1920\nWrapStyle: 2\nScaledBorderAndShadow: yes\n\n"
+        "[V4+ Styles]\nFormat: Name, Fontname, Fontsize, PrimaryColour, "
+        "SecondaryColour, OutlineColour, BackColour, Bold, Italic, "
+        "Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, "
+        "BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding\n"
+        "Style: CHOICE,DejaVu Sans,55,&H00FFFFFF,&H00FFFFFF,"
+        "&H80000000,&HA0000000,-1,0,0,0,100,100,0,0,"
+        "1,3,1,5,70,70,75,1\n\n"
+        "[Events]\nFormat: Layer, Start, End, Style, Name, MarginL, "
+        "MarginR, MarginV, Effect, Text\n"
+        f"Dialogue: 0,{_ass_clock(0)},{_ass_clock(seconds)},"
+        f"CHOICE,,0,0,0,,{message}\n"
+    )
+    dest.write_text(ass, encoding="utf-8")
+
+
+def _render_choice_card(ep: dict, shot, dest: Path, work: Path,
+                        fps: int, crf: int) -> None:
+    """Purpose-built text card; never passed off as physical story footage."""
+    if shot.dur <= 0:
+        raise VisualContractError("choice card duration must be positive")
+    ass = work / (dest.stem + ".ass")
+    _write_card_ass(ep, shot, ass)
+    run([
+        "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+        "-f", "lavfi", "-i",
+        f"color=c=0x0d141f:s=1080x1920:r={fps}:d={float(shot.dur):.3f}",
+        "-vf", f"ass={ass.as_posix()}",
+        "-t", f"{float(shot.dur):.3f}", "-an",
+        "-c:v", "libx264", "-preset", "medium", "-crf", str(crf),
+        "-pix_fmt", "yuv420p", str(dest),
+    ])
+
+
 def render_cinematic_episode(cfg: dict, ep: dict, voices: list, shots: list,
                              total: float, audio: Path, work: Path,
                              out_path: Path, crf: int = 18, Log=print) -> dict:
@@ -164,19 +226,29 @@ def render_cinematic_episode(cfg: dict, ep: dict, voices: list, shots: list,
     segments_dir = work / "cinematic_segments"
     segments_dir.mkdir(parents=True, exist_ok=True)
     segments = []
-    for index, (shot, source) in enumerate(sources):
+    source_iter = iter(sources)
+    for index, shot in enumerate(shots):
         segment = segments_dir / f"{index:03d}.mp4"
         target_duration = float(shot.dur)
-        Log(f"[cinematic] {shot.kind} {index}: {source.name} {target_duration:.2f}s")
-        run([
-            "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
-            "-i", str(source), "-t", f"{target_duration:.3f}",
-            "-vf", f"scale=1080:1920:force_original_aspect_ratio=increase,"
-                   f"crop=1080:1920,fps={fps},setsar=1",
-            "-an", "-c:v", "libx264", "-preset", "medium",
-            "-crf", str(crf), "-pix_fmt", "yuv420p",
-            str(segment),
-        ])
+        if shot.kind in {"vote", "ending"}:
+            # These are explicitly graphical, non-narrated end screens,
+            # not generic generated footage covering spoken physical actions.
+            Log(f"[cinematic] {shot.kind} graphic card {index}: {target_duration:.2f}s")
+            _render_choice_card(ep, shot, segment, work, fps, crf)
+        else:
+            selected_shot, source = next(source_iter)
+            if selected_shot is not shot:
+                raise VisualContractError("narrated shot/source ordering changed")
+            Log(f"[cinematic] {shot.kind} {index}: {source.name} {target_duration:.2f}s")
+            run([
+                "ffmpeg", "-hide_banner", "-loglevel", "error", "-y",
+                "-i", str(source), "-t", f"{target_duration:.3f}",
+                "-vf", f"scale=1080:1920:force_original_aspect_ratio=increase,"
+                       f"crop=1080:1920,fps={fps},setsar=1",
+                "-an", "-c:v", "libx264", "-preset", "medium",
+                "-crf", str(crf), "-pix_fmt", "yuv420p",
+                str(segment),
+            ])
         segments.append(segment)
     concat_file = segments_dir / "concat.txt"
     concat_file.write_text(
