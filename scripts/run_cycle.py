@@ -99,6 +99,16 @@ def main() -> None:
     args = ap.parse_args()
 
     cfg = load_config()
+    # HARD PAUSE: both config AND environment must explicitly permit publishing.
+    publishing_allowed = (
+        cfg.get("publishing_enabled") is True
+        and os.environ.get("ZMB_PUBLISH_ENABLED", "").strip() == "1"
+    )
+    if not publishing_allowed and not args.dry_run and not args.stills:
+        raise SystemExit(
+            "[cycle] PUBLISHING PAUSED: no Instagram post or scheduled preparation "
+            "is permitted until review and explicit re-enablement."
+        )
     state = load_state()
     scn = engine.load_scenarios()
     pending_path = Path(__file__).resolve().parents[1] / "state" / "pending_episode.json"
