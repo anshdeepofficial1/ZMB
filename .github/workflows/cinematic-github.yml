@@ -1,0 +1,124 @@
+name: Cinematic video on GitHub (preview only)
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "plan is free; references, shot and day1 use paid GPU inference"
+        required: true
+        type: choice
+        options:
+          - plan
+          - references
+          - shot
+          - day1
+        default: plan
+      shot:
+        description: "Zero-based Day 1 shot index (only for mode=shot)"
+        required: false
+        default: "0"
+        type: string
+      authorize_charges:
+        description: "For paid modes, enter I_ACCEPT_PROVIDER_CHARGES"
+        required: false
+        type: string
+        default: "NO"
+      max_billable_calls:
+        description: "Maximum billable image/video calls this run may start"
+        required: false
+        type: string
+        default: "24"
+  schedule:
+    # Zero-cost preflight only. Scheduled runs can NEVER call paid models.
+    - cron: "17 4 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zmb-cinematic-generator
+  cancel-in-progress: false
+
+jobs:
+  create-review-preview:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      FAL_KEY: ${{ secrets.FAL_KEY }}
+      ZMB_PUBLISH_ENABLED: "0"
+      ZMB_LOCAL_AI_ENABLED: "0"
+      IG_ACCESS_TOKEN: ""
+      IG_USER_ID: ""
+    steps:
+      - name: Checkout current cinematic implementation (never main's legacy poster)
+        uses: actions/checkout@v7
+        with:
+          # The feature is a draft PR. This workflow is installed on main
+          # solely to expose workflow_dispatch in GitHub's Actions UI.
+          ref: rebuild/comfyui-cinematic-assets
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements-cloud.txt
+
+      - name: Install CPU orchestration and video compositing dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --prefer-binary -r scripts/requirements-cloud.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          ffmpeg -hide_banner -version | head -n 1
+
+      - name: Unit tests and no-Instagram safety check
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts tests
+          python -m unittest discover -s tests -v
+          python -c "import json; c=json.load(open('config.example.json')); assert c['publishing_enabled'] is False and c['cinematic_release_approved'] is False"
+
+      - name: Generate real footage or plan (never publish)
+        env:
+          REQUEST_MODE: ${{ github.event_name == 'schedule' && 'plan' || inputs.mode }}
+          REQUEST_SHOT: ${{ inputs.shot }}
+          AUTHORIZE_CHARGES: ${{ inputs.authorize_charges }}
+          MAX_CALLS: ${{ inputs.max_billable_calls }}
+        run: |
+          set -euo pipefail
+          MODE="${REQUEST_MODE:-plan}"
+          SHOT="${REQUEST_SHOT:-0}"
+          CAP="${MAX_CALLS:-24}"
+          if [[ "$MODE" != "plan" ]]; then
+            if [[ "$AUTHORIZE_CHARGES" != "I_ACCEPT_PROVIDER_CHARGES" ]]; then
+              echo "::error::Explicit charge authorization required; no GPU request made."
+              exit 1
+            fi
+            if [[ -z "$FAL_KEY" ]]; then
+              echo "::error::Set FAL_KEY as a GitHub Actions repository secret; no GPU request made."
+              exit 1
+            fi
+            python scripts/github_cloud_video.py --mode "$MODE" --shot "$SHOT" --max-billable-calls "$CAP" --authorize-charges
+          else
+            python scripts/github_cloud_video.py --mode plan
+          fi
+
+      - name: Upload review files, rendered clips, and diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zmb-cinematic-unreviewed-${{ github.run_id }}
+          path: |
+            out/github_cinematic/**
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Final status summary
+        if: always()
+        run: |
+          echo "## ZMB cinematic GitHub run" >> "$GITHUB_STEP_SUMMARY"
+          echo "Everything in this run is **UNREVIEWED**." >> "$GITHUB_STEP_SUMMARY"
+          echo "Instagram posting is hard-disabled; this workflow has no publishing credentials." >> "$GITHUB_STEP_SUMMARY"
+          echo "View **Artifacts** on this Actions run for clip evidence and any Day 1 draft." >> "$GITHUB_STEP_SUMMARY"
