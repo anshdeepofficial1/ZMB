@@ -5,6 +5,26 @@ This is a genuine ComfyUI API client, not a pretend AI clip generator. It refuse
 to publish, requires approved character reference PNGs, saves scene-specific
 images and MP4s, and marks **every** generated clip UNREVIEWED.
 
+## GPU feasibility: do not promise zero-cost professional video
+
+Current open diffusion-video models are substantially more memory-hungry than
+traditional image generation. For example, LTX-2.5's official ComfyUI guide
+calls for 32GB+ VRAM, and Tencent's HunyuanVideo 1.5 documents 14GB minimum
+with offloading. A 4GB consumer GPU is **not validated for professional
+LTX-2.5/Hunyuan image-to-video**. The ComfyUI adapter is model-agnostic; this
+does not mean an API workflow is installed or can fit a given card.
+
+If there is no compatible GPU available, **do not pretend a CPU GitHub Actions
+job can produce realistic 3D human motion**. An actual GPU provider and matching
+API-format workflows are an operational prerequisite. Explore native quantized
+low-VRAM alternatives only with a real 9:16 test clip that passes physical-motion
+and temporal-consistency review; do not mark them production-ready based on
+speculation.
+
+Sources:
+- https://docs.ltx.io/open-source-model/integration-tools/comfy-ui
+- https://github.com/Tencent-Hunyuan/HunyuanVideo-1.5
+
 ## Why a separate GPU system?
 
 The GitHub-hosted Ubuntu CPU runner can run the original vector preview, but
