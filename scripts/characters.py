@@ -18,11 +18,11 @@ OUTLINE = "#151a22"
 
 PALETTES = {
     "boy": dict(
-        skin="#f4c79c", hair="#3a2a22", coat="#d1583f", pants="#3f5670",
+        skin="#ddb18d", hair="#241d1d", coat="#343940", pants="#65513e",
         shoe="#23262b", accent="#f2d16b",
     ),
     "girl": dict(
-        skin="#f4c79c", hair="#2a1e18", coat="#4f7fbf", pants="#333a48",
+        skin="#dfb592", hair="#2c2220", coat="#53634b", pants="#333a48",
         shoe="#20242b", accent="#e08a3c",
     ),
     "old": dict(
