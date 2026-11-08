@@ -123,8 +123,10 @@ def recap_line(res: dict | None) -> str | None:
     if res.get("kind") not in ("vote", "ending"):
         return None
     if res.get("fallback") or int(res.get("total", 0)) <= 0:
-        return "Not enough votes came in, so the story chose its own path. Comment to decide next time."
-    return f"Last time, {res['pct']} percent of you said: {res['winner_text']}."
+        # Never greet an audience with weak engagement statistics or pretend
+        # that the automatic default branch was chosen by real viewers.
+        return None
+    return f"Previously, viewers chose {res['winner_text']} ({res['pct']}%)."
 
 
 def pick_hashtags(cfg: dict, state: dict) -> list[str]:
@@ -169,7 +171,7 @@ def first_comment(choices: list[dict]) -> str | None:
     if not choices:
         return None
     parts = [f"{i} = {c['text']}" for i, c in enumerate(choices, start=1)]
-    return "VOTE KARO \U0001f447 " + "  |  ".join(parts)
+    return "YOUR CHOICE 👇 " + "  |  ".join(parts)
 
 
 def build_episode(state: dict, scn: dict, cfg: dict, recap: str | None = None) -> dict:
@@ -182,9 +184,10 @@ def build_episode(state: dict, scn: dict, cfg: dict, recap: str | None = None) -
 
     raw_lines = node.get("lines") or []
     lines: list[dict] = []
-    if recap:
-        lines.append({"text": substitute(recap, state),
-                      "shot": dict((raw_lines[0].get("shot") if raw_lines else {}) or {})})
+    # Recaps appear only in the caption. They are NEVER injected as a
+    # narration line with recycled shot metadata: doing so desynchronises
+    # the scene manifest, breaks human review hashes, and produces static
+    # filler footage before the actual hook.
     for ln in raw_lines:
         lines.append({
             "text": substitute(ln.get("text", ""), state),
