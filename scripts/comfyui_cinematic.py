@@ -32,9 +32,9 @@ from visual_manifest import (
 )
 
 
-def load_bindings(path: Path) -> dict:
+def load_bindings(path: Path, *, require_video: bool = True) -> dict:
     data = json.loads(path.read_text(encoding="utf-8"))
-    for stage in ("image", "video"):
+    for stage in (("image", "video") if require_video else ("image",)):
         item = data.get(stage)
         if not isinstance(item, dict):
             raise VisualContractError(f"bindings missing '{stage}' stage")
@@ -212,10 +212,11 @@ def sha256(path: Path) -> str:
     return hasher.hexdigest()
 
 
-def validate_generation_preflight(shots: list, bindings: dict, cast: dict, props: dict) -> None:
+def validate_generation_preflight(shots: list, bindings: dict, cast: dict, props: dict, *, require_video: bool = True) -> None:
     """Fail BEFORE GPU job submission unless every required reference is approved."""
     from reference_review import verify_reference
-    for stage_name in ("image", "video"):
+    stages = ("image", "video") if require_video else ("image",)
+    for stage_name in stages:
         stage = bindings[stage_name]
         flow = ROOT / stage["workflow_file"]
         if not flow.is_file():
@@ -234,7 +235,7 @@ def validate_generation_preflight(shots: list, bindings: dict, cast: dict, props
             # A PNG file alone is not an approved identity. Both image bytes
             # and the identity definition must match the review receipt.
             verify_reference(role, identity, root=ROOT)
-            for stage_name in ("image", "video"):
+            for stage_name in stages:
                 spec = bindings[stage_name]
                 if role not in (spec.get("reference_nodes") or {}):
                     raise VisualContractError(
@@ -246,7 +247,7 @@ def validate_generation_preflight(shots: list, bindings: dict, cast: dict, props
 
 def generate_shot(
     client: ComfyClient, shot: dict, bindings: dict, cast: dict, props: dict,
-    *, resume: bool = False,
+    *, resume: bool = False, image_only: bool = False,
 ) -> dict:
     still = Path(shot["image_path"])
     video = Path(shot["video_path"])
@@ -283,6 +284,18 @@ def generate_shot(
         image_run = client.execute(image_flow)
         image_out = select_output(image_run, image_cfg["output_node"], ".png")
         client.download(image_out, still)
+    if image_only:
+        # LTX-Video requires a real scene-specific first frame. Generate one
+        # with approved identities; never substitute a generic cast portrait.
+        proof = {
+            "shot_id": shot["id"], "source_image": str(still),
+            "image_sha256": sha256(still), "approval": "UNREVIEWED",
+            "publishing_authorized": False,
+        }
+        still.with_suffix(".frame.provenance.json").write_text(
+            json.dumps(proof, indent=2) + "\n", encoding="utf-8"
+        )
+        return proof
     if not (resume and video.is_file() and video.stat().st_size > 1024):
         remote_still = client.upload_image(still)
         video_cfg = bindings["video"]
@@ -324,6 +337,8 @@ def main():
     parser.add_argument("--bindings", default="workflows/zmb/bindings.json")
     parser.add_argument("--shot", type=int, help="Zero-based shot to generate (omit for all)")
     parser.add_argument("--resume", action="store_true")
+    parser.add_argument("--image-only", action="store_true",
+                        help="Generate first-frame PNGs for the internal LTX model; no video stage")
     parser.add_argument("--dry-run", action="store_true", help="Validate prompts only, never contact the server")
     args = parser.parse_args()
     manifest = build_manifest(day1_episode(), allow_unimplemented=True)
@@ -337,18 +352,25 @@ def main():
     if args.dry_run:
         print("DRY RUN: no ComfyUI contact, no generated files, no Instagram publishing")
         return
-    bindings = load_bindings(ROOT / args.bindings)
+    bindings = load_bindings(ROOT / args.bindings, require_video=not args.image_only)
     if not args.server:
         parser.error("--server or ZMB_COMFYUI_URL required for real generation")
     cast = json.loads(CAST_BIBLE.read_text(encoding="utf-8"))
     props = json.loads(PROP_BIBLE.read_text(encoding="utf-8"))["props"]
-    validate_generation_preflight(shots, bindings, cast, props)
+    validate_generation_preflight(shots, bindings, cast, props, require_video=not args.image_only)
     client = ComfyClient(args.server, token=os.environ.get(args.token_env, ""))
     client.health()
     for shot in shots:
-        result = generate_shot(client, shot, bindings, cast, props, resume=args.resume)
-        print(f"GENERATED, NOT REVIEWED: {result['shot_id']} "
-              f"mp4 sha256={result['video_sha256'][:16]}")
+        result = generate_shot(
+            client, shot, bindings, cast, props,
+            resume=args.resume, image_only=args.image_only
+        )
+        if args.image_only:
+            print(f"FIRST FRAME, NOT REVIEWED: {result['shot_id']} "
+                  f"png sha256={result['image_sha256'][:16]}")
+        else:
+            print(f"GENERATED, NOT REVIEWED: {result['shot_id']} "
+                  f"mp4 sha256={result['video_sha256'][:16]}")
     print("Assets generated, but publishing remains BLOCKED until every clip is reviewed.")
 
 
