@@ -102,9 +102,10 @@ def build_timeline(ep, cfg, voices):
     lead = 0.0
     if ep.get("title_card"):
         d = float(r.get("title_card_seconds", 3.0))
-        shots.append(Shot("title", 0.0, d, meta=_meta(voices[0]["shot"] if voices else {})))
-        t = d
-        lead = d
+        if d > 0.02:
+            shots.append(Shot("title", 0.0, d, meta=_meta(voices[0]["shot"] if voices else {})))
+            t = d
+            lead = d
     for v in voices:
         m = _meta(v["shot"])
         shots.append(Shot("line", t, max(1.2, v["dur"]), text=v["text"], words=v["words"], meta=m))
