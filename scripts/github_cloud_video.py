@@ -61,23 +61,40 @@ def required_roles(shots: list[dict]) -> list[str]:
     return sorted(found)
 
 
-def preflight_plan(shots: list[dict], *, max_calls: int = DEFAULT_MAX_CALLS) -> dict:
+def _approved_reference(role: str, identity: dict) -> Path | None:
+    """Reuse only immutable owner-approved identities across separate GH runs."""
+    path = ROOT / identity["reference"]
+    if not path.is_file():
+        return None
+    # A PNG without matching .reference.json is not considered an identity.
+    # An invalid existing file is a hard failure, not license to regenerate.
+    from reference_review import verify_reference
+    verify_reference(role, identity, root=ROOT)
+    return path
+
+
+def preflight_plan(shots: list[dict], *, max_calls: int = DEFAULT_MAX_CALLS,
+                   mode: str = "day1") -> dict:
     if not shots:
         raise VisualContractError("no authored cinematic shots")
     roles = required_roles(shots)
     bibles = identity_bibles()
     if not all(role in bibles for role in roles):
         raise VisualContractError("some story roles have no visual identity definitions")
-    # New characters/props each require 1 initial reference generation.
-    # Each scene needs 1 reference-conditioned first-frame + 1 real video.
-    calls = len(roles) + 2 * len(shots)
+    reusable = [role for role in roles if _approved_reference(role, bibles[role])]
+    missing = [role for role in roles if role not in reusable]
+    # New characters/props need 1 first-time reference call, and each selected
+    # narrated scene gets exactly 1 first-frame edit and 1 real video call.
+    calls = len(missing) + (0 if mode == "references" else 2 * len(shots))
     if calls > max_calls:
         raise VisualContractError(
             f"generation needs {calls} billable calls, exceeds safe cap {max_calls}; "
             "choose a smaller shot range or increase an explicit cap"
         )
     return {
-        "roles": roles, "shots": len(shots), "billable_api_calls_max": calls,
+        "roles": roles, "approved_roles_reused": reusable,
+        "unapproved_references_to_generate": missing,
+        "shots": len(shots), "billable_api_calls_max": calls,
         "cost_amount": "provider-priced; no fixed or guaranteed total",
         "reference_model": IMAGE_MODEL, "frame_model": EDIT_MODEL,
         "video_model": VIDEO_MODEL, "format": "1080x1920 portrait 9:16",
@@ -270,14 +287,25 @@ def generate_refs(provider: FalInference, roles: list[str], output: Path) -> dic
     references = {}
     for role in roles:
         destination = output / "references" / f"{role}.png"
-        provider.generate(
-            IMAGE_MODEL,
-            {
-                "prompt": reference_prompt(role, bibles[role]["visual_identity"]),
-                "image_size": "square_hd", "output_format": "png",
-            },
-            kind="image", destination=destination,
-        )
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        existing = _approved_reference(role, bibles[role])
+        if existing:
+            shutil.copyfile(existing, destination)
+            print(f"[cloud] reusing owner-approved canonical {role} reference", flush=True)
+        else:
+            seed = int(hashlib.sha256(
+                (role + bibles[role]["visual_identity"]).encode("utf-8")
+            ).hexdigest()[:8], 16)
+            provider.generate(
+                IMAGE_MODEL,
+                {
+                    "prompt": reference_prompt(role, bibles[role]["visual_identity"]),
+                    "image_size": "square_hd", "output_format": "png",
+                    "seed": seed,
+                },
+                kind="image", destination=destination,
+            )
+            print(f"[cloud] UNREVIEWED new {role} reference candidate", flush=True)
         _require_portrait_png(destination, reference=True)
         references[role] = provider.upload_image(destination)
     return references
@@ -451,7 +479,7 @@ def main():
     else:
         selected = full
     roles = required_roles(selected)
-    plan = preflight_plan(selected, max_calls=args.max_billable_calls)
+    plan = preflight_plan(selected, max_calls=args.max_billable_calls, mode=args.mode)
     write_metadata(ep, manifest, plan, OUTPUT)
     print(json.dumps({"mode":args.mode,**plan},indent=2), flush=True)
     if args.mode == "plan":
