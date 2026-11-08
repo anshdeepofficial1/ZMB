@@ -358,9 +358,16 @@ def assemble_draft(ep: dict, frames: list, voices: list,
     segments_dir.mkdir(parents=True, exist_ok=True)
     fps = 25
     segments = []
+    seen_hashes = set()
     for index, (shot, source) in enumerate(frames):
         target = segments_dir / f"{index:02d}.mp4"
         source = Path(source)
+        digest = sha_file(source)
+        if digest in seen_hashes:
+            raise VisualContractError(
+                f"duplicate footage cannot cover two different narrated actions: {source}"
+            )
+        seen_hashes.add(digest)
         info = _probe_video(source)
         if info["duration"] + 0.035 < shot.dur:
             raise VisualContractError(
