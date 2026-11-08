@@ -64,7 +64,7 @@ class DayOneVisualContractTests(unittest.TestCase):
         spec = build_manifest(ep, allow_unimplemented=True)
         self.assertEqual(len(spec["shots"]), 5)
         self.assertEqual(spec["shots"][2]["beat"], "cinematic_asset_only")
-        self.assertIn("staff door", spec["shots"][2]["physical_direction"].lower())
+        self.assertIn("staff only door", spec["shots"][2]["physical_direction"].lower())
         self.assertIn("door", " ".join(spec["shots"][2]["required_props"]).lower())
 
     def test_publish_guard_blocks_unsafe_production(self):
