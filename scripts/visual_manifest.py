@@ -163,7 +163,7 @@ def build_manifest(
                 "no scene substitutions",
                 "every frame-to-voice match manually reviewed",
             ],
-            "approved": False,
+            "approved": bool(manifest_shots) and all(s["reviewed"] for s in manifest_shots),
         },
     }
 
