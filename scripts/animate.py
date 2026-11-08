@@ -320,6 +320,65 @@ def narrative_beat_layer(meta, t):
             body += sk.path("M 697 -147 L 771 -294", "none", "#d5e0eb", 5)
         return sk.g(f"translate({n(x)} {n(y)}) scale({n(scale)})", body)
 
+    if beat == "car_driving":
+        # Story physics: wheels rotate, lane markers move backwards, and the
+        # headlight beam illuminates the road. The car is clearly IN MOTION.
+        rate = min(1.0, max(0.0, t / 0.42))
+        offset = (t * 340.0) % 250.0
+        out.append(sk.rect(0, 1440, W, 320, "#070d16", op=0.65))
+        for i in range(-2, 9):
+            x = i * 250.0 - offset
+            out.append(sk.rect(x, 1572, 145, 12, "#f6edc5", 5, op=0.8))
+        bob = 5.0 * math.sin(t * 15.0)
+        out.append(sk.ell(535, 1504, 450, 31, "#02050a", op=0.62))
+        out.append(sk.path(
+            "M 826 1405 L 1080 1255 L 1080 1575 L 826 1495 Z",
+            "#ffe5a0", op=0.19 * rate))
+        out.append(sk.g(f"translate(0 {n(bob)})",
+                        car_body(65, 1500, 0.99, "#46576a")))
+        # Rotating hub markers make the moving wheels distinguishable.
+        for cx in (250.0, 792.0):
+            cy = 1505.0 + bob
+            ang = t * 12.0
+            out.append(sk.line(cx - math.sin(ang) * 22, cy - math.cos(ang) * 22,
+                               cx + math.sin(ang) * 22, cy + math.cos(ang) * 22,
+                               "#d9e0e8", 6))
+        out.append(sk.text(540, 1080, "HIGHWAY  ·  2:47 AM", 25,
+                           "Barlow", "#d7e5f3", weight="bold", ls=3, op=0.90))
+        out.append(puffs(100, 1476, 3, 32, 28))
+
+    elif beat == "engine_stall":
+        # The first 1.8 s show the vehicle losing momentum, then parked.
+        braking = max(0.0, 1.0 - t / 1.8)
+        jitter = math.sin(t * 32.0) * 8.0 * braking
+        out.append(sk.ell(535, 1509, 455, 40, "#000307", op=0.58))
+        out.append(sk.g(f"translate({n(jitter)} 0)",
+                        car_body(66, 1502, 1.0, "#46576a")))
+        out.append(sk.path("M 838 1410 L 1080 1260 L 1080 1595 L 838 1495 Z",
+                           "#ffe1a0", op=0.11 if int(t * 3.0) % 2 else 0.28))
+        out.append(puffs(826, 1224, 8, 46, 74))
+        for i in range(-1, 8):
+            x = i * 225.0 - ((1.8 * 340 * (1.0 - braking)) % 225.0)
+            out.append(sk.rect(x, 1581, 130, 10, "#e4dfc4", 4, op=0.55))
+        out.append(sk.text(540, 1100, "ENGINE STALLED", 26, "Barlow",
+                           "#ffd593", weight="bold", ls=3, op=min(0.96, max(0.0, t - 0.4))))
+
+    elif beat == "flashlight_exit":
+        # Max and Biscuit are drawn by the main actor rig, outside a stationary
+        # car. The cone is attached to their foreground rather than the sky.
+        out.append(car_body(-105, 1552, 0.64, "#46576a"))
+        flicker = 0.76 + 0.05 * math.sin(t * 2.3)
+        out.append(sk.path("M 620 1194 L 1080 950 L 1080 1540 Z",
+                           "#ffedac", op=0.14 * flicker))
+        out.append(sk.ell(1054, 1242, 135, 195, "#ffefbb", op=0.095 * flicker))
+        out.append(sk.rect(600, 1190, 54, 24, "#343b42", 7, "#f0c575", 3))
+        out.append(sk.circ(654, 1202, 14, "#fff1ba", op=0.86))
+        out.append(sk.g("translate(0 0)",
+            sk.path("M 342 1028 Q 354 1004 389 1008 L 431 1030 L 429 1154 "
+                    "Q 392 1172 356 1152 Z", "#7b3f2b", "#f0c28c", 8)
+            + sk.path("M 349 1020 Q 367 1005 388 1032 M 421 1028 "
+                      "Q 435 1050 426 1073", "none", "#dca878", 9)))
+
     if beat == "breakdown":
         out.append(sk.rect(0, 970, W, 640, "#05080f", op=0.15))
         out.append(sk.ell(520, 1508, 470, 42, "#02050a", op=0.58))
@@ -385,7 +444,7 @@ def narrative_beat_layer(meta, t):
         out.append(sk.text(540, 1700, "STALLED  ·  2:47 AM", 27, "Barlow", "#ffd58d",
                            anchor="middle", weight="bold", ls=2, op=0.95))
 
-    elif beat in ("spot_station", "door_shadow"):
+    elif beat in ("spot_station", "door_shadow", "door_handle"):
         # The illuminated destination now takes over the composition.
         out.append(car_body(28, 1570, 0.62, "#42546a", broken=False))
         out.append(puffs(515, 1455, 4, 24, 38))
@@ -393,7 +452,7 @@ def narrative_beat_layer(meta, t):
         out.append(sk.path("M 640 770 L 1040 770", "none", "#ffdf9e", 9, op=0.85))
         out.append(sk.text(839, 730, "OPEN 24 HOURS", 29, "Barlow", "#ffe7b1",
                            anchor="middle", weight="bold", ls=2, op=0.94))
-        if beat == "door_shadow":
+        if beat in ("door_shadow", "door_handle"):
             # The shadow moves behind the lit shop door rather than remaining a vague glow.
             sx = 812.0 + math.sin(t * 1.65) * 24.0
             shadow_op = 0.78 + 0.12 * math.sin(t * 2.4)
@@ -411,6 +470,16 @@ def narrative_beat_layer(meta, t):
                 "none", "#05090f", 18, op=shadow_op))
             out.append(sk.circ(sx - 10, 969, 4, "#f7b96d", op=0.75 + 0.15 * math.sin(t * 3.0)))
             out.append(sk.circ(sx + 10, 969, 4, "#f7b96d", op=0.75 + 0.15 * math.sin(t * 3.0 + 0.4)))
+            if beat == "door_handle":
+                # A physically turning knob and vibrating door follow the last
+                # spoken action; never substitute unrelated walk-cycle footage.
+                turn = min(1.0, t / 1.4)
+                out.append(sk.circ(884, 1044, 11, "#f2d89f", stroke="#5f492d", sw=3))
+                out.append(sk.g(f"translate(884 1044) rotate({n(62.0 * turn)})",
+                                sk.rect(-3, -4, 31, 8, "#d6b678", 4)))
+                out.append(sk.path("M 738 895 L 906 895 L 906 1164",
+                                   "none", "#e5c99b", 5,
+                                   op=0.5 + 0.3 * abs(math.sin(t * 11.0))))
 
     elif beat == "backpack_exit":
         # A visible, strapped pack placed against Max's upper back + parked car.
@@ -763,7 +832,7 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
     # The two car-centric shots have their own composition/passengers; all other
     # story beats keep the normal character rig and scene parallax.
     beat = meta.get("beat") if shot.kind == "line" else None
-    if beat not in ("breakdown", "car_interior"):
+    if beat not in ("breakdown", "car_driving", "engine_stall", "car_interior"):
         body.append(actors_layer(meta, t, fx, cache))
 
     ov = []  # screen space
