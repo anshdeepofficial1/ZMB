@@ -53,7 +53,7 @@
   "publish_time_ist": "19:00",
   "publish_every_hours": 24,
   "publish_prepare_hours": 1,
-  "visual_mode": "procedural",
+  "visual_mode": "cinematic_assets",
   "ai_story_generation": false,
   "publishing_enabled": false,
   "enforce_visual_contract": true,
