@@ -84,6 +84,7 @@ def space_info() -> dict:
         "hardware": hardware,
         "public": not bool(data.get("private")),
         "free_zero_gpu_verified": "zero" in hardware.lower(),
+        "ready_for_inference": stage.upper() == "RUNNING" and "zero" in hardware.lower(),
         "no_inference_requested": True,
         "billable_calls": 0,
     }
@@ -150,7 +151,7 @@ def generate_one_clip(shot: dict, *, token: str, output: Path) -> dict:
         )
     first_frame = approved_scene(shot)
     status = space_info()
-    if not status["public"] or status["stage"].upper() != "RUNNING":
+    if not status["public"] or not status["ready_for_inference"]:
         raise VisualContractError(
             f"Free model demo unavailable ({status['stage']}). "
             "No paid or non-free fallback will be used."
