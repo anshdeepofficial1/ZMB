@@ -25,17 +25,24 @@ HEIGHT = 1376  # 9:16 portrait within model's 32-pixel grid
 def frame_prompt(shot: dict) -> str:
     if int(shot["index"]) == 0:
         camera = (
-            "Dynamic CINEMATIC TIGHT THREE-QUARTER PASSENGER-SIDE windshield and "
-            "driver tracking shot. Hero Max is visible in detailed close-medium "
-            "view through the driver's side window, actual natural young adult "
-            "human face sharply visible and expressive, hands tightly gripping "
-            "the steering wheel. The same dusty steel-blue late-2000s four-door "
-            "sedan's front quarter, dashboard and one front wheel appear in "
-            "the CENTER close foreground; road lane markings motion-blurred alongside "
-            "the car, wet highway surface, bright flickering headlights cutting "
-            "through dense fog. Frame FULL with car, driver and real motion "
-            "cues. Camera near car level, not distant, not frontal symmetrical "
-            "catalogue shot. Cropped sky, no moon, no void above or below car. "
+            "INSIDE THE CAR, passenger-seat mounted close-to-medium camera "
+            "looking diagonally at Max as he drives. Max is FULLY SEATED "
+            "behind the steering wheel, body, shoulders, arms and legs ALL "
+            "INSIDE the car, seatbelt fastened. Natural expressive young "
+            "adult human face well lit and sharply visible; both hands "
+            "gripping the steering wheel in the right physical positions. "
+            "Visible dark blue-black dashboard and windshield on the left "
+            "side of portrait; outside the GLASS windshield, wet highway "
+            "lane markings and roadside lights streak backwards in fog. "
+            "Headlights flicker and their cool beams visibly illuminate "
+            "the forward road. AMBER dashboard instrument lights warmly "
+            "illuminate the driver's face, cyan moonlight through glass, "
+            "rich cinematic contrast. Camera is INSIDE the cabin, NOT an "
+            "external car glamour shot. Not a man leaning out of a window, "
+            "not a person climbing through the door, no hanging limbs, "
+            "no arm outside, no body outside the moving car. "
+            "Composition face occupies central third, wheel foreground "
+            "and road clearly visible through window in background. "
         )
     else:
         camera = (
