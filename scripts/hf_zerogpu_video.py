@@ -211,10 +211,15 @@ def main() -> None:
     parser.add_argument("--use-free-quota", action="store_true")
     args = parser.parse_args()
     if args.mode == "plan":
-        print(json.dumps(planned(), indent=2))
+        document=planned()
+        OUT.mkdir(parents=True,exist_ok=True)
+        (OUT/"plan.json").write_text(json.dumps(document,indent=2)+"\n",encoding="utf-8")
+        print(json.dumps(document, indent=2))
         return
     if args.mode == "probe":
         status = space_info()
+        OUT.mkdir(parents=True,exist_ok=True)
+        (OUT/"probe.json").write_text(json.dumps(status,indent=2)+"\n",encoding="utf-8")
         print(json.dumps(status, indent=2))
         if not status["free_zero_gpu_verified"]:
             print("Free GPU hardware not confirmed; experimental clip disabled.")
