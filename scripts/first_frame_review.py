@@ -73,6 +73,7 @@ def _expected(shot: dict) -> dict:
         references[role]=proof["file_sha256"]
     return {
         "shot_id":shot["id"],
+        "art_style": __import__("art_direction").STYLE_ID,
         "png_sha256":digest_file(picture),
         "direction_sha256":digest_string(shot["physical_direction"]),
         "prompt_sha256":digest_string(shot["prompt"]),
