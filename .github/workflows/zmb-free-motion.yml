@@ -1,0 +1,112 @@
+name: ZMB real free cinematic motion preview
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/zmb-free-motion.yml"]
+  workflow_dispatch:
+    inputs:
+      first_frame_artifact_id:
+        description: "Reviewed, original free-FLUX image artifact ID"
+        required: true
+        type: string
+        default: "13648624128"
+      free_quota_authorized:
+        description: "Use only the included free HF quota for ONE experimental LTX video"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: zmb-free-video-motion
+  cancel-in-progress: false
+
+jobs:
+  free-moving-scene:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      FAL_KEY: ""
+      IG_ACCESS_TOKEN: ""
+      IG_USER_ID: ""
+      ZMB_PUBLISH_ENABLED: "0"
+      ZMB_BUDGET_RUPEES: "0"
+    steps:
+      - name: Checkout real ZMB cinematic development code
+        uses: actions/checkout@v7
+        with:
+          ref: rebuild/comfyui-cinematic-assets
+          persist-credentials: false
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements-free.txt
+
+      - name: Install FREE client and FFmpeg
+        run: |
+          set -euo pipefail
+          python -m pip install --prefer-binary -r scripts/requirements-free.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - name: Validate image provenance and true moving-video exporter
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts/free_video_preview.py tests/test_free_video_preview.py
+          python -m unittest discover -s tests -p test_free_video_preview.py -v
+          python -m unittest discover -s tests -p test_free_first_frame.py -v
+
+      - name: Download exact inspected FLUX source image from GitHub Actions
+        uses: actions/download-artifact@v7
+        with:
+          artifact-ids: ${{ github.event_name == 'push' && '13648624128' || inputs.first_frame_artifact_id }}
+          path: source-frame
+          github-token: ${{ github.token }}
+
+      - name: Produce one REAL 4s moving cinematic shot for review
+        env:
+          ALLOW_FREE_QUOTA: ${{ github.event_name == 'push' && 'true' || inputs.free_quota_authorized }}
+        run: |
+          set -euo pipefail
+          if [[ "$ALLOW_FREE_QUOTA" != "true" ]]; then
+            echo "::error::Free quota was not authorized for this run."
+            exit 1
+          fi
+          if [[ -z "$HF_TOKEN" ]]; then
+            echo "::error::HF_TOKEN missing; no inference attempted."
+            exit 1
+          fi
+          mapfile -t FILES < <(find source-frame -type f -name shot_00.png | sort)
+          if [[ "${#FILES[@]}" -ne 1 ]]; then
+            echo "::error::Expected one exact generated shot_00.png from GitHub artifact."
+            exit 1
+          fi
+          python scripts/free_video_preview.py --mode video --shot 0 \
+            --source "${FILES[0]}" --accept-free-quota
+
+      - name: Upload actual MP4 for quality analysis (UNREVIEWED)
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zmb-real-zero-rupee-motion-${{ github.run_id }}
+          path: |
+            out/free_motion/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Status note
+        if: always()
+        run: |
+          echo "## ZMB real free motion render" >> "$GITHUB_STEP_SUMMARY"
+          echo "Only included Hugging Face FREE ZeroGPU quota allowed. No billed inference." >> "$GITHUB_STEP_SUMMARY"
+          echo "This is a TEST of one original four-second scene, not the full Reel." >> "$GITHUB_STEP_SUMMARY"
+          echo "Every real generated scene must be inspected before any production release." >> "$GITHUB_STEP_SUMMARY"
+          echo "**Instagram publishing remains OFF.**" >> "$GITHUB_STEP_SUMMARY"
