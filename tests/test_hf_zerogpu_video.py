@@ -35,6 +35,23 @@ class ZeroBudgetTests(unittest.TestCase):
             request.assert_called_once()
             self.assertEqual(request.call_args.args[0],z.SPACE_API)
 
+    def test_paused_zero_gpu_is_not_available_for_inference(self):
+        result=Mock()
+        result.json.return_value={
+            "private":False,
+            "runtime":{"stage":"PAUSED","hardware":{"current":None,"requested":"zero-a10g"}},
+        }
+        with patch.object(z.requests,"get",return_value=result):
+            info=z.space_info()
+        self.assertTrue(info["free_zero_gpu_verified"])
+        self.assertFalse(info["ready_for_inference"])
+        self.assertEqual(info["billable_calls"],0)
+
+    def test_official_model_is_selected_not_paused_third_party_space(self):
+        self.assertEqual(z.SPACE,"Lightricks/LTX-2.5")
+        self.assertIn("LTX-2.5",z.MODEL)
+        self.assertEqual(z.planned()["model_clip_seconds"],4)
+
     def test_non_free_hardware_not_confirmed(self):
         result=Mock()
         result.json.return_value={
