@@ -124,6 +124,9 @@ def animation_prompt(shot: dict) -> str:
         "visibly pulsing through dark moonlit fog. His hands remain properly "
         "on the wheel with believable minor steering corrections, "
         "his animated adult face remains mature and consistent. "
+        "MAX IS ANXIOUS AND ON EDGE, eyebrows knitted, eyes fixed on the road, "
+        "jaw tense, mouth closed, breathing subtly, fearful suspense. "
+        "NO smiling, no laughter, no cheerful grin, no comedic expression. "
         "NO dog enters the shot, NO gas station, NO daylight. "
         if int(shot.get("index", -1)) == 0 else
         "Animate the intended character/prop interaction with convincing "
