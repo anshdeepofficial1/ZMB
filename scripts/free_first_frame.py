@@ -31,7 +31,7 @@ def frame_prompt(shot: dict) -> str:
             "human face sharply visible and expressive, hands tightly gripping "
             "the steering wheel. The same dusty steel-blue late-2000s four-door "
             "sedan's front quarter, dashboard and one front wheel appear in "
-            "the close foreground; road lane markings motion-blurred alongside "
+            "the CENTER close foreground; road lane markings motion-blurred alongside "
             "the car, wet highway surface, bright flickering headlights cutting "
             "through dense fog. Frame FULL with car, driver and real motion "
             "cues. Camera near car level, not distant, not frontal symmetrical "
