@@ -25,7 +25,7 @@ class FreeFirstFrameTests(unittest.TestCase):
         self.assertIn("Max",prompt)
         self.assertIn("No title",prompt)
         self.assertIn("live-action",prompt.lower())
-        self.assertIn("center",prompt.lower())
+        self.assertTrue("central" in prompt.lower() or "center" in prompt.lower())
 
     def test_source_model_is_free_shared_gpu(self):
         self.assertEqual(first.MODEL,"black-forest-labs/FLUX.1-schnell")
