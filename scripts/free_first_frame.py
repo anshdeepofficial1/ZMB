@@ -25,11 +25,17 @@ HEIGHT = 1376  # 9:16 portrait within model's 32-pixel grid
 def frame_prompt(shot: dict) -> str:
     if int(shot["index"]) == 0:
         camera = (
-            "Dramatic medium-close low three-quarter FRONT tracking camera, "
-            "steel-blue four-door sedan fills center 75% of portrait composition. "
-            "Visible front wheels firmly on road, realistic headlamp reflections "
-            "and lane markings, driver Max discernible through windscreen. "
-            "No floating car, no aerial camera, no landscape framed too wide. "
+            "Dynamic CINEMATIC TIGHT THREE-QUARTER PASSENGER-SIDE windshield and "
+            "driver tracking shot. Hero Max is visible in detailed close-medium "
+            "view through the driver's side window, actual natural young adult "
+            "human face sharply visible and expressive, hands tightly gripping "
+            "the steering wheel. The same dusty steel-blue late-2000s four-door "
+            "sedan's front quarter, dashboard and one front wheel appear in "
+            "the close foreground; road lane markings motion-blurred alongside "
+            "the car, wet highway surface, bright flickering headlights cutting "
+            "through dense fog. Frame FULL with car, driver and real motion "
+            "cues. Camera near car level, not distant, not frontal symmetrical "
+            "catalogue shot. Cropped sky, no moon, no void above or below car. "
         )
     else:
         camera = (
@@ -50,8 +56,10 @@ def frame_prompt(shot: dict) -> str:
         "Frame 9:16 vertical cinematic composition. The fixed narrator action "
         "is exactly: " + shot["physical_direction"] + ". " +
         camera + characters + props +
-        "Deep moonlit teal blue environment, distinct warm amber halogen "
-        "lamps and headlights, detailed night fog, rich photographic contrast "
+        "Deep moonlit slate-blue environment, CINEMATIC HIGH CONTRAST "
+        "of warm ORANGE-AMBER halogen lights versus blue shadows, " +
+            "
+        "detailed night fog, rich photographic contrast "
         "without dark empty frame, visible natural material texture, accurate "
         "anatomy and physical perspective, 35mm cinema lens, professional "
         "colour grading with neutral skin tones, restrained film grain. "
@@ -134,7 +142,7 @@ def generate(shot: dict, destination: Path) -> dict:
     # Official FLUX.1-Schnell Space: infer(prompt, seed, randomize_seed,
     #                                      width, height, num_inference_steps).
     seed = int(hashlib.sha256(
-        (shot["id"] + shot["prompt"]).encode("utf-8")
+        (shot["id"] + frame_prompt(shot)).encode("utf-8")
     ).hexdigest()[:7], 16)
     result = client.predict(
         frame_prompt(shot),
