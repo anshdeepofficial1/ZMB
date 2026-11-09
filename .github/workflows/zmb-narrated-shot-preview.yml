@@ -1,0 +1,93 @@
+name: ZMB narrator and text layout on FREE moving video
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/zmb-narrated-shot-preview.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zmb-narrated-preview
+  cancel-in-progress: false
+
+jobs:
+  narrate-reviewed-footage:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      ZMB_PUBLISH_ENABLED: "0"
+      IG_ACCESS_TOKEN: ""
+      IG_USER_ID: ""
+      FAL_KEY: ""
+      ZMB_BUDGET_RUPEES: "0"
+    steps:
+      - name: Checkout real cinematic editor
+        uses: actions/checkout@v7
+        with:
+          ref: rebuild/comfyui-cinematic-assets
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements-free.txt
+
+      - name: Install FREE editing and narration dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --prefer-binary -r scripts/requirements-free.txt
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+
+      - name: Validate caption/audio and video scripts before processing
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts/compose_story_sample.py scripts/inspect_free_motion.py
+          python -m unittest discover -s tests -p test_free_video_preview.py -v
+
+      - name: Retrieve exact real LTX footage from GitHub (immutable SHA)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p first-video
+          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/13649648225/zip" > /tmp/zmb-real-video.zip
+          unzip -t /tmp/zmb-real-video.zip
+          unzip -q /tmp/zmb-real-video.zip -d first-video
+          FILE=first-video/shot_00_UNREVIEWED.mp4
+          test -s "$FILE"
+          EXPECTED=2225a4f533d56dca04eedd07eb5f587bdf66eb72d5bd087c609fff1a211e8236
+          ACTUAL="$(sha256sum "$FILE" | cut -d ' ' -f 1)"
+          [[ "$ACTUAL" == "$EXPECTED" ]] || {
+            echo "::error::Real LTX source SHA not matched; no narration attached"
+            exit 1
+          }
+          echo "Genuine model MP4 artifact verified: $ACTUAL"
+
+      - name: Add real English voice, timed captions, and technical QA
+        run: |
+          set -euo pipefail
+          python scripts/compose_story_sample.py \
+            --video first-video/shot_00_UNREVIEWED.mp4 --shot 0
+
+      - name: Upload narrated video and eight-frame quality contact sheet
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zmb-real-narrated-unreviewed-${{ github.run_id }}
+          path: |
+            out/review_sample/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Safety summary
+        if: always()
+        run: |
+          echo "## ZMB real cinematic review-only output" >> "$GITHUB_STEP_SUMMARY"
+          echo "Actual FREE LTX moving clip plus real Edge TTS English voice and mobile-safe captions." >> "$GITHUB_STEP_SUMMARY"
+          echo "Not a completed seven-scene Reel. **No publishing or payments**." >> "$GITHUB_STEP_SUMMARY"
