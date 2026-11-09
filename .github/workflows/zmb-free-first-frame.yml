@@ -1,0 +1,107 @@
+name: ZMB free cinematic first frame (no payment)
+
+on:
+  push:
+    branches: [main]
+    paths: [".github/workflows/zmb-free-first-frame.yml"]
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "plan uses no quota; image generates ONE original cinematic still"
+        required: true
+        type: choice
+        options: [plan, image]
+        default: image
+      shot:
+        description: "Day 1 shot index (0..6)"
+        required: false
+        type: string
+        default: "0"
+      use_free_quota:
+        description: "Authorize ONE use of included free HF ZeroGPU quota"
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zmb-free-first-frame
+  cancel-in-progress: false
+
+jobs:
+  free-first-frame:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      FAL_KEY: ""
+      IG_ACCESS_TOKEN: ""
+      IG_USER_ID: ""
+      ZMB_PUBLISH_ENABLED: "0"
+      ZMB_BUDGET_RUPEES: "0"
+    steps:
+      - name: Checkout real cinematic video branch
+        uses: actions/checkout@v7
+        with:
+          ref: rebuild/comfyui-cinematic-assets
+          persist-credentials: false
+
+      - name: Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements-free.txt
+
+      - name: Install free inference client dependencies
+        run: |
+          set -euo pipefail
+          python -m pip install --prefer-binary -r scripts/requirements-free.txt
+
+      - name: Validate 9:16 narrative and free GPU policy
+        run: |
+          set -euo pipefail
+          python -m compileall -q scripts/free_first_frame.py tests/test_free_first_frame.py
+          python -m unittest discover -s tests -p test_free_first_frame.py -v
+
+      - name: Generate original photorealistic source image or free plan
+        env:
+          REQUEST_MODE: ${{ github.event_name == 'push' && 'image' || inputs.mode }}
+          REQUEST_SHOT: ${{ inputs.shot }}
+          REQUEST_FREE_QUOTA: ${{ github.event_name == 'push' && 'true' || inputs.use_free_quota }}
+        run: |
+          set -euo pipefail
+          MODE="${REQUEST_MODE:-plan}"
+          SHOT="${REQUEST_SHOT:-0}"
+          if [[ "$MODE" == "plan" ]]; then
+            python scripts/free_first_frame.py --mode plan --shot "$SHOT"
+          elif [[ "$MODE" == "image" && "$REQUEST_FREE_QUOTA" == "true" ]]; then
+            if [[ -z "$HF_TOKEN" ]]; then
+              echo "::error::HF_TOKEN missing from repository secrets; no free GPU request made."
+              exit 1
+            fi
+            python scripts/free_first_frame.py --mode image --shot "$SHOT" --accept-free-quota
+          else
+            echo "::error::A free quota authorization is required."
+            exit 1
+          fi
+
+      - name: Upload source photo for actual inspection
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: zmb-free-original-frame-${{ github.run_id }}
+          path: |
+            out/free_first_frame/**
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Final summary
+        if: always()
+        run: |
+          echo "## ZMB first cinematic frame" >> "$GITHUB_STEP_SUMMARY"
+          echo "**Budget: ₹0.** Uses only free ZeroGPU, never any paid service." >> "$GITHUB_STEP_SUMMARY"
+          echo "**NOT APPROVED:** This is a generated first-frame candidate, NOT a moving video." >> "$GITHUB_STEP_SUMMARY"
+          echo "No publishing credentials, no Instagram post." >> "$GITHUB_STEP_SUMMARY"
