@@ -1,4 +1,4 @@
-name: ZMB free cinematic first frame (no payment)
+name: ZMB premium 3D animated first frame (free)
 
 on:
   push:
@@ -65,8 +65,9 @@ jobs:
           set -euo pipefail
           python -m compileall -q scripts/free_first_frame.py tests/test_free_first_frame.py
           python -m unittest discover -s tests -p test_free_first_frame.py -v
+          python -m unittest discover -s tests -p test_art_direction.py -v
 
-      - name: Generate original photorealistic source image or free plan
+      - name: Generate original premium 3D animation still or free plan
         env:
           REQUEST_MODE: ${{ github.event_name == 'push' && 'image' || inputs.mode }}
           REQUEST_SHOT: ${{ inputs.shot }}
@@ -88,7 +89,7 @@ jobs:
             exit 1
           fi
 
-      - name: Upload source photo for actual inspection
+      - name: Upload animated first frame for character-design inspection
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -103,5 +104,5 @@ jobs:
         run: |
           echo "## ZMB first cinematic frame" >> "$GITHUB_STEP_SUMMARY"
           echo "**Budget: ₹0.** Uses only free ZeroGPU, never any paid service." >> "$GITHUB_STEP_SUMMARY"
-          echo "**NOT APPROVED:** This is a generated first-frame candidate, NOT a moving video." >> "$GITHUB_STEP_SUMMARY"
+          echo "**NOT APPROVED:** This is a premium 3D animated first-frame CANDIDATE, NOT a moving video." >> "$GITHUB_STEP_SUMMARY"
           echo "No publishing credentials, no Instagram post." >> "$GITHUB_STEP_SUMMARY"
