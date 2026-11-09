@@ -11,7 +11,6 @@ import hashlib
 import json
 import os
 from pathlib import Path
-import shutil
 
 from PIL import Image
 
@@ -108,7 +107,6 @@ def verify_quota(token: str) -> dict:
 def generate(shot: dict, destination: Path) -> dict:
     token = os.environ.get("HF_TOKEN", "")
     quota = verify_quota(token)
-    from hf_zerogpu_video import space_info as _video_space_info
     # Only the user's free daily shared quota can be charged.
     # No paid inference SDK or cloud billing key is imported.
     from gradio_client import Client
