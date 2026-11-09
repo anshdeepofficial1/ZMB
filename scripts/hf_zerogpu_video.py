@@ -28,11 +28,11 @@ import requests
 
 from visual_manifest import ROOT, build_manifest, day1_episode, VisualContractError
 
-SPACE = "ZeroCollabs/LTX-2.3-turbo"
+SPACE = "Lightricks/LTX-2.5"
 SPACE_API = f"https://huggingface.co/api/spaces/{SPACE}"
-MODEL = "Lightricks/LTX-2.3 (third-party ZeroGPU demo)"
+MODEL = "Lightricks/LTX-2.5 (official free ZeroGPU demo)"
 DAILY_FREE_SECONDS = 300
-MINIMUM_REMAINING_SECONDS = 205  # the demo's 6s generation reserves ~200s
+MINIMUM_REMAINING_SECONDS = 200  # conservative reserve for xlarge 2x GPU quota
 OUT = ROOT / "out" / "free_zerogpu"
 
 
@@ -46,6 +46,8 @@ def planned() -> dict:
         "clips_per_invocation_max": 1,
         "authentication": "free HF_TOKEN required for actual inference",
         "free_account_gpu_quota_seconds_per_day": DAILY_FREE_SECONDS,
+        "model_clip_seconds": 4,
+        "model_demo_may_pause_or_change": True,
         "minimum_quota_before_one_clip": MINIMUM_REMAINING_SECONDS,
         "paid_fallback_allowed": False,
         "instagram_publishing": False,
@@ -165,22 +167,22 @@ def generate_one_clip(shot: dict, *, token: str, output: Path) -> dict:
         raise VisualContractError(
             "Install gradio_client from scripts/requirements-free.txt"
         ) from exc
-    # Exactly ONE 6-second 9:16 clip per manual request; the third-party
-    # Space can change endpoints and output shape, which must fail safely.
+    # Exactly ONE 4-second 9:16 clip per manual request. The official
+    # model uses an xlarge ZeroGPU reservation at double quota cost.
+    # No retries, alternative identities, or billing fallbacks.
     client = Client(SPACE, token=token, verbose=False)
     result = client.predict(
-        handle_file(str(first_frame)),  # first frame, identity protected
-        None,  # end frame absent
-        str(shot["physical_direction"]),
-        6.0,
-        "Image-to-Video",
-        False,  # no extra prompt enhancement that changes story events
-        42,
-        False,  # deterministic seed
-        768,  # output height before model upsampling
-        512,
-        None,  # audio is produced separately by GitHub
-        api_name="/generate_video",
+        str(shot["physical_direction"]),  # exact narrated action
+        handle_file(str(first_frame)),   # approved scene first frame
+        896,  # height, divisible by 64, near 9:16
+        512,  # width, divisible by 64
+        4.0,  # official 1-5 second demo slider
+        42,   # stable seed
+        "conv",  # fast VAE video decoder
+        False,   # no unpredictable auto duration
+        False,   # don't randomize seed
+        False,   # no enhancer rewriting approved action
+        api_name="/run",
     )
     generated = _extract_video_path(result)
     destination = output / f"{int(shot['index']):02d}_UNREVIEWED.mp4"
