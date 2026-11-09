@@ -64,13 +64,24 @@ jobs:
           python -m unittest discover -s tests -p test_free_video_preview.py -v
           python -m unittest discover -s tests -p test_free_first_frame.py -v
 
-      - name: Download exact inspected FLUX source image from GitHub Actions
-        uses: actions/download-artifact@v7
-        with:
-          name: zmb-free-original-frame-42560181369
-          run-id: 42560181369
-          path: source-frame
-          github-token: ${{ github.token }}
+      - name: Download IMMUTABLE third FLUX image artifact by exact GitHub REST ID
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p source-frame
+          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/13648624128/zip" > /tmp/zmb-source.zip
+          unzip -t /tmp/zmb-source.zip
+          unzip -q /tmp/zmb-source.zip -d source-frame
+          test -f source-frame/shot_00.png
+          test -f source-frame/shot_00.json
+          ACTUAL="$(sha256sum source-frame/shot_00.png | cut -d ' ' -f 1)"
+          EXPECTED="e5aea227d2f6f02570aece68f89bb7c394e39f637018b190467c9f335ac3a564"
+          if [[ "$ACTUAL" != "$EXPECTED" ]]; then
+            echo "::error::Refusing to animate wrong frame: source SHA mismatch"
+            exit 1
+          fi
+          echo "Verified immutable third source frame SHA: $ACTUAL"
 
       - name: Produce one REAL 4s moving cinematic shot for review
         env:
