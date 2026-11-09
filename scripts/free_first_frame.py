@@ -57,8 +57,7 @@ def frame_prompt(shot: dict) -> str:
         "is exactly: " + shot["physical_direction"] + ". " +
         camera + characters + props +
         "Deep moonlit slate-blue environment, CINEMATIC HIGH CONTRAST "
-        "of warm ORANGE-AMBER halogen lights versus blue shadows, " +
-            "
+        "of warm ORANGE-AMBER halogen lights versus blue shadows, "
         "detailed night fog, rich photographic contrast "
         "without dark empty frame, visible natural material texture, accurate "
         "anatomy and physical perspective, 35mm cinema lens, professional "
