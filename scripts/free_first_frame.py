@@ -1,4 +1,4 @@
-"""Generate ONE photorealistic cinematic first frame on FREE Hugging Face ZeroGPU.
+"""Generate ONE premium cinematic 3D animation first frame on FREE ZeroGPU.
 
 This runs inside GitHub Actions, never on the user's laptop. This is an
 UNREVIEWED candidate and cannot authorize publishing or production video.
@@ -15,6 +15,7 @@ from pathlib import Path
 from PIL import Image
 
 from visual_manifest import build_manifest, day1_episode, VisualContractError, ROOT
+from art_direction import STYLE_ID
 
 MODEL = "black-forest-labs/FLUX.1-schnell"
 OUT = ROOT / "out" / "free_first_frame"
@@ -23,57 +24,9 @@ HEIGHT = 1376  # 9:16 portrait within model's 32-pixel grid
 
 
 def frame_prompt(shot: dict) -> str:
-    if int(shot["index"]) == 0:
-        camera = (
-            "INSIDE THE CAR, passenger-seat mounted close-to-medium camera "
-            "looking diagonally at Max as he drives. Max is FULLY SEATED "
-            "behind the steering wheel, body, shoulders, arms and legs ALL "
-            "INSIDE the car, seatbelt fastened. Natural expressive young "
-            "adult human face well lit and sharply visible; both hands "
-            "gripping the steering wheel in the right physical positions. "
-            "Visible dark blue-black dashboard and windshield on the left "
-            "side of portrait; outside the GLASS windshield, wet highway "
-            "lane markings and roadside lights streak backwards in fog. "
-            "Headlights flicker and their cool beams visibly illuminate "
-            "the forward road. AMBER dashboard instrument lights warmly "
-            "illuminate the driver's face, cyan moonlight through glass, "
-            "rich cinematic contrast. Camera is INSIDE the cabin, NOT an "
-            "external car glamour shot. Not a man leaning out of a window, "
-            "not a person climbing through the door, no hanging limbs, "
-            "no arm outside, no body outside the moving car. "
-            "Composition face occupies central third, wheel foreground "
-            "and road clearly visible through window in background. "
-        )
-    else:
-        camera = (
-            "Portrait close-to-medium live-action story frame, characters and "
-            "required props centrally visible and scale believable. "
-        )
-    characters = " ".join(
-        f"{a['id'].upper()}: {a['identity']}. "
-        for a in shot.get("characters", [])
-    )
-    props = " ".join(
-        f"PERMANENT PROP {a['id'].upper()}: {a['identity']}. "
-        for a in shot.get("prop_references", [])
-    )
-    return (
-        "ONE SINGLE FRAME from an expensive photorealistic survival-horror "
-        "feature film. Live-action cinematography, not animation. "
-        "Frame 9:16 vertical cinematic composition. The fixed narrator action "
-        "is exactly: " + shot["physical_direction"] + ". " +
-        camera + characters + props +
-        "Deep moonlit slate-blue environment, CINEMATIC HIGH CONTRAST "
-        "of warm ORANGE-AMBER halogen lights versus blue shadows, "
-        "detailed night fog, rich photographic contrast "
-        "without dark empty frame, visible natural material texture, accurate "
-        "anatomy and physical perspective, 35mm cinema lens, professional "
-        "colour grading with neutral skin tones, restrained film grain. "
-        "One cohesive place and one continuous believable scene, not collage. "
-        "No title, no letterforms, no logo, no subtitle, no HUD, no watermark, "
-        "no plastic/cartoon/illustrated people, no robot, no drawn outlines, "
-        "no cheap 3D game render, no empty upper half of frame."
-    )
+    """Canonical premium animated 3D frame, never photographic live action."""
+    from art_direction import scene_prompt
+    return scene_prompt(shot)
 
 
 def _result_file(result) -> Path:
@@ -178,6 +131,7 @@ def generate(shot: dict, destination: Path) -> dict:
         "shot_id": shot["id"],
         "file_sha256": hashlib.sha256(destination.read_bytes()).hexdigest(),
         "model_space": MODEL,
+        "art_style": STYLE_ID,
         "original_generated_width": WIDTH, "original_generated_height": HEIGHT,
         "free_quota_before_seconds": quota["remaining_before"],
         "character_identity_status": "UNREVIEWED",
@@ -204,7 +158,8 @@ def main() -> None:
     if args.mode == "plan":
         print(json.dumps({
             "mode": "plan", "cost_rupees": 0, "model": MODEL,
-            "shot_id": shot["id"], "resolution": f"{WIDTH}x{HEIGHT}",
+            "shot_id": shot["id"], "art_style": STYLE_ID,
+            "resolution": f"{WIDTH}x{HEIGHT}",
             "source_prompt": frame_prompt(shot),
             "motion_created": False,
             "publishing_authorized": False,
