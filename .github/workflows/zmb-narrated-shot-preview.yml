@@ -1,4 +1,4 @@
-name: ZMB narrator and text layout on FREE moving video
+name: ZMB animated film shot with voice and captions (free)
 
 on:
   push:
@@ -50,18 +50,18 @@ jobs:
           python -m compileall -q scripts/compose_story_sample.py scripts/inspect_free_motion.py
           python -m unittest discover -s tests -p test_free_video_preview.py -v
 
-      - name: Retrieve exact real LTX footage from GitHub (immutable SHA)
+      - name: Retrieve the exact new 3D ANIMATED LTX footage (SHA locked)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p first-video
-          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/13649648225/zip" > /tmp/zmb-real-video.zip
+          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/13656443993/zip" > /tmp/zmb-real-video.zip
           unzip -t /tmp/zmb-real-video.zip
           unzip -q /tmp/zmb-real-video.zip -d first-video
           FILE=first-video/shot_00_UNREVIEWED.mp4
           test -s "$FILE"
-          EXPECTED=2225a4f533d56dca04eedd07eb5f587bdf66eb72d5bd087c609fff1a211e8236
+          EXPECTED=f912ae7fcb0340ad0ce8c177ba768b9ecb9f36b6c169d6f5d165f9f2ae372d3c
           ACTUAL="$(sha256sum "$FILE" | cut -d ' ' -f 1)"
           [[ "$ACTUAL" == "$EXPECTED" ]] || {
             echo "::error::Real LTX source SHA not matched; no narration attached"
@@ -69,7 +69,7 @@ jobs:
           }
           echo "Genuine model MP4 artifact verified: $ACTUAL"
 
-      - name: Add real English voice, timed captions, and technical QA
+      - name: Narrate animated horror shot with safe captions and moving-frame QA
         run: |
           set -euo pipefail
           python scripts/compose_story_sample.py \
@@ -89,5 +89,5 @@ jobs:
         if: always()
         run: |
           echo "## ZMB real cinematic review-only output" >> "$GITHUB_STEP_SUMMARY"
-          echo "Actual FREE LTX moving clip plus real Edge TTS English voice and mobile-safe captions." >> "$GITHUB_STEP_SUMMARY"
+          echo "Premium ORIGINAL 3D ANIMATED shot with free LTX motion, Edge TTS voice and mobile-safe captions." >> "$GITHUB_STEP_SUMMARY"
           echo "Not a completed seven-scene Reel. **No publishing or payments**." >> "$GITHUB_STEP_SUMMARY"
