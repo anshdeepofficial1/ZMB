@@ -67,7 +67,7 @@ jobs:
       - name: Download exact inspected FLUX source image from GitHub Actions
         uses: actions/download-artifact@v7
         with:
-          artifact-ids: ${{ github.event_name == 'push' && '13648624128' || inputs.first_frame_artifact_id }}
+          name: zmb-free-original-frame-42560181369
           run-id: 42560181369
           path: source-frame
           github-token: ${{ github.token }}
