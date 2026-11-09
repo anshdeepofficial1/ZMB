@@ -56,7 +56,14 @@ def compose(video: Path, shot_index: int, output: Path=OUT) -> dict:
     info=ffprobe(video)
     if info["native_width"]!=1080 or info["native_height"]!=1920:
         raise VisualContractError("source must be an actual verified 1080x1920 preview")
-    text=shots[shot_index]["narration"]
+    canonical_narration=shots[shot_index]["narration"]
+    # The real free model gives only 4 seconds. This explicit editorial
+    # rewrite preserves the timestamp, solitary driver and flickering lamps;
+    # it is recorded in provenance rather than silently changing the story.
+    text=(
+        "2:47 AM. Max drives alone. Headlights flicker."
+        if shot_index==0 else canonical_narration
+    )
     output.mkdir(parents=True,exist_ok=True)
     work=output/"work"
     voice,words=voice_for_shot(text,info["duration"],work)
@@ -91,7 +98,9 @@ def compose(video: Path, shot_index: int, output: Path=OUT) -> dict:
         "shot_id":shots[shot_index]["id"],
         "video_sha256":sha,
         "actual_moving_video_duration_seconds":result["duration"],
+        "canonical_story_narration":canonical_narration,
         "english_narration":text,
+        "narration_edited_for_nonlooped_4_second_clip": text!=canonical_narration,
         "word_timed_captions":len(words),
         "subtitle_position":"Instagram-safe lower third",
         "non_looped":True,
