@@ -89,6 +89,21 @@ jobs:
             exit 1
           fi
 
+      - name: Verify animated-style provenance (never approve image automatically)
+        run: |
+          set -euo pipefail
+          if [ -f out/free_first_frame/shot_00.json ]; then
+            python - <<'PY'
+          import json
+          from pathlib import Path
+          p=json.loads(Path("out/free_first_frame/shot_00.json").read_text())
+          assert p["art_style"] == "zmb_premium_animated_3d_v1"
+          assert p["character_identity_status"] == "UNREVIEWED"
+          assert p["instagram_publishing_authorized"] is False
+          print("3D ANIMATION style documented; visual review still required")
+          PY
+          fi
+
       - name: Upload animated first frame for character-design inspection
         if: always()
         uses: actions/upload-artifact@v7
