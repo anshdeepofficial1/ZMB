@@ -163,8 +163,12 @@ def _first_media_url(result: dict, *, kind: str) -> str:
 
 
 class FalInference:
-    """One paid call per explicit request, with bounded queue wait and no retry spending."""
+    """Retired paid provider: never submit a billable request for ZMB."""
     def __init__(self):
+        raise VisualContractError(
+            "Paid image/video inference is permanently DISABLED for ZMB's "
+            "zero-rupee budget. No FAL_KEY or billing is permitted."
+        )
         if not os.environ.get("FAL_KEY", "").strip():
             raise VisualContractError(
                 "FAL_KEY GitHub Actions secret is missing; no external "
