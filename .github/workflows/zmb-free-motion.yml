@@ -1,4 +1,4 @@
-name: ZMB real free cinematic motion preview
+name: ZMB 3D animated motion preview (free)
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
         description: "Reviewed, original free-FLUX image artifact ID"
         required: true
         type: string
-        default: "13648624128"
+        default: "13656669954"
       free_quota_authorized:
         description: "Use only the included free HF quota for ONE experimental LTX video"
         required: true
@@ -64,26 +64,26 @@ jobs:
           python -m unittest discover -s tests -p test_free_video_preview.py -v
           python -m unittest discover -s tests -p test_free_first_frame.py -v
 
-      - name: Download IMMUTABLE third FLUX image artifact by exact GitHub REST ID
+      - name: Download the NEW animated 3D scene by immutable artifact ID
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p source-frame
-          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/13648624128/zip" > /tmp/zmb-source.zip
+          gh api "/repos/${GITHUB_REPOSITORY}/actions/artifacts/13656669954/zip" > /tmp/zmb-source.zip
           unzip -t /tmp/zmb-source.zip
           unzip -q /tmp/zmb-source.zip -d source-frame
           test -f source-frame/shot_00.png
           test -f source-frame/shot_00.json
           ACTUAL="$(sha256sum source-frame/shot_00.png | cut -d ' ' -f 1)"
-          EXPECTED="e5aea227d2f6f02570aece68f89bb7c394e39f637018b190467c9f335ac3a564"
+          EXPECTED="2718827b759b8402bdbdd601a1ceb9865717a936d371eb5f62a913af36c5cb88"
           if [[ "$ACTUAL" != "$EXPECTED" ]]; then
             echo "::error::Refusing to animate wrong frame: source SHA mismatch"
             exit 1
           fi
           echo "Verified immutable third source frame SHA: $ACTUAL"
 
-      - name: Produce one REAL 4s moving cinematic shot for review
+      - name: Animate the 3D Max-in-car shot for four seconds using free ZeroGPU
         env:
           ALLOW_FREE_QUOTA: ${{ github.event_name == 'push' && 'true' || inputs.free_quota_authorized }}
         run: |
@@ -98,7 +98,7 @@ jobs:
           fi
           mapfile -t FILES < <(find source-frame -type f -name shot_00.png | sort)
           if [[ "${#FILES[@]}" -ne 1 ]]; then
-            echo "::error::Expected one exact generated shot_00.png from GitHub artifact."
+            echo "::error::Expected the current 3D animated source shot_00.png."
             exit 1
           fi
           python scripts/free_video_preview.py --mode video --shot 0 \
@@ -119,6 +119,6 @@ jobs:
         run: |
           echo "## ZMB real free motion render" >> "$GITHUB_STEP_SUMMARY"
           echo "Only included Hugging Face FREE ZeroGPU quota allowed. No billed inference." >> "$GITHUB_STEP_SUMMARY"
-          echo "This is a TEST of one original four-second scene, not the full Reel." >> "$GITHUB_STEP_SUMMARY"
+          echo "This is a TEST of one premium 3D animated four-second scene, not the full Reel." >> "$GITHUB_STEP_SUMMARY"
           echo "Every real generated scene must be inspected before any production release." >> "$GITHUB_STEP_SUMMARY"
           echo "**Instagram publishing remains OFF.**" >> "$GITHUB_STEP_SUMMARY"
