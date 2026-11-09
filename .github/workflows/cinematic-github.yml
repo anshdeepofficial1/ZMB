@@ -90,7 +90,7 @@ jobs:
 
       - name: Free model plan, public API probe, or one reviewed clip
         env:
-          REQUEST_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'plan' }}
+          REQUEST_MODE: ${{ github.event_name == 'push' && 'probe' || (github.event_name == 'workflow_dispatch' && inputs.mode || 'plan') }}
           REQUEST_SHOT: ${{ inputs.shot }}
           REQUEST_FREE_QUOTA: ${{ inputs.use_free_quota }}
         run: |
