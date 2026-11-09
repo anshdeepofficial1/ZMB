@@ -150,6 +150,8 @@ def generate_one_clip(shot: dict, *, token: str, output: Path) -> dict:
             "repository secret HF_TOKEN, not a code file."
         )
     first_frame = approved_scene(shot)
+    from art_direction import STYLE_ID, animation_prompt
+    # Approved frame receipt is now bound to the animated 3D style ID.
     status = space_info()
     if not status["public"] or not status["ready_for_inference"]:
         raise VisualContractError(
@@ -173,7 +175,7 @@ def generate_one_clip(shot: dict, *, token: str, output: Path) -> dict:
     # No retries, alternative identities, or billing fallbacks.
     client = Client(SPACE, token=token, verbose=False)
     result = client.predict(
-        str(shot["physical_direction"]),  # exact narrated action
+        animation_prompt(shot),  # coherent premium 3D animated action
         handle_file(str(first_frame)),   # approved scene first frame
         896,  # height, divisible by 64, near 9:16
         512,  # width, divisible by 64
@@ -195,6 +197,7 @@ def generate_one_clip(shot: dict, *, token: str, output: Path) -> dict:
         "sha256": sha,
         "shot_id": shot["id"],
         "model": MODEL,
+        "art_style": STYLE_ID,
         "zero_gpu_remaining_before": quota["remaining"],
         "free_only": True,
         "cost_rupees": 0,
