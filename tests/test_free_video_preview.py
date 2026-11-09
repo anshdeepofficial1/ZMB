@@ -23,7 +23,7 @@ class FreeVideoTests(unittest.TestCase):
         self.assertEqual(clip.SPACE,"Lightricks/LTX-2.5")
         prompt=clip.prompt_for_real_motion(self.shot)
         self.assertIn(self.shot["physical_direction"],prompt)
-        for required in ("drives forward","hands make believable", "headlights visibly pulse","morphing"):
+        for required in ("drives forward","steering corrections", "headlights", "morphing"):
             self.assertIn(required.lower(),prompt.lower())
 
     def test_real_first_frame_provenance_cannot_be_swapped(self):
