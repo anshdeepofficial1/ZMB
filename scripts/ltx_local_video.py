@@ -66,28 +66,9 @@ PROFILES = {
 
 
 def scene_prompt(shot: dict) -> str:
-    """Model-safe photographic brief, locked to the literal narrated action."""
-    exact = str(shot.get("physical_direction") or "").strip()
-    if len(exact) < 15:
-        raise VisualContractError("a physical action description is mandatory")
-    return (
-        "Premium photorealistic survival-thriller cinema. Consistent real "
-        "human anatomy and the exact same character face and wardrobe as "
-        "the conditioned first-frame reference; same exact vehicle and "
-        "architecture in each adjacent scene. Professionally photographed, "
-        "tactile practical environment, sophisticated teal moonlit shadows "
-        "and warm amber practical lamps, accurate skin tones, expressive "
-        "faces, detailed textures, subtle film grain, high dynamic range "
-        "without crushed blacks. MAIN ACTION: " + exact + " "
-        "REAL PHYSICAL MOTION: moving parts and characters act exactly as "
-        "narrated; visible road movement, correct wheel movement, ignition "
-        "failure or moving door handle only if specified in this action. "
-        "Controlled camera movement and depth, no arbitrary cuts, no "
-        "subject teleportation, no extra people. FRAME: vertical 9:16, "
-        "keep people and important props within the central safe region; "
-        "leave clean lower-third negative space for captions. "
-        "No text, UI overlay, drawing, HUD, watermark or toy animation."
-    )
+    """Premium original 3D animation: same style as the free cloud workflow."""
+    from art_direction import animation_prompt
+    return animation_prompt(shot)
 
 
 def deterministic_seed(shot: dict) -> int:
