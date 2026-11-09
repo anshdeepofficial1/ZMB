@@ -17,15 +17,17 @@ class FreeFirstFrameTests(unittest.TestCase):
     def setUpClass(cls):
         cls.shots=build_manifest(day1_episode(),allow_unimplemented=True)["shots"]
 
-    def test_shot_zero_has_real_visual_action_not_generic_cartoon(self):
+    def test_shot_zero_is_premium_animation_not_live_action(self):
         shot=self.shots[0]
         prompt=first.frame_prompt(shot)
         self.assertIn(shot["physical_direction"],prompt)
         self.assertIn("steel-blue",prompt)
         self.assertIn("Max",prompt)
-        self.assertIn("No title",prompt)
-        self.assertIn("live-action",prompt.lower())
-        self.assertTrue("central" in prompt.lower() or "center" in prompt.lower())
+        self.assertIn("text, subtitles",prompt)
+        self.assertIn("3d animated feature film", prompt.lower())
+        self.assertIn("not a real photographic person", prompt.lower())
+        self.assertIn("fully seated", prompt.lower())
+        self.assertIn("central 70 percent",prompt.lower())
 
     def test_source_model_is_free_shared_gpu(self):
         self.assertEqual(first.MODEL,"black-forest-labs/FLUX.1-schnell")
