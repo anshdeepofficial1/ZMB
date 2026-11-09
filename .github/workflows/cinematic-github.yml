@@ -18,7 +18,7 @@ on:
         required: false
         default: "0"
       use_free_quota:
-        description: "Consume existing 5-min/day FREE Hugging Face quota for exactly ONE clip"
+        description: "Use only FREE Hugging Face quota for ONE 4-second LTX-2.5 clip"
         type: boolean
         required: false
         default: false
