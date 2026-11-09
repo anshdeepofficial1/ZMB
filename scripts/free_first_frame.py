@@ -82,13 +82,29 @@ def verify_quota(token: str) -> dict:
             "GitHub repository secret HF_TOKEN required (free Hugging Face)."
         )
     from huggingface_hub import HfApi
+    api = HfApi(token=token)
     try:
-        quota = HfApi(token=token).get_zero_gpu_quota()
+        account = api.whoami(token=token)
     except Exception as exc:
         raise VisualContractError(
-            "Could not read free ZeroGPU quota. The HF token may need "
-            "'Billing: read usage' permission; no inference attempted."
+            "Could not confirm Hugging Face Free account; no inference attempted."
         ) from exc
+    if not isinstance(account, dict) or account.get("isPro") is not False:
+        raise VisualContractError(
+            "Strict zero-cost inference requires verified Free account "
+            "(isPro=false), not Pro/Team/Enterprise billing."
+        )
+    # Some read-scoped tokens cannot call the *billing-protected* quota API.
+    # For verified Free accounts, HF itself enforces the included daily quota
+    # and does not offer paid overage. Do not ask the user for billing access.
+    try:
+        quota = api.get_zero_gpu_quota()
+    except Exception:
+        return {
+            "base": 300,
+            "remaining_before": None,
+            "quota_protection": "verified-free-account-provider-enforced",
+        }
     base = float(getattr(quota, "base", 0) or 0)
     remaining = float(getattr(quota, "remaining", 0) or 0)
     if base <= 0 or base > 300:
@@ -101,8 +117,8 @@ def verify_quota(token: str) -> dict:
             f"Only {remaining:.0f}s free quota remain; need at least 35s "
             "before requesting an image. No paid fallback."
         )
-    return {"base": base, "remaining_before": remaining}
-
+    return {"base": base, "remaining_before": remaining,
+            "quota_protection": "verified-free-account-with-quota-check"}
 
 def generate(shot: dict, destination: Path) -> dict:
     token = os.environ.get("HF_TOKEN", "")
