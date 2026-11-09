@@ -74,8 +74,19 @@ jobs:
           python -m compileall -q scripts tests
           python -m unittest discover -s tests -v
           python -c "import json; c=json.load(open('config.example.json')); assert c['publishing_enabled'] is False and c['cinematic_release_approved'] is False"
-          python -c "from github_cloud_video import FalInference; from visual_manifest import VisualContractError; \
-            exec('try:\\n FalInference()\\nexcept VisualContractError:\\n pass\\nelse:\\n raise AssertionError(\"billable inference was not blocked\")')"
+          python - <<'PY'
+          import sys
+          sys.path.insert(0, "scripts")
+          from github_cloud_video import FalInference
+          from visual_manifest import VisualContractError
+          try:
+              FalInference()
+          except VisualContractError as exc:
+              assert "DISABLED" in str(exc)
+              print("Paid inference permanently blocked — verified")
+          else:
+              raise AssertionError("Paid inference must stay disabled")
+          PY
 
       - name: Free model plan, public API probe, or one reviewed clip
         env:
