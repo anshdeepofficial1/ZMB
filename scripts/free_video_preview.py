@@ -50,7 +50,13 @@ def verify_source(shot: dict, image: Path) -> dict:
     if digest != data.get("file_sha256"):
         raise VisualContractError("first-frame bytes changed since model generation")
     if data.get("model_space") != "black-forest-labs/FLUX.1-schnell":
-        raise VisualContractError("first frame is not the reviewed free model source")
+        raise VisualContractError("first frame is not the original free FLUX model")
+    from art_direction import STYLE_ID
+    if data.get("art_style") != STYLE_ID:
+        raise VisualContractError(
+            "Cannot animate old photorealistic source image. Generate a NEW "
+            "premium 3D animated first frame with matching style provenance."
+        )
     with Image.open(image) as picture:
         w, h = picture.size
         if picture.format != "PNG" or w < 512 or h < 768:
@@ -62,24 +68,9 @@ def verify_source(shot: dict, image: Path) -> dict:
 
 
 def prompt_for_real_motion(shot: dict) -> str:
-    return (
-        "One continuous cinematic survival-thriller live-action shot. "
-        "DO NOT change the opening frame's exact car, driver, road, "
-        "wardrobe, lights, body shape or camera angle. "
-        "The physically visible event must happen, not a Ken Burns image pan: "
-        + shot["physical_direction"]
-        + ". A REAL steel-blue sedan DRIVES FORWARD on wet asphalt, "
-        "the tyres rotate and the lane lines and roadside physically "
-        "move backwards past the car, the steering moves slightly, "
-        "headlight beams pulse in fog, driver remains seated with "
-        "hands on the wheel, his face remains the same and realistic. "
-        "Subtle handheld/camera tracking with stable background geometry "
-        "and smooth organic motion, professional contrast between amber "
-        "headlamps and teal-blue moonlit fog, atmospheric realistic depth. "
-        "No sudden cuts, no car changing into another model, no extra "
-        "cars, no duplicated arms, no morphing, no freeze, no cartoon "
-        "art, no text, no subtitles, no HUD, no logos or watermark."
-    )
+    """Physically coherent premium CGI animation, not live-action footage."""
+    from art_direction import animation_prompt
+    return animation_prompt(shot)
 
 
 def ffprobe(path: Path) -> dict:
@@ -164,6 +155,7 @@ def generate_one(shot: dict, first_frame: Path, output: Path) -> dict:
     proof = {
         "shot_id": shot["id"],
         "model": SPACE,
+        "art_style": __import__("art_direction").STYLE_ID,
         "source_image_sha256": first["sha256"],
         "native_model_size": f"{native['native_width']}x{native['native_height']}",
         "delivery_size": "1080x1920 (scaled; not native)",
