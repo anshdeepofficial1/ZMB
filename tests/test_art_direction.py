@@ -44,9 +44,9 @@ class AnimatedStoryStyleTests(unittest.TestCase):
         still=scene_prompt(intro).lower()
         motion=animation_prompt(intro).lower()
         for word in ("fully seated","inside","seatbelt","steering wheel",
-                     "navy","amber","biscuit","steel-blue"):
+                     "navy","amber","no dog","steel-blue","no dawn"):
             self.assertIn(word,still)
-        for phrase in ("stays buckled","rotating wheels","headlights visibly pulse",
+        for phrase in ("stays buckled","road lines moving", "headlights",
                        "original animated character","3d animated"):
             self.assertIn(phrase,motion)
         self.assertIn("no giant empty sky",style_header().lower())
