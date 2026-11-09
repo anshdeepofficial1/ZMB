@@ -1,4 +1,4 @@
-name: Cinematic video on GitHub (preview only)
+name: ZMB free-only cinematic checks (zero rupees)
 
 on:
   push:
@@ -7,129 +7,112 @@ on:
   workflow_dispatch:
     inputs:
       mode:
-        description: "plan is free; references, shot and day1 use paid GPU inference"
-        required: true
+        description: "plan and probe cost ₹0; one_clip uses only free HF ZeroGPU quota"
         type: choice
-        options:
-          - plan
-          - references
-          - shot
-          - day1
+        required: true
+        options: [plan, probe, one_clip]
         default: plan
       shot:
-        description: "Zero-based Day 1 shot index (only for mode=shot)"
+        description: "Day 1 shot index 0-6; one_clip requires approved first-frame PNG"
+        type: string
         required: false
         default: "0"
-        type: string
-      authorize_charges:
-        description: "For paid modes, enter I_ACCEPT_PROVIDER_CHARGES"
+      use_free_quota:
+        description: "Consume existing 5-min/day FREE Hugging Face quota for exactly ONE clip"
+        type: boolean
         required: false
-        type: string
-        default: "NO"
-      max_billable_calls:
-        description: "Maximum billable image/video calls this run may start"
-        required: false
-        type: string
-        default: "24"
+        default: false
   schedule:
-    # Zero-cost preflight only. Scheduled runs can NEVER call paid models.
+    # Free non-inference validation only. No automatic quota consumption.
     - cron: "17 4 * * *"
 
 permissions:
   contents: read
 
 concurrency:
-  group: zmb-cinematic-generator
+  group: zmb-free-cinematic
   cancel-in-progress: false
 
 jobs:
-  create-review-preview:
+  verify-free-video:
     runs-on: ubuntu-latest
     timeout-minutes: 120
     env:
-      FAL_KEY: ${{ secrets.FAL_KEY }}
+      ZMB_BUDGET_RUPEES: "0"
       ZMB_PUBLISH_ENABLED: "0"
       ZMB_LOCAL_AI_ENABLED: "0"
+      HF_TOKEN: ${{ secrets.HF_TOKEN }}
       IG_ACCESS_TOKEN: ""
       IG_USER_ID: ""
+      FAL_KEY: ""
     steps:
-      - name: Checkout current cinematic implementation (never main's legacy poster)
+      - name: Checkout cinematic draft implementation (not old procedural release)
         uses: actions/checkout@v7
         with:
-          # The feature is a draft PR. This workflow is installed on main
-          # solely to expose workflow_dispatch in GitHub's Actions UI.
           ref: rebuild/comfyui-cinematic-assets
           persist-credentials: false
 
-      - name: Set up Python
+      - name: Python setup
         uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: scripts/requirements-cloud.txt
+          cache-dependency-path: scripts/requirements-free.txt
 
-      - name: Install CPU orchestration and video compositing dependencies
+      - name: Install only free tools and CPU media editor
         run: |
           set -euo pipefail
-          python -m pip install --prefer-binary -r scripts/requirements-cloud.txt
+          python -m pip install --prefer-binary -r scripts/requirements-free.txt
           sudo apt-get update -qq
           sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
-          ffmpeg -hide_banner -version | head -n 1
 
-      - name: Unit tests and no-Instagram safety check
+      - name: Verify safety and all automated rendering tests
         env:
-          # Isolated tests mock the local LLM; this does not run the model.
           ZMB_LOCAL_AI_ENABLED: "1"
         run: |
           set -euo pipefail
           python -m compileall -q scripts tests
           python -m unittest discover -s tests -v
           python -c "import json; c=json.load(open('config.example.json')); assert c['publishing_enabled'] is False and c['cinematic_release_approved'] is False"
+          python -c "from github_cloud_video import FalInference; from visual_manifest import VisualContractError; \
+            exec('try:\\n FalInference()\\nexcept VisualContractError:\\n pass\\nelse:\\n raise AssertionError(\"billable inference was not blocked\")')"
 
-      - name: Verify actual FFmpeg 9:16 preview assembly with synthetic test media
-        run: |
-          set -euo pipefail
-          python -m unittest discover -s tests -p test_github_cloud_video.py -v
-
-      - name: Generate real footage or plan (never publish)
+      - name: Free model plan, public API probe, or one reviewed clip
         env:
-          REQUEST_MODE: ${{ github.event_name == 'schedule' && 'plan' || inputs.mode }}
+          REQUEST_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'plan' }}
           REQUEST_SHOT: ${{ inputs.shot }}
-          AUTHORIZE_CHARGES: ${{ inputs.authorize_charges }}
-          MAX_CALLS: ${{ inputs.max_billable_calls }}
+          REQUEST_FREE_QUOTA: ${{ inputs.use_free_quota }}
         run: |
           set -euo pipefail
           MODE="${REQUEST_MODE:-plan}"
           SHOT="${REQUEST_SHOT:-0}"
-          CAP="${MAX_CALLS:-24}"
-          if [[ "$MODE" != "plan" ]]; then
-            if [[ "$AUTHORIZE_CHARGES" != "I_ACCEPT_PROVIDER_CHARGES" ]]; then
-              echo "::error::Explicit charge authorization required; no GPU request made."
-              exit 1
-            fi
-            if [[ -z "$FAL_KEY" ]]; then
-              echo "::error::Set FAL_KEY as a GitHub Actions repository secret; no GPU request made."
-              exit 1
-            fi
-            python scripts/github_cloud_video.py --mode "$MODE" --shot "$SHOT" --max-billable-calls "$CAP" --authorize-charges
+          if [[ "$MODE" == "plan" ]]; then
+            python scripts/hf_zerogpu_video.py --mode plan
+          elif [[ "$MODE" == "probe" ]]; then
+            python scripts/hf_zerogpu_video.py --mode probe
+          elif [[ "$MODE" == "one_clip" && "$REQUEST_FREE_QUOTA" == "true" ]]; then
+            test -n "$HF_TOKEN" || { echo "::error::Free Hugging Face HF_TOKEN not set"; exit 1; }
+            python scripts/hf_zerogpu_video.py --mode one_clip --shot "$SHOT" --use-free-quota
           else
-            python scripts/github_cloud_video.py --mode plan
+            echo "::error::No quota use authorized; no inference submitted."
+            exit 1
           fi
 
-      - name: Upload review files, rendered clips, and diagnostics
+      - name: Upload only zero-budget plans or UNREVIEWED video
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: zmb-cinematic-unreviewed-${{ github.run_id }}
+          name: zmb-zero-rupees-${{ github.run_id }}
           path: |
-            out/github_cinematic/**
-          if-no-files-found: warn
+            out/free_zerogpu/**
+          if-no-files-found: ignore
           retention-days: 14
 
-      - name: Final status summary
+      - name: Record strict budget and review status
         if: always()
         run: |
-          echo "## ZMB cinematic GitHub run" >> "$GITHUB_STEP_SUMMARY"
-          echo "Everything in this run is **UNREVIEWED**." >> "$GITHUB_STEP_SUMMARY"
-          echo "Instagram posting is hard-disabled; this workflow has no publishing credentials." >> "$GITHUB_STEP_SUMMARY"
-          echo "View **Artifacts** on this Actions run for clip evidence and any Day 1 draft." >> "$GITHUB_STEP_SUMMARY"
+          echo "## ZMB Zero-Rupee workflow" >> "$GITHUB_STEP_SUMMARY"
+          echo "Budget is **₹0**; fal.ai/Replicate/paid GPUs are disabled." >> "$GITHUB_STEP_SUMMARY"
+          echo "Only free Hugging Face ZeroGPU quotas may be used by an explicit manual one_clip run." >> "$GITHUB_STEP_SUMMARY"
+          echo "No Instagram credentials are present; all video outputs are UNREVIEWED." >> "$GITHUB_STEP_SUMMARY"
+          echo "Free third-party ZeroGPU availability, daily output and cinematic quality are NOT guaranteed." >> "$GITHUB_STEP_SUMMARY"
