@@ -12,8 +12,9 @@ STYLE_ID = "zmb_premium_animated_3d_v1"
 LOOK = (
     "PREMIUM ORIGINAL 3D ANIMATED FEATURE FILM, stylized cinematic survival "
     "horror, sophisticated hand-crafted CGI aesthetic rather than live action. "
-    "Expressive deliberately-designed animated adult faces with softly "
-    "stylized proportions, distinctive silhouettes, sculpted hair, clean "
+    "Distinctively ADULT animated faces and adult body proportions, "
+    "angular mature silhouettes, subtle expressive brows and natural "
+    "animated eyes rather than child-sized oversized eyes, sculpted hair, clean "
     "animated skin shaders, detailed stylized fabric, meticulously modeled "
     "objects and atmospheric volumetric fog. Cohesive animated character "
     "design as if every shot belongs to the SAME one feature film. "
@@ -65,19 +66,29 @@ COMPOSITION = (
 )
 
 SHOT_ZERO = (
-    "Interior passenger-seat camera in a designed 3D animated car cabin, "
-    "looking diagonally at Max, who is FULLY SEATED with his seatbelt on. "
-    "His animated face, torso and hands on the steering wheel are plainly "
-    "visible. His arms, legs and head remain entirely INSIDE the car. "
-    "Dark cabin and cyan fog beyond the windshield, warm amber dashboard "
-    "shines on his cheek and hands. Wet highway lane markings move past "
-    "the glass, headlights flicker ahead, wheel movement grounded. "
-    "Biscuit is a small tan animated dog sitting naturally on the passenger "
-    "side; no extra people, no limbs outside a car window. "
+    "EXACT TIME 2:47 AM, PITCH-DARK DESERTED HIGHWAY. Premium 3D animated "
+    "THRILLER opening, INSIDE a single steel-blue sedan. Camera bolted to "
+    "the FRONT PASSENGER SIDE, in a tight medium shot looking diagonally "
+    "toward Max and through the FRONT WINDSHIELD, steering wheel clearly "
+    "visible foreground. Max is a distinctly ADULT male in his mid-20s, "
+    "lean and tired, mature animated face not a child, charcoal jacket. "
+    "Max sits FULLY SEATED and belted INSIDE the car, both properly formed "
+    "hands touching the steering wheel, no hands or arms outside. "
+    "The dark wet HIGHWAY road, lane stripes and faint fog are visible "
+    "THROUGH the glass behind the dashboard. Background EMPTY rural road "
+    "at midnight: NO gas station, no houses, no shop, no sunset, NO dawn, "
+    "no bright blue morning sky. Near-black blue-black outside with "
+    "limited cool teal headlight beams, subtle glowing AMBER instrument "
+    "lights softly illuminate Max's cheek and fingers. High contrast "
+    "animated film lighting with face and wheel both readable. "
+    "ONLY Max is VISIBLE in this shot, NO dog in Max's lap, on dashboard, "
+    "or obscuring driver's hands. Max and camera remain fully inside car. "
 )
 
 def style_header() -> str:
-    return f"ZMB STYLE {STYLE_ID}. " + LOOK + CHARACTER_LOCK + SCENE_LOCK + COMPOSITION
+    # Do not mention the entire cast or gas station in EVERY shot.
+    # Doing so can insert a dog/station into a lone-driver highway opener.
+    return f"ZMB STYLE {STYLE_ID}. " + LOOK + COMPOSITION
 
 def scene_prompt(shot: dict) -> str:
     if not str(shot.get("physical_direction") or "").strip():
@@ -89,6 +100,7 @@ def scene_prompt(shot: dict) -> str:
     characters = " ".join(
         f"VISIBLE CHARACTER {person['id']}: {person['identity']}. "
         for person in shot.get("characters", [])
+        if not (int(shot.get("index", -1)) == 0 and person["id"] == "biscuit")
     )
     props = " ".join(
         f"CONSISTENT DESIGN {item['id']}: {item['identity']}. "
@@ -108,9 +120,11 @@ def animation_prompt(shot: dict) -> str:
         raise ValueError("Missing physical action; cannot invent animation")
     movement = (
         "Max stays buckled INSIDE the vehicle as it DRIVES forward, with "
-        "clearly rotating wheels and environment moving naturally past "
-        "the windscreen. His hands make believable minor wheel corrections, "
-        "headlights visibly pulse, Biscuit stays seated. "
+        "the road lines moving naturally past the windscreen and headlights "
+        "visibly pulsing through dark moonlit fog. His hands remain properly "
+        "on the wheel with believable minor steering corrections, "
+        "his animated adult face remains mature and consistent. "
+        "NO dog enters the shot, NO gas station, NO daylight. "
         if int(shot.get("index", -1)) == 0 else
         "Animate the intended character/prop interaction with convincing "
         "keyframed-style easing and momentum; keep action continuous. "
