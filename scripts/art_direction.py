@@ -72,7 +72,7 @@ SHOT_ZERO = (
     "toward Max and through the FRONT WINDSHIELD, steering wheel clearly "
     "visible foreground. Max is a distinctly ADULT male in his mid-20s, "
     "lean and tired, mature animated face not a child, charcoal jacket. "
-    "Max sits FULLY SEATED and belted INSIDE the car, both properly formed "
+    "Max sits FULLY SEATED with the seatbelt fastened INSIDE the car, " "both properly formed "
     "hands touching the steering wheel, no hands or arms outside. "
     "The dark wet HIGHWAY road, lane stripes and faint fog are visible "
     "THROUGH the glass behind the dashboard. Background EMPTY rural road "
