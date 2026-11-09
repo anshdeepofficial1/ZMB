@@ -41,6 +41,7 @@ def voice_for_shot(text: str, target: float, work: Path) -> tuple[Path,list]:
         if not words:
             raise VisualContractError("Narration has no exact Edge TTS word boundaries")
         spoken=duration(source)
+        print(f"[tts] rate={rate}, speech={spoken:.2f}s, final word={float(words[-1]['end']):.2f}s, film={target:.2f}s",flush=True)
         if spoken <= target-0.04 and float(words[-1]["end"]) <= target-0.05:
             return source,words
     raise VisualContractError(
@@ -60,13 +61,25 @@ def compose(video: Path, shot_index: int, output: Path=OUT) -> dict:
     # The real free model gives only 4 seconds. This explicit editorial
     # rewrite preserves the timestamp, solitary driver and flickering lamps;
     # it is recorded in provenance rather than silently changing the story.
-    text=(
-        "2:47 AM. Max drives alone. Headlights flicker."
-        if shot_index==0 else canonical_narration
+    # The 4s free model requires a genuine 4s voice. Preserve story facts in
+    # the canonical record, and progressively shorten editorial voiceover;
+    # never truncate, speed-garble, repeat or freeze footage.
+    candidate_lines=(
+        ["Max drives alone. Headlights flicker.", "Max drives. Headlights flicker."]
+        if shot_index==0 else [canonical_narration]
     )
     output.mkdir(parents=True,exist_ok=True)
     work=output/"work"
-    voice,words=voice_for_shot(text,info["duration"],work)
+    for text in candidate_lines:
+        try:
+            voice,words=voice_for_shot(text,info["duration"],work)
+            break
+        except VisualContractError as exc:
+            print(f"[tts] overlong voice line rejected: {text!r}",flush=True)
+    else:
+        raise VisualContractError(
+            "No natural spoken line fits the genuine 4-second moving clip"
+        )
     ass=work/"captions.ass"
     line=SimpleNamespace(
         kind="line",start=0.0,end=info["duration"],dur=info["duration"]
