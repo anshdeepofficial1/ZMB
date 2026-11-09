@@ -59,7 +59,7 @@ class FreeVideoTests(unittest.TestCase):
     def test_no_nonportrait_or_tiny_motion_can_be_accepted(self):
         import inspect
         text=inspect.getsource(clip.ffprobe)
-        self.assertIn('9 / 16',text)
+        self.assertTrue('9/16' in text or '9 / 16' in text)
         self.assertIn('3.0 <= duration <= 6.0',text)
 
 
