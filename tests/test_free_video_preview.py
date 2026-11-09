@@ -23,7 +23,7 @@ class FreeVideoTests(unittest.TestCase):
         self.assertEqual(clip.SPACE,"Lightricks/LTX-2.5")
         prompt=clip.prompt_for_real_motion(self.shot)
         self.assertIn(self.shot["physical_direction"],prompt)
-        for required in ("tyres rotate","lane lines","headlight beams pulse","no morphing"):
+        for required in ("drives forward","hands make believable", "headlights visibly pulse","morphing"):
             self.assertIn(required.lower(),prompt.lower())
 
     def test_real_first_frame_provenance_cannot_be_swapped(self):
@@ -33,12 +33,25 @@ class FreeVideoTests(unittest.TestCase):
             data={
                 "shot_id":self.shot["id"],
                 "model_space":"black-forest-labs/FLUX.1-schnell",
+                "art_style":"zmb_premium_animated_3d_v1",
                 "file_sha256":hashlib.sha256(file.read_bytes()).hexdigest(),
             }
             file.with_suffix(".json").write_text(json.dumps(data))
             self.assertEqual(clip.verify_source(self.shot,file)["image_width"],768)
             Image.new("RGB",(768,1376),(18,42,33)).save(file)
             with self.assertRaisesRegex(VisualContractError,"changed"):
+                clip.verify_source(self.shot,file)
+
+    def test_live_action_reference_is_rejected_even_when_png_sha_matches(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            file=Path(tmp)/"shot_00.png"
+            Image.new("RGB",(768,1376),(40,68,95)).save(file)
+            file.with_suffix(".json").write_text(json.dumps({
+                "shot_id":self.shot["id"],
+                "model_space":"black-forest-labs/FLUX.1-schnell",
+                "file_sha256":hashlib.sha256(file.read_bytes()).hexdigest()
+            }))
+            with self.assertRaisesRegex(VisualContractError,"old photorealistic"):
                 clip.verify_source(self.shot,file)
 
     def test_frame_requires_provenance_not_generic_portrait(self):
