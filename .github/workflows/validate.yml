@@ -45,10 +45,10 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-          cache-dependency-path: scripts/requirements.txt
+          cache-dependency-path: scripts/requirements-free.txt
 
-      - name: Install dependencies
-        run: pip install --prefer-binary --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu -r scripts/requirements.txt
+      - name: Install free CI dependencies (local GGUF inference is not run)
+        run: pip install --prefer-binary -r scripts/requirements-free.txt
 
       - name: Compile Python files
         run: python -m compileall -q scripts tests
