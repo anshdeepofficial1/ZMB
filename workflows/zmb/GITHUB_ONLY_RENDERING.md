@@ -14,12 +14,12 @@ Everything is controlled by GitHub Actions. Standard runners have CPUs, so any a
 
 ## Free GPU limits
 
-Hugging Face ZeroGPU currently offers free users **five minutes per 24 hours** of shared GPU quota, with queues and unavailable demos possible. The selected ZeroCollabs/LTX-2.3-turbo Space can reserve around 200 seconds for one six-second clip. That cannot guarantee seven professional clips every day.
+Hugging Face ZeroGPU currently offers free users **five minutes per 24 hours** of shared GPU quota, with queues and unavailable demos possible. The selected Lightricks/LTX-2.5 Space can reserve around a large quota reservation for one four-second clip. That cannot guarantee seven professional clips every day.
 
 Sources:
 - https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job
 - https://huggingface.co/docs/hub/spaces-zerogpu
-- https://huggingface.co/spaces/ZeroCollabs/LTX-2.3-turbo
+- https://huggingface.co/spaces/Lightricks/LTX-2.5
 
 ## Use from GitHub Actions; no laptop
 
@@ -27,7 +27,7 @@ Open https://github.com/anshdeepofficial1/ZMB/actions/workflows/cinematic-github
 
 - **plan**: completely free, no GPU use, outputs a project plan.
 - **probe**: free public Space status check, no GPU inference.
-- **one_clip**: opt-in, at most one six-second experimental video using only free quota. Requires an HF_TOKEN belonging to a free Hugging Face account and an already human-approved action-specific first-frame PNG. No characters or footage are invented if that PNG is absent.
+- **one_clip**: opt-in, at most one four-second experimental video using only free quota. Requires an HF_TOKEN belonging to a free Hugging Face account and an already human-approved action-specific first-frame PNG. No characters or footage are invented if that PNG is absent.
 
 Save a read-only free Hugging Face token only as GitHub repository secret HF_TOKEN. Do not add a card, buy credits or use a paid plan. The inference script rejects absent tokens, low shared quota, paid/extended allowance, missing face/prop references and unavailable ZeroGPU hardware.
 
