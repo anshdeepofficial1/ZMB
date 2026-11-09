@@ -122,21 +122,12 @@ def build_manifest(
                     "identity": identity["visual_identity"],
                     "reference": identity["reference"],
                 })
+        from art_direction import style_header, NEGATIVE
         prompt = (
-            "Vertical 9:16 ORIGINAL PHOTOREALISTIC CINEMA, premium survival-thriller "
-            "film frame. Genuine human anatomy and detailed, natural facial "
-            "features; actual believable dog anatomy, grounded car geometry; "
-            "physically based materials, fine fabric and skin texture, realistic "
-            "cinematic depth-of-field and lens response. Filmic high-contrast "
-            "teal moonlight in the shadows with warm amber station practicals; "
-            "preserve accurate skin tones and readable shadow detail. "
-            "Compose the subject and every action prop in the MIDDLE 70% "
-            "of the vertical frame, not tiny at the bottom below an empty sky. "
-            "Foreground action is physically legible at phone size. "
-            "NEGATIVE: flat cartoon, vector art, stick figures, toy/plastic "
-            "characters, dark empty sky dominating the frame, generic motion, "
-            "UI/HUD, on-frame text or baked captions. "
-            f"LOCATION: {place}; TIME: {meta.get('time','night')}; "
+            style_header()
+            + NEGATIVE
+            + "LOCATION: "
+            + f"{place}; TIME: {meta.get('time','night')}; "
             f"MOOD: {meta.get('mood','tense')}. "
             f"VISIBLE PHYSICAL ACTION: {action}. "
             f"REQUIRED PHYSICAL PROPS: {', '.join(props)}. "
@@ -182,7 +173,7 @@ def build_manifest(
             "season": episode["season"], "day": episode["day"],
             "arc": episode["arc"], "node": episode["node"]
         },
-        "style": "photorealistic, warm-amber/teal-moonlight film with constant faces and full-frame action",
+        "style": "premium_original_stylized_3d_animated_thriller_navy_teal_amber",
         "shots": manifest_shots,
         "approval": {
             "required": [
