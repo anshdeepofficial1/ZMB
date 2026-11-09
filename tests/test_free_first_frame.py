@@ -33,19 +33,33 @@ class FreeFirstFrameTests(unittest.TestCase):
         self.assertEqual(first.HEIGHT%32,0)
         self.assertAlmostEqual(first.WIDTH/first.HEIGHT,9/16,delta=0.045)
 
-    def test_quota_requires_readable_free_allowance(self):
+    def test_quota_requires_verified_free_account(self):
         from huggingface_hub import HfApi
-        with patch.object(HfApi,"get_zero_gpu_quota",
-                          return_value=SimpleNamespace(base=300,remaining=250)):
-            self.assertEqual(first.verify_quota("hf_fake")["remaining_before"],250)
-        with patch.object(HfApi,"get_zero_gpu_quota",
-                          return_value=SimpleNamespace(base=300,remaining=5)):
-            with self.assertRaisesRegex(VisualContractError,"Only"):
+        with patch.object(HfApi,"whoami",return_value={"isPro":False}):
+            with patch.object(HfApi,"get_zero_gpu_quota",
+                              return_value=SimpleNamespace(base=300,remaining=250)):
+                self.assertEqual(first.verify_quota("hf_fake")["remaining_before"],250)
+            with patch.object(HfApi,"get_zero_gpu_quota",
+                              return_value=SimpleNamespace(base=300,remaining=5)):
+                with self.assertRaisesRegex(VisualContractError,"Only"):
+                    first.verify_quota("hf_fake")
+            with patch.object(HfApi,"get_zero_gpu_quota",
+                              return_value=SimpleNamespace(base=2400,remaining=2400)):
+                with self.assertRaisesRegex(VisualContractError,"300-second"):
+                    first.verify_quota("hf_fake")
+        with patch.object(HfApi,"whoami",return_value={"isPro":True}):
+            with self.assertRaisesRegex(VisualContractError,"requires verified Free"):
                 first.verify_quota("hf_fake")
-        with patch.object(HfApi,"get_zero_gpu_quota",
-                          return_value=SimpleNamespace(base=2400,remaining=2400)):
-            with self.assertRaisesRegex(VisualContractError,"Free-only"):
-                first.verify_quota("hf_fake")
+
+    def test_read_only_token_quota_403_falls_back_safely_for_free_account(self):
+        from huggingface_hub import HfApi
+        with patch.object(HfApi,"whoami",return_value={"isPro":False}), patch.object(
+            HfApi,"get_zero_gpu_quota",side_effect=PermissionError("403 Forbidden")
+        ):
+            proof=first.verify_quota("hf_free_readonly")
+        self.assertIsNone(proof["remaining_before"])
+        self.assertEqual(proof["base"],300)
+        self.assertIn("provider-enforced",proof["quota_protection"])
 
     def test_missing_token_blocks_inference(self):
         with self.assertRaisesRegex(VisualContractError,"HF_TOKEN"):
