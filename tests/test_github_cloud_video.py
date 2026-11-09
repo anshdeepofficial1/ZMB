@@ -39,7 +39,7 @@ class GitHubCloudPlanTests(unittest.TestCase):
 
     def test_no_key_cannot_start_billable_inference(self):
         with patch.dict("os.environ", {"FAL_KEY": ""}):
-            with self.assertRaisesRegex(VisualContractError, "missing"):
+            with self.assertRaisesRegex(VisualContractError, "DISABLED"):
                 cloud.FalInference()
 
     def test_cloud_runtime_writes_only_unreviewed_provenance(self):
