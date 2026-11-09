@@ -30,7 +30,7 @@ class LocalModelPlanTests(unittest.TestCase):
         for shot in self.shots:
             prompt = local.scene_prompt(shot).lower()
             self.assertIn(shot["physical_direction"].lower(), prompt)
-            self.assertIn("photorealistic", prompt)
+            self.assertIn("3d animated", prompt)
             self.assertIn("motion", prompt)
             self.assertNotIn("flat cartoon", prompt)
         self.assertIn("wheel", local.scene_prompt(self.shots[0]).lower())
