@@ -85,8 +85,9 @@ class NarrativeVisualBeatTests(unittest.TestCase):
     def test_flashlight_and_turning_door_handle_are_visible(self):
         flashlight = narrative_beat_layer({"beat": "flashlight_exit"}, 1.25)
         handle = narrative_beat_layer({"beat": "door_handle"}, 1.25)
-        self.assertIn("translate(150 1436)", flashlight)
-        self.assertIn("rotate(", flashlight)
+        self.assertIn("translate(-105 1552) scale(0.64)", flashlight)
+        self.assertIn("translate(325 -157) scale(", flashlight)
+        self.assertNotIn("translate(150 1436)", flashlight)
         self.assertNotIn("translate(620 1194)", flashlight)
         self.assertIn("rotate(", handle)
         self.assertIn("M 738 895", handle)
