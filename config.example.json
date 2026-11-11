@@ -36,7 +36,7 @@
     "#horrorstory"
   ],
   "hashtags_per_post": 5,
-  "music_volume": 0.1,
+  "music_volume": 0,
   "ai_disclosure": false,
   "media_branch": "media",
   "stats_reset": {
@@ -63,5 +63,6 @@
   "cinematic_release_approved": false,
   "procedural_release_approved": false,
   "narration_engine": "espeak-ng",
-  "narration_words_per_minute": 155
+  "narration_words_per_minute": 155,
+  "sound_design_enabled": true
 }
