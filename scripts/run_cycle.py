@@ -25,7 +25,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import engine  # noqa: E402
-from ai_providers import rewrite_episode  # noqa: E402
 import publish  # noqa: E402
 import render  # noqa: E402
 import votes as votes_mod  # noqa: E402
@@ -107,8 +106,8 @@ def main() -> None:
     # HARD PAUSE: both config AND environment must explicitly permit publishing.
     publishing_allowed = (
         cfg.get("publishing_enabled") is True
-        and cfg.get("cinematic_release_approved") is True
-        and str(cfg.get("visual_mode", "")) == "cinematic_assets"
+        and cfg.get("procedural_release_approved") is True
+        and str(cfg.get("visual_mode", "")) == "procedural"
         and os.environ.get("ZMB_PUBLISH_ENABLED", "").strip() == "1"
     )
     if not publishing_allowed and not args.dry_run and not args.stills:
@@ -132,9 +131,8 @@ def main() -> None:
     ig_user_id = (os.environ.get("IG_USER_ID") or "").strip()
 
     visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
-    if visual_mode in {"ai_storyboard", "ai_video"}:
-        log(f"[cycle] remote visual mode '{visual_mode}' is disabled; using the existing local procedural animation engine")
-        cfg["visual_mode"] = "procedural"
+    if visual_mode != "procedural":
+        raise SystemExit("[cycle] Only code-drawn 2D procedural animation is allowed")
 
     # Fail before spending minutes rendering when required publishing credentials are absent.
     if not args.dry_run and not args.prepare_scheduled:
@@ -274,11 +272,9 @@ def main() -> None:
                 log(f"[cycle] resolution → {resolution}")
 
         episode = engine.build_episode(state, scn, cfg, recap)
-        if bool(cfg.get("ai_story_generation", True)):
-            episode = rewrite_episode(episode, log)
-        else:
-            episode["ai_story"] = {"provider": "local-llama.cpp", "status": "disabled"}
-            log("[local-ai] disabled by config; using authored scenario script")
+        episode["ai_story"] = {"provider": "authored_story", "status": "disabled"}
+        log("[2d] authored script only; no AI model used")
+
         log(f"[cycle] episode: S{episode['season']} D{episode['day']} "
             f"node={episode['node']} kind={episode['kind']} vote={episode['vote']}")
         if args.stills:
