@@ -293,7 +293,7 @@ def narrative_beat_layer(meta, t):
                                 rotate=math.sin(t + i) * 24.0))
         return "".join(items)
 
-    def car_body(x=70.0, y=1505.0, scale=1.0, color="#56677b", broken=False):
+    def car_body(x=70.0, y=1505.0, scale=1.0, color="#3e8d9f", broken=False, driver=False):
         # side view, nose/engine on the right; wheels and glass remain distinct
         body = (
             sk.path("M 0 0 L 24 -105 Q 34 -142 88 -150 L 315 -150 "
@@ -314,6 +314,20 @@ def narrative_beat_layer(meta, t):
             + sk.circ(733, 5, 28, "#738195", "#182332", 7)
             + sk.ell(867, -90, 18, 12, "#ffda8a", op=0.95)
         )
+        if driver:
+            # Visible, illustrated Max in the driver's window. His identity
+            # is tied to the 2D palette, not a generic empty car silhouette.
+            body += sk.path("M 551 -163 L 552 -183 Q 568 -211 601 -201 "
+                            "Q 623 -194 630 -164 Z", "#147f96", "#162b41", 5)
+            body += sk.circ(590, -213, 31, "#f5bd96", "#14283b", 5)
+            body += sk.path("M 558 -218 Q 555 -252 584 -250 "
+                            "Q 615 -256 626 -221 L 610 -234 L 595 -246 "
+                            "L 578 -230 L 561 -235 Z", "#142c43", "#14283b", 3)
+            body += sk.ell(603, -215, 4, 6, "#14283b")
+            body += sk.path("M 612 -180 L 655 -164", "none", "#ffc966", 5)
+            # Re-outline the windshield panes over the seated figure.
+            body += sk.path("M 504 -244 L 625 -244 L 707 -161 L 504 -161 Z",
+                            "none", "#a4e3ec", 5)
         if broken:
             body += sk.path("M 698 -145 L 770 -294 L 844 -275 L 771 -131 Z",
                             "#7b8a9b", "#172230", 10)
@@ -335,7 +349,7 @@ def narrative_beat_layer(meta, t):
             "M 826 1405 L 1080 1255 L 1080 1575 L 826 1495 Z",
             "#ffe5a0", op=0.19 * rate))
         out.append(sk.g(f"translate(0 {n(bob)})",
-                        car_body(65, 1500, 0.99, "#46576a")))
+                        car_body(65, 1500, 0.99, "#358aa0", driver=True)))
         # Rotating hub markers make the moving wheels distinguishable.
         for cx in (250.0, 792.0):
             cy = 1505.0 + bob
@@ -353,7 +367,7 @@ def narrative_beat_layer(meta, t):
         jitter = math.sin(t * 32.0) * 8.0 * braking
         out.append(sk.ell(535, 1509, 455, 40, "#000307", op=0.58))
         out.append(sk.g(f"translate({n(jitter)} 0)",
-                        car_body(66, 1502, 1.0, "#46576a")))
+                        car_body(66, 1502, 1.0, "#358aa0", driver=True)))
         out.append(sk.path("M 838 1410 L 1080 1260 L 1080 1595 L 838 1495 Z",
                            "#ffe1a0", op=0.11 if int(t * 3.0) % 2 else 0.28))
         out.append(puffs(826, 1224, 8, 46, 74))
@@ -366,7 +380,7 @@ def narrative_beat_layer(meta, t):
     elif beat == "flashlight_exit":
         # Physical storyboard: the same parked sedan's door actually opens
         # before Max sweeps his handheld flashlight across the roadside.
-        out.append(car_body(-105, 1552, 0.64, "#46576a"))
+        out.append(car_body(-105, 1552, 0.64, "#358aa0"))
         door_open = ease(min(1.0, max(0.0, t / 1.30)))
         out.append(sk.g(
             f"translate(150 1436) rotate({n(-43.0 * door_open)})",
@@ -395,7 +409,7 @@ def narrative_beat_layer(meta, t):
         out.append(sk.rect(0, 970, W, 640, "#05080f", op=0.15))
         out.append(sk.ell(520, 1508, 470, 42, "#02050a", op=0.58))
         # large, readable car foreground and driver visible through the side window
-        out.append(car_body(72, 1515, 1.05, "#596b80", broken=True))
+        out.append(car_body(72, 1515, 1.05, "#358aa0", broken=True))
         out.append('<defs><clipPath id="zmb-break-window" clipPathUnits="userSpaceOnUse">'
                    '<path d="M 420 1351 L 505 1265 L 584 1265 L 584 1350 Z '
                    'M 597 1265 L 720 1265 L 797 1350 L 597 1350 Z"/></clipPath></defs>')
@@ -456,7 +470,7 @@ def narrative_beat_layer(meta, t):
 
     elif beat in ("spot_station", "door_shadow", "door_handle"):
         # The illuminated destination now takes over the composition.
-        out.append(car_body(28, 1570, 0.62, "#42546a", broken=False))
+        out.append(car_body(28, 1570, 0.62, "#358aa0", broken=False))
         out.append(puffs(515, 1455, 4, 24, 38))
         out.append(sk.ell(820, 1000, 260, 210, "#ffca76", op=0.065))
         out.append(sk.path("M 640 770 L 1040 770", "none", "#ffdf9e", 9, op=0.85))
@@ -493,7 +507,7 @@ def narrative_beat_layer(meta, t):
 
     elif beat == "backpack_exit":
         # A visible, strapped pack placed against Max's upper back + parked car.
-        out.append(car_body(6, 1580, 0.52, "#344456", broken=False))
+        out.append(car_body(6, 1580, 0.52, "#358aa0", broken=False))
         out.append(sk.ell(245, 1420, 210, 28, "#02050a", op=0.46))
         out.append(sk.g("translate(0 0)",
             sk.path("M 342 1028 Q 354 1004 389 1008 L 431 1030 L 429 1154 "
@@ -530,37 +544,39 @@ def narrative_beat_layer(meta, t):
 
 
 def hud_layer(stats, labels, meta, t, ep):
-    x, y = 46.0, 92.0
-    out = []
-    for i, key in enumerate(["hp", "noise", "food", "dog"]):
-        if key not in stats:
-            continue
-        val = max(0, min(100, stats.get(key, 0)))
-        col = HUD_COLORS[key]
-        yy = y + i * 62
-        slide = ease_out(min(1.0, t / 0.5 + i * 0.06))
-        ox = -60 * (1 - slide)
-        op = 0.55 + 0.45 * slide
-        out.append(g(f"translate({n(ox)} 0)",
-                     rect(x, yy, 316, 48, "#080c14", 24, op=0.52 * op)
-                     + rect(x + 16, yy + 15, 18, 18, col, 9, op=op)
-                     + text(x + 46, yy + 34, labels.get(key, key.upper()), 26, "Barlow",
-                            "#e8eef6", anchor="start", weight="bold", op=op)
-                     + rect(x + 150, yy + 17, 150, 14, "#1b2330", 7, op=0.75 * op)
-                     + rect(x + 150, yy + 17, max(4.0, 150 * val / 100.0), 14,
-                            col, 7, op=0.95 * op)
-                     + text(x + 306, yy + 34, str(int(val)), 24, "Barlow", "#ffffff",
-                            anchor="end", weight="bold", op=op)))
-    # top-right: season / day / place
-    tag = f"S{ep.get('season', 1)}  DAY {ep.get('day', 1)}"
-    place = PLACE_NAME.get(meta.get("place", ""), "")
-    out.append(g("translate(0 0)",
-                 text(W - 46, 122, tag, 30, "Barlow", "#f2d16b", anchor="end",
-                      weight="bold", ls=1.5)
-                 + text(W - 46, 162, place, 26, "Barlow", "#9fb2c6", anchor="end", weight="bold")
-                 + text(W - 46, 196, meta.get("subtitle", ""), 22, "Barlow", "#6f8296",
-                        anchor="end")))
-    return "".join(out)
+    """Minimal premium series bug inside the Instagram-safe top region.
+
+    Never stack tiny HP bars over the actor or clutter the first frame.
+    """
+    day=int(ep.get("day", 1))
+    place=PLACE_NAME.get(meta.get("place", ""), "UNKNOWN")
+    left=(rect(84,300,285,62,"#081b32",20,stroke="#75dbed",sw=2,op=.88)
+          +text(106,340,"ZMB",29,"Archivo Black","#ffdb81",
+                anchor="start",weight="bold",ls=2)
+          +text(205,338,f"DAY {day:02d}",26,"Barlow","#edf9ff",
+                anchor="start",weight="bold"))
+    right=(rect(688,300,304,62,"#081b32",20,stroke="#75dbed",sw=2,op=.86)
+           +text(840,340,place,21,"Barlow","#d9f9ff",weight="bold",ls=1))
+    # Only important meter. Intrusive RPG dashboard removed from every scene.
+    if "hp" in stats:
+        health=int(max(0,min(100,stats["hp"])))
+        left+=rect(85,378,186,9,"#18354c",4,op=.8)
+        left+=rect(85,378,186*health/100.0,9,"#ff7773",4,op=.94)
+    return left+right
+
+
+def opening_hook_layer(shot, t):
+    """Clear scrolling-feed hook visible from frame zero, no opening title card."""
+    if shot.kind != "line" or shot.meta.get("beat") != "car_driving":
+        return ""
+    p=ease_out(min(1.0,max(0.0,t/.35)))
+    fade=min(1.0,max(0.0,(2.8-t)/.55))
+    opacity=p*fade
+    return g(f"translate(0 {n(17*(1-p))})",
+        text(W/2,500,"2:47 AM",104,"Archivo Black","#fff8de",
+             stroke="#173b55",sw=9,weight="bold",op=opacity)
+        +text(W/2,560,"THE LAST DRIVE",38,"Barlow","#ffd46e",
+             weight="bold",ls=4,op=opacity))
 
 
 # --------------------------------------------------------------- captions ----
@@ -640,52 +656,58 @@ def chunk_words(words, Texts, size, max_w=1020.0, max_words=7, source_text=""):
     return out
 
 
-def caption_layer(chunks, t, Texts, size=54.0, max_w=1020.0):
+def caption_layer(chunks, t, Texts, size=54.0, max_w=760.0):
+    """Consistent Instagram-safe subtitles, one anchored high-contrast card.
+
+    Top of card y=930, bottom y=1138; stays outside Meta's bottom UI band.
+    All chunks have the same position; no shifting when text wraps.
+    """
     if not chunks:
         return ""
     active = None
-    for idx, c in enumerate(chunks):
-        if c["start"] - 0.06 <= t <= c["end"]:
-            active = (idx, c)
+    for c in chunks:
+        if c["start"]-.06 <= t <= c["end"]:
+            active=c
             break
     if active is None:
-        for idx, c in enumerate(chunks):
-            if t < c["start"]:
-                active = (idx, c)
-                break
+        active=next((c for c in chunks if t < c["start"]), None)
     if active is None:
         return ""
-    idx, c = active
-    words = c["words"]
-    # do line mein todo agar zaroorat ho
-    lines, cur = [], []
-    for wd in words:
-        trial = cur + [wd]
-        wid = sum(Texts.w(x["w"] + " ", size) for x in trial)
-        if cur and wid > max_w:
-            lines.append(cur)
-            cur = [wd]
+    width=min(755.0,max(550.0,float(max_w)))
+    max_words_per_line=4
+    lines, current=[],[]
+    for wd in active["words"]:
+        trial=current+[wd]
+        length=sum(Texts.w(str(w["w"])+ " ",size) for w in trial)
+        if current and (length>width or len(trial)>max_words_per_line):
+            lines.append(current)
+            current=[wd]
         else:
-            cur = trial
-    if cur:
-        lines.append(cur)
-    out = [rect(0, 1435, W, H - 1435, "url(#cap_scrim)")]
-    # Keep subtitles above the bottom safe area; anchor the last line consistently.
-    base_y = 1540 - (len(lines) - 1) * 80
-    for li, ln in enumerate(lines):
-        wid = sum(Texts.w(x["w"] + " ", size) for x in ln) - Texts.w(" ", size)
-        x = (W - wid) / 2.0
-        y = base_y + li * 74
-        for wd in ln:
-            spoken = t >= wd["start"]
-            is_now = wd["start"] <= t <= wd["end"] + 0.16
-            col = "#ffe08a" if is_now else ("#ffffff" if spoken else "#c8d4e0")
-            op = 1.0 if (spoken or is_now) else 0.72
-            out.append(path(f"M {n(x)} {n(y - size * 0.72)} L {n(x + Texts.w(wd['w'], size))} {n(y - size * 0.72)}",
-                            "none", "#080c14", 26, op=0.0))
-            out.append(text(x, y, wd["w"], size, "Barlow", col, anchor="start",
-                            weight="bold", stroke="#05070c", sw=11, op=op))
-            x += Texts.w(wd["w"] + " ", size)
+            current=trial
+    if current:
+        lines.append(current)
+    if len(lines)>2:
+        # Render only the two newest lines inside the fixed safe region.
+        # chunk_words caps words per panel in the configured 2D workflow.
+        lines=lines[:2]
+    out=[
+        rect(120,932,840,202,"#071b30",25,
+             stroke="#6bc7df",sw=2,op=.91),
+        rect(144,947,8,172,"#ffd36f",4,op=.94)
+    ]
+    for li,line_words in enumerate(lines):
+        # A one-line chunk is centered vertically; two-line chunks never drift.
+        y=1051 if len(lines)==1 else 1017+li*72
+        full=sum(Texts.w(str(w["w"])+" ",size) for w in line_words)-Texts.w(" ",size)
+        x=(W-full)/2.0
+        for wd in line_words:
+            word=str(wd["w"])
+            now=wd["start"]<=t<=wd["end"]+.13
+            read=t>=wd["start"]
+            color="#ffd46c" if now else ("#ffffff" if read else "#d6e6f1")
+            out.append(text(x,y,word,size,"Barlow",color,anchor="start",
+                            weight="bold",stroke="#07131e",sw=8,op=1.0))
+            x+=Texts.w(word+" ",size)
     return "".join(out)
 
 
@@ -829,6 +851,8 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
     scroll += loco * local
     prev = shots[call_idx - 1] if call_idx > 0 else None
     fx, fy, z = cam_at(shot, p, t, loco > 0, prev_shot=prev, place=place)
+    # Story subjects occupy the center of 9:16; no giant empty top half.
+    fy += 260.0
 
     defs, layers = _scene_cached(cache, place, tname, mood, seed)
     vw, vh = W / z, H / z
@@ -847,7 +871,9 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
 
     ov = []  # screen space
     if shot.kind == "line" and beat:
-        ov.append(narrative_beat_layer(meta, local))
+        # Bring illustrated events into the visual center, separate from
+        # caption and app controls. The world camera remains continuous.
+        ov.append(g("translate(0 -285)", narrative_beat_layer(meta, local)))
     if shot.kind == "line":
         ov.append(fx_layer(meta.get("fx", "none"), local, shot.dur, t_abs=t))
     elif shot.kind == "vote":
@@ -870,6 +896,8 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
             float(render_cfg.get("caption_size", 54)),
             float(render_cfg.get("caption_max_width", 930)),
         ))
+    if shot.kind == "line":
+        ov.append(opening_hook_layer(shot, local))
     if shot.kind != "title":
         ov.append(hud_layer(ep.get("stats", {}), ep.get("stats_labels", {}),
                             dict(meta, subtitle=ep.get("subtitle", "")), t, ep))
