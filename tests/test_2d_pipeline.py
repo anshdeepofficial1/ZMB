@@ -98,6 +98,21 @@ class Pure2DTests(unittest.TestCase):
         self.assertLessEqual(cfg["render"]["caption_max_width"],755)
 
 
+    def test_backpack_follows_actor_and_stays_on_max_after_exit(self):
+        import characters
+        moving=characters.render_actor("max","walk",0.6,size=600,backpack=True)
+        turning=characters.render_actor("max","look",1.8,size=600,backpack=True)
+        unladen=characters.render_actor("max","walk",.6,size=600,backpack=False)
+        self.assertIn("#965533",moving)
+        self.assertIn("#965533",turning)
+        self.assertNotIn("#965533",unladen)
+        self.assertNotEqual(moving,turning)
+
+    def test_driver_head_uses_same_original_2d_face_design(self):
+        driving=animate.narrative_beat_layer({"beat":"car_driving"},.6)
+        self.assertIn("#fff9f0",driving)
+        self.assertIn("#f5bd96",driving)
+
     def test_flashlight_is_attached_to_original_2d_max_hand(self):
         import characters
         actor = characters.render_actor("max","walk_flashlight",1.5,size=600)
