@@ -71,6 +71,26 @@ class Pure2DTests(unittest.TestCase):
         self.assertIn("THE LAST DRIVE", hook)
         self.assertIn("2:47 AM", hook)
 
+    def test_original_audio_synth_is_non_ai_and_has_real_wav(self):
+        import sound_design
+        from types import SimpleNamespace
+        import wave
+        sequence=[
+            SimpleNamespace(kind="line",meta={"beat":"car_driving"},start=0,end=2),
+            SimpleNamespace(kind="line",meta={"beat":"engine_stall"},start=2,end=4),
+            SimpleNamespace(kind="line",meta={"beat":"flashlight_exit"},start=4,end=6),
+            SimpleNamespace(kind="line",meta={"beat":"spot_station"},start=6,end=8),
+            SimpleNamespace(kind="line",meta={"beat":"door_handle"},start=8,end=10),
+        ]
+        with tempfile.TemporaryDirectory() as root:
+            path=Path(root)/"sound.wav"
+            info=sound_design.synthesize(sequence,10.0,path)
+            self.assertFalse(info["ai_generated"])
+            with wave.open(str(path),"rb") as wav:
+                self.assertEqual(wav.getframerate(),24000)
+                self.assertEqual(wav.getnframes(),240000)
+            self.assertGreater(path.stat().st_size,400000)
+
     def test_caption_config_keeps_all_words_visible(self):
         cfg = json.loads((ROOT / "config.example.json").read_text())
         self.assertLessEqual(cfg["render"]["caption_max_words"],4)
