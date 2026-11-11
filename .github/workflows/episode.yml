@@ -74,7 +74,12 @@ jobs:
           python scripts/engine.py --selftest
 
       - name: Render cinematic Day 1 draft only (never publish)
-        run: python scripts/preview_day1.py --video
+        run: |
+          set -euo pipefail
+          python scripts/preview_day1.py --video
+          VIDEO="$(find out -maxdepth 1 -name '*.mp4' -type f -print -quit)"
+          test -s "$VIDEO" || { echo "::error::No 2D MP4 produced"; exit 1; }
+          python scripts/verify_2d_video.py "$VIDEO"
 
       - name: Upload reel artifact (debug)
         if: always()
@@ -86,6 +91,7 @@ jobs:
             out/caption.txt
             out/episode.json
             out/day1_visual_manifest.json
+            out/2d_qa_report.json
             out/stills/*.png
           if-no-files-found: ignore
           retention-days: 5
