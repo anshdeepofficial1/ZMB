@@ -413,15 +413,13 @@ def narrative_beat_layer(meta, t):
         out.append(sk.rect(188, 365, 704, 740, "#0d1d31", 24))
         out.append(sk.circ(780, 530, 47, "#fff0c3", op=0.85))
         out.append(sk.ell(780, 530, 112, 100, "#f2c779", op=0.105))
-        # distant road, lane markings, and the one still-lit station
+        # The gas station has NOT appeared yet: road and extinguished engine only.
         out.append(sk.path("M 236 1100 L 450 820 L 630 820 L 845 1100 Z", "#202c3c"))
         out.append(sk.path("M 535 1090 L 535 970 M 535 920 L 535 872",
                            "none", "#d9d5c5", 9, op=0.72))
-        out.append(sk.rect(650, 700, 160, 12, "#f6d99a", 7, op=0.95))
-        out.append(sk.rect(665, 712, 9, 96, "#b1a28a", 5))
-        out.append(sk.rect(785, 712, 9, 96, "#b1a28a", 5))
-        out.append(sk.rect(687, 744, 32, 29, "#ffe7b0", op=0.92))
-        out.append(sk.rect(733, 744, 32, 29, "#ffe7b0", op=0.76))
+        # Ignition fails in view: amber dashboard pulses off as Max turns the key.
+        dashboard_glow = 0.06 + (0.34 if t < 0.55 else 0.0)
+        out.append(sk.ell(310, 1347, 200, 65, "#f4bf74", op=dashboard_glow))
         # seat backs and passengers, held inside the cabin silhouette
         out.append(sk.path("M 112 1290 L 112 1100 Q 112 1040 176 1025 L 255 1060 L 255 1455 L 112 1455 Z",
                            "#172536", "#30445a", 13))
