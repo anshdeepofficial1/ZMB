@@ -444,7 +444,7 @@ def render_human(pal, pose: Pose, size=430.0, art="boy", op=None, held_prop=None
         # Handheld beam shares the near-hand joint every frame. This is not
         # the disembodied flashlight that previously drifted across the scene.
         out.append(g(
-            f"translate({n(hand_n[0])} {n(hand_n[1])}) rotate({n(-5.5+math.sin(t*1.5)*4.0)})",
+            f"translate({n(hand_n[0])} {n(hand_n[1])}) rotate({n(-5.5+(pose.arm_n-83.0)*.65)})",
             path("M 38 -14 L 440 -145 L 440 175 Z",
                  "#fff3a4",op=.17)
             + ell(385,13,88,112,"#fff0b2",op=.07)
