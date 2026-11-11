@@ -569,7 +569,7 @@ def opening_hook_layer(shot, t):
     """Clear scrolling-feed hook visible from frame zero, no opening title card."""
     if shot.kind != "line" or shot.meta.get("beat") != "car_driving":
         return ""
-    p=ease_out(min(1.0,max(0.0,t/.35)))
+    p=.78+.22*ease_out(min(1.0,max(0.0,t/.35)))
     fade=min(1.0,max(0.0,(2.8-t)/.55))
     opacity=p*fade
     return g(f"translate(0 {n(17*(1-p))})",
@@ -656,57 +656,60 @@ def chunk_words(words, Texts, size, max_w=1020.0, max_words=7, source_text=""):
     return out
 
 
-def caption_layer(chunks, t, Texts, size=54.0, max_w=760.0):
-    """Consistent Instagram-safe subtitles, one anchored high-contrast card.
+def caption_layer(chunks, t, Texts, size=51.0, max_w=690.0):
+    """Small adaptive, CENTER-ANCHORED capsule, never a character-covering slab.
 
-    Top of card y=930, bottom y=1138; stays outside Meta's bottom UI band.
-    All chunks have the same position; no shifting when text wraps.
+    All text stays in the safe y<1248 area and left of right-side Reels UI.
+    The baseline is stable within each one/two-line variant.
     """
     if not chunks:
         return ""
-    active = None
-    for c in chunks:
-        if c["start"]-.06 <= t <= c["end"]:
-            active=c
-            break
+    active = next((c for c in chunks if c["start"]-.06 <= t <= c["end"]),None)
     if active is None:
-        active=next((c for c in chunks if t < c["start"]), None)
+        active = next((c for c in chunks if t < c["start"]),None)
     if active is None:
         return ""
-    width=min(755.0,max(550.0,float(max_w)))
-    max_words_per_line=4
-    lines, current=[],[]
+    width=min(680.0,float(max_w))
+    lines,current=[],[]
     for wd in active["words"]:
         trial=current+[wd]
-        length=sum(Texts.w(str(w["w"])+ " ",size) for w in trial)
-        if current and (length>width or len(trial)>max_words_per_line):
+        length=sum(Texts.w(str(w["w"])+" ",size) for w in trial)
+        if current and (length>width or len(trial)>4):
             lines.append(current)
             current=[wd]
         else:
             current=trial
     if current:
         lines.append(current)
+    # Source chunker caps 4 words. Never throw away a spoken caption silently.
     if len(lines)>2:
-        # Render only the two newest lines inside the fixed safe region.
-        # chunk_words caps words per panel in the configured 2D workflow.
-        lines=lines[:2]
-    out=[
-        rect(120,932,840,202,"#071b30",25,
-             stroke="#6bc7df",sw=2,op=.91),
-        rect(144,947,8,172,"#ffd36f",4,op=.94)
+        raise ValueError("Caption overflow: too many words for 2-line safe-zone")
+    lines_widths=[
+        sum(Texts.w(str(w["w"])+" ",size) for w in line)-Texts.w(" ",size)
+        for line in lines
     ]
-    for li,line_words in enumerate(lines):
-        # A one-line chunk is centered vertically; two-line chunks never drift.
-        y=1051 if len(lines)==1 else 1017+li*72
-        full=sum(Texts.w(str(w["w"])+" ",size) for w in line_words)-Texts.w(" ",size)
-        x=(W-full)/2.0
-        for wd in line_words:
+    widest=max(lines_widths)
+    pill_width=min(735.0,max(210.0,widest+88.0))
+    center_x=488.0
+    top=1125.0 if len(lines)==1 else 1057.0
+    height=104.0 if len(lines)==1 else 174.0
+    out=[
+        rect(center_x-pill_width/2,top,pill_width,height,
+             "#061827",25,stroke="#72d9e8",sw=1.8,op=.89),
+        rect(center_x-pill_width/2+15,top+19,5,height-38,
+             "#ffd36b",3,op=.93)
+    ]
+    for li,line in enumerate(lines):
+        baseline=1195.0 if len(lines)==1 else 1121.0+li*71.0
+        x=center_x-lines_widths[li]/2
+        for wd in line:
             word=str(wd["w"])
             now=wd["start"]<=t<=wd["end"]+.13
             read=t>=wd["start"]
-            color="#ffd46c" if now else ("#ffffff" if read else "#d6e6f1")
-            out.append(text(x,y,word,size,"Barlow",color,anchor="start",
-                            weight="bold",stroke="#07131e",sw=8,op=1.0))
+            color="#ffd46c" if now else ("#ffffff" if read else "#e1eefa")
+            out.append(text(x,baseline,word,size,"Barlow",color,
+                            anchor="start",weight="bold",
+                            stroke="#04111d",sw=7,op=1))
             x+=Texts.w(word+" ",size)
     return "".join(out)
 
@@ -858,7 +861,11 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
     vw, vh = W / z, H / z
     vx, vy = fx - vw / 2.0, fy - vh / 2.0
 
-    body = []
+    # The camera reframes higher than the original 1920px scene canvas.
+    # Fill the exposed lower world in the scene palette instead of a black
+    # letterbox band, including during camera moves and on every aspect ratio.
+    body = [rect(vx-50,vy-50,vw+100,vh+100,
+                 shade(sc.TIME[tname]["near"],-.10))]
     for k, content in layers:
         dx = (fx - W / 2.0) * (1.0 - k) - scroll * (0.25 + 0.75 * k)
         dy = (fy - H / 2.0) * (1.0 - k) * 0.4
@@ -873,7 +880,13 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
     if shot.kind == "line" and beat:
         # Bring illustrated events into the visual center, separate from
         # caption and app controls. The world camera remains continuous.
-        ov.append(g("translate(0 -285)", narrative_beat_layer(meta, local)))
+        # Car close-ups sit above captions so Max's face is never obscured.
+        focus_up = {
+            "car_driving": -411, "engine_stall": -411,
+            "car_interior": -365, "flashlight_exit": -300
+        }.get(beat, -285)
+        ov.append(g(f"translate(0 {n(focus_up)})",
+                    narrative_beat_layer(meta, local)))
     if shot.kind == "line":
         ov.append(fx_layer(meta.get("fx", "none"), local, shot.dur, t_abs=t))
     elif shot.kind == "vote":
