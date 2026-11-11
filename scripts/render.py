@@ -121,7 +121,7 @@ def _silence(seconds: float, path: Path) -> Path:
     return path
 
 
-def build_master_audio(voices, lead, outro, work: Path, total=None, cfg=None) -> Path:
+def build_master_audio(voices, lead, outro, work: Path, total=None, cfg=None, shots=None) -> Path:
     a_dir = work / "audio"
     parts: list[Path] = []
     if lead > 0.02:
@@ -137,8 +137,24 @@ def build_master_audio(voices, lead, outro, work: Path, total=None, cfg=None) ->
     run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0",
          "-i", str(lst), "-ar", "24000", "-ac", "1", "-c:a", "pcm_s16le", str(master)])
 
-    # optional music bed (assets/music/*.mp3) — low volume neeche narration ke
     cfg = cfg or {}
+    # All physical sound cues are original procedural waveforms; no AI model
+    # or third-party music is involved. Narration always remains dominant.
+    if bool(cfg.get("sound_design_enabled", True)) and shots and total:
+        from sound_design import synthesize
+        background = a_dir / "original_2d_soundscape.wav"
+        synthesize(shots, total, background)
+        scored = a_dir / "soundscaped.wav"
+        run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+             "-i", str(master), "-i", str(background),
+             "-filter_complex",
+             "[0:a]volume=1.0[voice];[1:a]volume=0.72[amb];"
+             "[voice][amb]amix=inputs=2:duration=first:dropout_transition=0,"
+             "alimiter=limit=0.95[out]",
+             "-map", "[out]", "-ar", "24000", "-ac", "1",
+             "-c:a", "pcm_s16le", str(scored)])
+        master = scored
+    # Optional OWNER-OWNED background music is off by default.
     vol = float(cfg.get("music_volume", 0.0) or 0.0)
     music_dir = ROOT / "assets" / "music"
     tracks = sorted(music_dir.glob("*.mp3")) if music_dir.exists() else []
@@ -186,7 +202,7 @@ def render_episode(cfg: dict, ep: dict, *, jobs=None, scale=None, crf=None,
     outro = max(0.0, total - lead - sum(v["dur"] for v in voices))
     Log(f"[render] timeline: {len(shots)} shots, {total:.1f}s "
         f"({len(shots) + 1} cards incl.), fps={fps}, {iw}x{ih} -> {ow}x{oh}, jobs={jobs}")
-    audio = build_master_audio(voices, lead, outro, work, total, cfg)
+    audio = build_master_audio(voices, lead, outro, work, total, cfg, shots=shots)
 
     visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
     if visual_mode != "procedural":
