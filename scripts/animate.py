@@ -364,15 +364,27 @@ def narrative_beat_layer(meta, t):
                            "#ffd593", weight="bold", ls=3, op=min(0.96, max(0.0, t - 0.4))))
 
     elif beat == "flashlight_exit":
-        # Max and Biscuit are drawn by the main actor rig, outside a stationary
-        # car. The cone is attached to their foreground rather than the sky.
+        # Physical storyboard: the same parked sedan's door actually opens
+        # before Max sweeps his handheld flashlight across the roadside.
         out.append(car_body(-105, 1552, 0.64, "#46576a"))
-        flicker = 0.76 + 0.05 * math.sin(t * 2.3)
-        out.append(sk.path("M 620 1194 L 1080 950 L 1080 1540 Z",
-                           "#ffedac", op=0.14 * flicker))
-        out.append(sk.ell(1054, 1242, 135, 195, "#ffefbb", op=0.095 * flicker))
-        out.append(sk.rect(600, 1190, 54, 24, "#343b42", 7, "#f0c575", 3))
-        out.append(sk.circ(654, 1202, 14, "#fff1ba", op=0.86))
+        door_open = ease(min(1.0, max(0.0, t / 1.30)))
+        out.append(sk.g(
+            f"translate(150 1436) rotate({n(-43.0 * door_open)})",
+            sk.path("M -3 -82 L 140 -82 L 158 73 L -3 73 Z",
+                    "#40536a", "#a8bbce", 8)
+            + sk.path("M 8 -66 L 125 -66 L 133 -12 L 8 -12 Z",
+                      "#152b40", "#8ba9c4", 4)
+            + sk.rect(116, 11, 24, 7, "#e5c28a", 3)))
+        sweep = 6.0 * math.sin(t * 1.6) + 5.0 * min(1.0, t / 1.3)
+        flicker = 0.87 + 0.10 * math.sin(t * 3.7)
+        out.append(sk.g(f"translate(620 1194) rotate({n(sweep)})",
+            sk.path("M 0 0 L 460 -244 L 460 346 Z",
+                    "#ffedac", op=0.19 * flicker)))
+        out.append(sk.ell(1054, 1242, 135, 195, "#ffefbb",
+                          op=0.08 + 0.04 * (1.0 + math.sin(t * 1.6)) / 2.0))
+        out.append(sk.g(f"translate(620 1194) rotate({n(sweep)})",
+            sk.rect(-20, -4, 54, 24, "#343b42", 7, "#f0c575", 3)
+            + sk.circ(34, 8, 14, "#fff1ba", op=0.86)))
         out.append(sk.g("translate(0 0)",
             sk.path("M 342 1028 Q 354 1004 389 1008 L 431 1030 L 429 1154 "
                     "Q 392 1172 356 1152 Z", "#7b3f2b", "#f0c28c", 8)
