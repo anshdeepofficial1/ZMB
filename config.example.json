@@ -36,7 +36,7 @@
   ],
   "hashtags_per_post": 5,
   "music_volume": 0.1,
-  "ai_disclosure": true,
+  "ai_disclosure": false,
   "media_branch": "media",
   "stats_reset": {
     "hp": 100,
@@ -54,10 +54,13 @@
   "publish_every_hours": 24,
   "publish_prepare_hours": 1,
   "visual_mode": "procedural",
-  "ai_story_generation": true,
+  "ai_story_generation": false,
   "publishing_enabled": false,
   "enforce_visual_contract": true,
   "cinematic_assets_root": "assets/cinematic",
   "max_publish_late_minutes": 115,
-  "cinematic_release_approved": false
+  "cinematic_release_approved": false,
+  "procedural_release_approved": false,
+  "narration_engine": "espeak-ng",
+  "narration_words_per_minute": 155
 }
