@@ -14,30 +14,30 @@ from dataclasses import dataclass, field
 
 from svgkit import circ, dirv, ell, esc, g, limb, line, n, path, rect, text, shade
 
-OUTLINE = "#151a22"
+OUTLINE = "#122438"
 
 PALETTES = {
     "boy": dict(
-        skin="#ddb18d", hair="#241d1d", coat="#343940", pants="#65513e",
-        shoe="#23262b", accent="#f2d16b",
+        skin="#f5bd96", hair="#142c43", coat="#167f97", pants="#75614d",
+        shoe="#1a3145", accent="#ffce62",
     ),
     "girl": dict(
-        skin="#dfb592", hair="#2c2220", coat="#53634b", pants="#333a48",
-        shoe="#20242b", accent="#e08a3c",
+        skin="#f1b996", hair="#402238", coat="#b14c7b", pants="#3c6378",
+        shoe="#1a3145", accent="#ffe083",
     ),
     "old": dict(
-        skin="#e6b98f", hair="#d8d4cc", coat="#6d5b45", pants="#494a52",
-        shoe="#2a2622", accent="#8fa0b0",
+        skin="#f0bf9b", hair="#e0eae9", coat="#b57c4f", pants="#526779",
+        shoe="#1a3145", accent="#73d8d6",
     ),
     "zombie": dict(
-        skin="#86ab6d", hair="#59684a", coat="#7f8570", pants="#4b4b3f",
-        shoe="#2c2c26", accent="#3f4a35",
+        skin="#a1c184", hair="#3d655d", coat="#568473", pants="#3e5550",
+        shoe="#1b3532", accent="#ef8b77",
     ),
 }
 
 DOG_PAL = dict(
-    body="#e9c188", belly="#f5dfc0", nose="#26262a",
-    collar="#d1583f", tongue="#e2748a",
+    body="#f6b95f", belly="#ffedcc", nose="#1f2b3f",
+    collar="#ff5e5e", tongue="#e2748a",
 )
 
 ROLE_ART = {"max": "boy", "ada": "girl", "old": "old", "zombie": "zombie"}
@@ -275,57 +275,83 @@ HUMAN_ACTIONS = {
 
 
 def _face_head(px, py, hr, pal, pose, art):
-    """Head: hair circle + face circle + eye + brow + mouth."""
+    """Designed 2D graphic-novel head, stable identity; never an AI portrait."""
     o = OUTLINE
-    ow = hr * 0.22
     out = []
-    # ponytail / cap / hair mass
     if art == "girl":
-        out.append(ell(px - hr * 0.85, py - hr * 0.25, hr * 0.42, hr * 0.72,
-                       pal["hair"], o, ow, rotate=-18))
-    elif art == "old":
         out.append(path(
-            f"M {px - hr * 1.15} {py - hr * 0.35} L {px + hr * 1.1} {py - hr * 0.45} "
-            f"L {px + hr * 1.05} {py - hr * 1.05} L {px - hr * 0.9} {py - hr * 1.2} Z",
-            pal["accent"], o, ow * 0.8))
-    # hair blob
-    out.append(circ(px - hr * 0.08, py - hr * 0.1, hr * 1.02, pal["hair"], o, ow))
-    # face
-    out.append(circ(px + hr * 0.2, py + hr * 0.14, hr * 0.88, pal["skin"], o, ow * 0.85))
-    # hair fringe over the forehead
+            f"M {n(px-hr*.8)} {n(py-hr*.5)} Q {n(px-hr*1.5)} {n(py)} "
+            f"{n(px-hr*1.04)} {n(py+hr*1.3)} L {n(px-hr*.25)} {n(py+hr*.7)} Z",
+            shade(pal["hair"],-.1),o,hr*.1))
+    if art == "old":
+        out.append(path(
+            f"M {n(px-hr*1.2)} {n(py-hr*.5)} L {n(px+hr*1.1)} {n(py-hr*.4)} "
+            f"L {n(px+hr*.8)} {n(py-hr*1.25)} L {n(px-hr)} {n(py-hr*1.2)} Z",
+            "#ffca85",o,hr*.12))
+    # Angular hair mass with side locks.
     out.append(path(
-        f"M {px - hr * 1.0} {py - hr * 0.42} "
-        f"Q {px + hr * 0.1} {py - hr * 1.28} {px + hr * 0.98} {py - hr * 0.5} "
-        f"Q {px + hr * 0.3} {py - hr * 0.72} {px - hr * 0.2} {py - hr * 0.44} Z",
-        pal["hair"], o, ow * 0.7))
-    # ear
-    out.append(circ(px - hr * 0.72, py + hr * 0.2, hr * 0.2, pal["skin"], o, ow * 0.55))
-    # eye
-    ex, ey = px + hr * 0.46, py + hr * 0.02
-    out.append(ell(ex, ey, hr * 0.13, hr * 0.17, o))
-    out.append(circ(ex + hr * 0.04, ey - hr * 0.05, hr * 0.045, "#ffffff", op=0.9))
-    # brow (zombie se gussa, max se tension)
-    by = ey - hr * 0.34 + pose.brow * 0.4
-    out.append(line(ex - hr * 0.2, by + hr * 0.06, ex + hr * 0.2, by, o, hr * 0.11))
-    # mouth
-    mx, my = px + hr * 0.4, py + hr * 0.52
-    if pose.mouth == "open":
-        out.append(ell(mx, my, hr * 0.22, hr * 0.2, "#3a1f22", o, ow * 0.6))
-        out.append(ell(mx, my - hr * 0.04, hr * 0.1, hr * 0.07, "#e2748a"))
+        f"M {n(px-hr)} {n(py+hr*.17)} Q {n(px-hr*1.25)} {n(py-hr*.95)} "
+        f"{n(px-hr*.29)} {n(py-hr*1.27)} Q {n(px+hr*.57)} {n(py-hr*1.49)} "
+        f"{n(px+hr*1.07)} {n(py-hr*.46)} L {n(px+hr*.8)} {n(py+hr*.24)} Z",
+        pal["hair"],o,hr*.17))
+    # Faceted lower jaw instead of oversized flat circle.
+    out.append(path(
+        f"M {n(px-hr*.7)} {n(py-hr*.36)} Q {n(px-hr*.18)} {n(py-hr*.72)} "
+        f"{n(px+hr*.56)} {n(py-hr*.55)} L {n(px+hr*1.02)} {n(py-hr*.18)} "
+        f"L {n(px+hr*.87)} {n(py+hr*.55)} L {n(px+hr*.32)} {n(py+hr*.92)} "
+        f"Q {n(px-hr*.52)} {n(py+hr*.72)} {n(px-hr*.7)} {n(py-hr*.36)} Z",
+        pal["skin"],o,hr*.14))
+    out.append(path(
+        f"M {n(px+hr*.22)} {n(py-hr*.42)} L {n(px+hr*.87)} {n(py-hr*.06)} "
+        f"Q {n(px+hr*.64)} {n(py+hr*.4)} {n(px+hr*.29)} {n(py+hr*.46)}",
+        "none",shade(pal["skin"],-.22),hr*.12,op=.68))
+    out.append(ell(px-hr*.69,py+hr*.01,hr*.18,hr*.28,pal["skin"],o,hr*.11))
+    for ex in (px-hr*.13,px+hr*.45):
+        ey=py-hr*.02
+        out.append(ell(ex,ey,hr*.14,hr*.145,"#fff9f0",o,hr*.07))
+        out.append(ell(ex+hr*.04,ey+hr*.01,hr*.072,hr*.102,"#193d55"))
+        out.append(circ(ex+hr*.065,ey-hr*.04,hr*.028,"#ffffff"))
+        out.append(line(ex-hr*.19,ey-hr*.28+pose.brow*.32,
+                        ex+hr*.15,ey-hr*.38+pose.brow*.32,
+                        pal["hair"],hr*.12))
+    out.append(path(
+        f"M {n(px+hr*.55)} {n(py+hr*.13)} l {n(hr*.24)} {n(hr*.16)} "
+        f"l {n(-hr*.25)} {n(hr*.035)}",
+        "none",shade(pal["skin"],-.35),hr*.095))
+    mx,my=px+hr*.31,py+hr*.59
+    if pose.mouth=="open":
+        out.append(ell(mx,my,hr*.2,hr*.18,"#432932",o,hr*.075))
+        out.append(ell(mx,my+hr*.06,hr*.09,hr*.05,"#e8899a"))
     else:
         out.append(path(
-            f"M {mx - hr * 0.22} {my} Q {mx} {my + hr * 0.2} {mx + hr * 0.22} {my - hr * 0.02}",
-            "none", o, hr * 0.11))
+            f"M {n(mx-hr*.2)} {n(my)} Q {n(mx)} {n(my+hr*.08)} "
+            f"{n(mx+hr*.22)} {n(my-hr*.03)}",
+            "none",o,hr*.095))
+    if art=="zombie":
+        out.append(line(px-hr*.24,py+hr*.32,px+hr*.1,py+hr*.40,
+                        "#f08388",hr*.12))
+    # Signature sharp three tufts, stable at every frame/pose.
+    out.append(path(
+        f"M {n(px-hr*.97)} {n(py-hr*.45)} L {n(px-hr*.96)} {n(py-hr*1.23)} "
+        f"L {n(px-hr*.34)} {n(py-hr*.96)} L {n(px+hr*.02)} {n(py-hr*1.39)} "
+        f"L {n(px+hr*.34)} {n(py-hr*.96)} L {n(px+hr*.81)} {n(py-hr*.99)} "
+        f"L {n(px+hr*.87)} {n(py-hr*.46)} Q {n(px)} {n(py-hr*.75)} "
+        f"{n(px-hr*.97)} {n(py-hr*.45)} Z",pal["hair"],o,hr*.065))
+    out.append(path(
+        f"M {n(px-hr*.66)} {n(py-hr*.84)} Q {n(px-hr*.05)} {n(py-hr*1.13)} "
+        f"{n(px+hr*.3)} {n(py-hr*.98)}",
+        "none",shade(pal["hair"],.32),hr*.09,op=.68))
     return "".join(out)
+
 
 
 def render_human(pal, pose: Pose, size=430.0, art="boy", op=None):
     l1, l2 = size * 0.235, size * 0.225
     l3 = size * 0.33
     lu, lf = size * 0.16, size * 0.155
-    hr = size * 0.083
+    hr = size * 0.103
     o = OUTLINE
-    ow = max(4.0, size * 0.017)
+    ow = max(4.0, size * 0.014)
 
     hip_y = -max(_foot(pose.thigh_f, pose.knee_f, l1, l2),
                  _foot(pose.thigh_n, pose.knee_n, l1, l2)) + pose.hip_dy
@@ -362,6 +388,20 @@ def render_human(pal, pose: Pose, size=430.0, art="boy", op=None):
     out.append(limb(hip[0], hip[1], neck[0], neck[1], coat_n, size * 0.162, o, ow))
     out.append(limb(hip[0] - size * 0.035, hip[1] + size * 0.006, hip[0] + size * 0.035, hip[1] - size * 0.004,
                     shade(pal["pants"], 0.06), size * 0.115, o, ow * 0.85))
+    # Designed graphic-novel jacket: zipper, raised collar and pocket marks.
+    out.append(path(
+        f"M {n(neck[0]-size*.06)} {n(neck[1]+size*.012)} "
+        f"L {n(neck[0]+size*.012)} {n(neck[1]+size*.095)} "
+        f"L {n(hip[0]+size*.025)} {n(hip[1]-size*.048)} "
+        f"L {n(neck[0]-size*.023)} {n(neck[1]+size*.026)} Z",
+        shade(pal["coat"],.26),op=.92))
+    out.append(line(neck[0]+size*.012,neck[1]+size*.095,
+                    hip[0]+size*.023,hip[1]-size*.04,
+                    pal["accent"],max(3.0,size*.012)))
+    out.append(path(
+        f"M {n(hip[0]-size*.053)} {n(hip[1]-size*.13)} l {n(size*.031)} {n(size*.02)} "
+        f"M {n(hip[0]+size*.036)} {n(hip[1]-size*.12)} l {n(size*.030)} {n(size*.01)}",
+        "none",shade(pal["coat"],.38),max(2.0,size*.009)))
     # scarf / accent
     out.append(limb(neck[0] - size * 0.012, neck[1] + size * 0.014,
                     neck[0] + size * 0.052, neck[1] + size * 0.058,
@@ -488,6 +528,8 @@ def render_dog(action, t, size=130.0, flip=False, op=None, mood="calm"):
     body_g = (
         rect(bx - L * 0.5, by - size * 0.25, L, size * 0.5, body["body"], size * 0.21, o, ow)
         + rect(bx - L * 0.3, by + size * 0.12, L * 0.62, size * 0.14, body["belly"], size * 0.07)
+        + ell(bx-L*.1,by-size*.11,L*.28,size*.11,"#ffe6b0",op=.76)
+        + circ(bx-L*.31,by-size*.07,size*.083,"#d88340",op=.72)
     )
     tx, ty = bx - L * 0.46, by - size * 0.12
     ta = tail_a + math.sin(t * 11.0 * wag) * (16.0 * wag)
@@ -514,6 +556,7 @@ def render_dog(action, t, size=130.0, flip=False, op=None, mood="calm"):
         head += ell(hx + hrr * 1.0, hy + hrr * 0.72, hrr * 0.28, hrr * 0.2, "#3a1f22", o, ow * 0.45)
     collar = rect(hx - hrr * 1.16, hy + hrr * 0.52, hrr * 0.42, hrr * 0.44,
                   DOG_PAL["collar"], hrr * 0.09, o, ow * 0.45)
+    collar += circ(hx-hrr*.79,hy+hrr*.92,hrr*.15,"#ffda76",o,ow*.25)
     neck_g = limb(bx + L * 0.32, by - size * 0.04, hx - hrr * 0.45, hy + hrr * 0.18,
                   shade(body["body"], -0.08), size * 0.21, o, ow)
 
