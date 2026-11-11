@@ -264,7 +264,12 @@ def actors_layer(meta, t, fx, cache):
                          ch.render_actor(who, act, t * 1.0 + 0.2, size=size)))
         else:
             out.append(g(f"translate({n(x)} {n(GROUND)})",
-                         ch.render_actor(who, act, t, size=size)))
+                         ch.render_actor(
+                             who, act, t, size=size,
+                             backpack=(who=="max" and meta.get("beat") in {
+                                 "flashlight_exit","spot_station",
+                                 "door_shadow","door_handle","backpack_exit"
+                             }))))
     return "".join(out)
 
 
@@ -322,11 +327,9 @@ def narrative_beat_layer(meta, t):
             # is tied to the 2D palette, not a generic empty car silhouette.
             body += sk.path("M 551 -163 L 552 -183 Q 568 -211 601 -201 "
                             "Q 623 -194 630 -164 Z", "#147f96", "#162b41", 5)
-            body += sk.circ(590, -213, 31, "#f5bd96", "#14283b", 5)
-            body += sk.path("M 558 -218 Q 555 -252 584 -250 "
-                            "Q 615 -256 626 -221 L 610 -234 L 595 -246 "
-                            "L 578 -230 L 561 -235 Z", "#142c43", "#14283b", 3)
-            body += sk.ell(603, -215, 4, 6, "#14283b")
+            body += ch._face_head(
+                590, -207, 28, ch.PALETTES["boy"],
+                ch.pose_idle(0), "boy")
             body += sk.path("M 612 -180 L 655 -164", "none", "#ffc966", 5)
             # Re-outline the windshield panes over the seated figure.
             body += sk.path("M 504 -244 L 625 -244 L 707 -161 L 504 -161 Z",
@@ -394,11 +397,8 @@ def narrative_beat_layer(meta, t):
             + sk.rect(116, 11, 24, 7, "#e5c28a", 3)))
         # The physical torch and cone now come from Max's articulated
         # hand in actors_layer; no duplicate/free-floating beam here.
-        out.append(sk.g("translate(0 0)",
-            sk.path("M 342 1028 Q 354 1004 389 1008 L 431 1030 L 429 1154 "
-                    "Q 392 1172 356 1152 Z", "#7b3f2b", "#f0c28c", 8)
-            + sk.path("M 349 1020 Q 367 1005 388 1032 M 421 1028 "
-                      "Q 435 1050 426 1073", "none", "#dca878", 9)))
+        # Max's rucksack is now physically bound to the animated torso
+        # in actors_layer. No duplicate static backpack asset remains.
 
     if beat == "breakdown":
         out.append(sk.rect(0, 970, W, 640, "#05080f", op=0.15))
@@ -871,7 +871,9 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
     if beat not in ("breakdown", "car_driving", "engine_stall", "car_interior"):
         body.append(actors_layer(meta, t, fx, cache))
 
-    ov = []  # screen space
+    # Smooth deliberate fade into the Instagram-control region; no distinct
+    # horizontal letterbox stripes or abrupt cut-off below the scenery.
+    ov = [rect(0,1280,W,640,"url(#footfade)")]  # screen space
     if shot.kind == "line" and beat:
         # Bring illustrated events into the visual center, separate from
         # caption and app controls. The world camera remains continuous.
@@ -947,6 +949,9 @@ def _fake_words(shot, Texts, size):
 
 def _ui_defs():
     return (
-        sk.lin_grad("cap_scrim", [(0, "#05070d", 0.0), (30, "#05070d", 0.62), (100, "#05070d", 0.94)])
+        sk.lin_grad("footfade", [(0, "#102b42", 0.0),
+                                 (23, "#0b243a", 0.65),
+                                 (100, "#081a2b", 1.0)])
+        + sk.lin_grad("cap_scrim", [(0, "#05070d", 0.0), (30, "#05070d", 0.62), (100, "#05070d", 0.94)])
         + sk.lin_grad("vig_top", [(0, "#05070d", 0.85), (100, "#05070d", 0.0)])
     )
