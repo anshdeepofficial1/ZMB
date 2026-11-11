@@ -355,7 +355,7 @@ def _face_head(px, py, hr, pal, pose, art):
 
 
 
-def render_human(pal, pose: Pose, size=430.0, art="boy", op=None, held_prop=None):
+def render_human(pal, pose: Pose, size=430.0, art="boy", op=None, held_prop=None, backpack=False):
     l1, l2 = size * 0.235, size * 0.225
     l3 = size * 0.33
     lu, lf = size * 0.16, size * 0.155
@@ -394,6 +394,25 @@ def render_human(pal, pose: Pose, size=430.0, art="boy", op=None, held_prop=None
     out.append(limb(hip[0], hip[1], knee_f[0], knee_f[1], pnt_f, wl, o, ow))
     out.append(limb(knee_f[0], knee_f[1], ank_f[0], ank_f[1], pnt_f, wl * 0.86, o, ow))
     out.append(limb(ank_f[0], ank_f[1], ank_f[0] + size * 0.055, ank_f[1], shade(shoe, -0.15), wl * 0.8, o, ow * 0.8))
+    if backpack:
+        # Same strapped rust-brown rucksack across every post-exit scene;
+        # local skeleton coordinates preserve identity during motion/camera.
+        px=neck[0]-size*.092
+        py=neck[1]+size*.070
+        out.append(path(
+            f"M {n(px)} {n(py)} "
+            f"Q {n(px-size*.090)} {n(py-size*.018)} {n(px-size*.116)} {n(py+size*.097)} "
+            f"L {n(hip[0]-size*.085)} {n(hip[1]-size*.03)} "
+            f"Q {n(hip[0]-size*.018)} {n(hip[1]+size*.006)} "
+            f"{n(hip[0]+size*.007)} {n(hip[1]-size*.08)} "
+            f"L {n(px+size*.032)} {n(py+size*.02)} Z",
+            "#965533",o,ow*1.22))
+        out.append(path(
+            f"M {n(px-size*.070)} {n(py+size*.025)} "
+            f"L {n(px+size*.008)} {n(py+size*.021)} "
+            f"M {n(px-size*.073)} {n(py+size*.097)} "
+            f"L {n(px+size*.005)} {n(py+size*.090)}",
+            "none","#eebc72",max(3.0,size*.011)))
     # Structured 2D jacket silhouette (shoulders + taper + zipped front).
     # Moves with the real articulated skeleton; not an overlay sticker.
     out.append(path(
@@ -604,7 +623,7 @@ def render_dog(action, t, size=130.0, flip=False, op=None, mood="calm"):
 # ------------------------------------------------------------------ actor ----
 
 
-def render_actor(who, action, t, size=430.0, flip=False, op=None, art=None):
+def render_actor(who, action, t, size=430.0, flip=False, op=None, art=None, backpack=False):
     """who: max | ada | old | zombie | biscuit. action ko pose/anim mein map karta hai."""
     if who == "biscuit":
         return render_dog(action, t, size=size * 0.3, flip=flip, op=op)
@@ -616,5 +635,6 @@ def render_actor(who, action, t, size=430.0, flip=False, op=None, art=None):
     fn = HUMAN_ACTIONS.get(act) or HUMAN_ACTIONS["idle"]
     return render_human(
         pal, fn(t), size=size, art=a, op=op,
-        held_prop="flashlight" if act == "walk_flashlight" else None
+        held_prop="flashlight" if act == "walk_flashlight" else None,
+        backpack=backpack
     )
