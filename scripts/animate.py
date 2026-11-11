@@ -301,7 +301,8 @@ def narrative_beat_layer(meta, t):
                                 rotate=math.sin(t + i) * 24.0))
         return "".join(items)
 
-    def car_body(x=70.0, y=1505.0, scale=1.0, color="#3e8d9f", broken=False, driver=False):
+    def car_body(x=70.0, y=1505.0, scale=1.0, color="#3e8d9f",
+                 broken=False, driver=False, door_open=None):
         # side view, nose/engine on the right; wheels and glass remain distinct
         body = (
             sk.path("M 0 0 L 24 -105 Q 34 -142 88 -150 L 315 -150 "
@@ -334,6 +335,25 @@ def narrative_beat_layer(meta, t):
             # Re-outline the windshield panes over the seated figure.
             body += sk.path("M 504 -244 L 625 -244 L 707 -161 L 504 -161 Z",
                             "none", "#a4e3ec", 5)
+        if door_open is not None:
+            # The door is in the vehicle's LOCAL coordinate system, not an
+            # independent screen-space rectangle. The apparent perspective
+            # compresses as the door swings toward the viewer, keeping hinges,
+            # trim and handle in continuous physical alignment with the car.
+            p = ease(max(0.0, min(1.0, door_open)))
+            # Dark opening behind the moving door.
+            body += sk.path("M 324 -157 L 481 -157 L 480 -16 L 325 -16 Z",
+                            "#182c3f", "#a0becc", 5)
+            body += sk.g(
+                f"translate(325 -157) scale({n(1-.70*p)} 1)",
+                sk.path("M 0 0 L 157 0 L 158 138 L 0 140 Z",
+                        "#39889b", "#b5d4df", 7)
+                + sk.path("M 9 11 L 140 11 L 140 63 L 9 63 Z",
+                          "#1b465e", "#a3dfed", 4)
+                + sk.rect(119,85,25,8,"#ffe0a1",4)
+                + sk.path("M 10 74 L 145 74", "none", "#7ac6d9", 4,op=.72))
+            # Warm cabin light visible through the swung door.
+            body += sk.ell(334, -63, 19+37*p, 70, "#ffe2a4", op=.04+.10*p)
         if broken:
             body += sk.path("M 698 -145 L 770 -294 L 844 -275 L 771 -131 Z",
                             "#7b8a9b", "#172230", 10)
@@ -384,21 +404,15 @@ def narrative_beat_layer(meta, t):
                            "#ffd593", weight="bold", ls=3, op=min(0.96, max(0.0, t - 0.4))))
 
     elif beat == "flashlight_exit":
-        # Physical storyboard: the same parked sedan's door actually opens
-        # before Max sweeps his handheld flashlight across the roadside.
-        out.append(car_body(-105, 1552, 0.64, "#358aa0"))
-        door_open = ease(min(1.0, max(0.0, t / 1.30)))
-        out.append(sk.g(
-            f"translate(150 1436) rotate({n(-43.0 * door_open)})",
-            sk.path("M -3 -82 L 140 -82 L 158 73 L -3 73 Z",
-                    "#40536a", "#a8bbce", 8)
-            + sk.path("M 8 -66 L 125 -66 L 133 -12 L 8 -12 Z",
-                      "#152b40", "#8ba9c4", 4)
-            + sk.rect(116, 11, 24, 7, "#e5c28a", 3)))
-        # The physical torch and cone now come from Max's articulated
-        # hand in actors_layer; no duplicate/free-floating beam here.
-        # Max's rucksack is now physically bound to the animated torso
-        # in actors_layer. No duplicate static backpack asset remains.
+        # Shot physics: car remains in its parking position, a real side
+        # panel opens on its hinge, then Max is already outside with Biscuit.
+        # Never use a separate screen-space door that becomes a floating kite.
+        swing = min(1.0, t / 1.25)
+        out.append(car_body(-105, 1552, 0.64, "#358aa0",
+                            door_open=swing))
+        out.append(sk.ell(122, 1544, 170, 26, "#071d2c", op=.43))
+        # Handheld light + worn backpack come from Max's shared skeleton via
+        # actors_layer and are not duplicated in this background illustration.
 
     if beat == "breakdown":
         out.append(sk.rect(0, 970, W, 640, "#05080f", op=0.15))
