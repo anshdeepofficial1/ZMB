@@ -110,6 +110,15 @@ def pose_walk(t):
     )
 
 
+def pose_walk_flashlight(t):
+    """Natural stride, arm raised forward to HOLD the real handheld light."""
+    p=pose_walk(t)
+    p.arm_n=83.0+2.3*math.sin(t*2.8)
+    p.elbow_n=-8.0
+    p.mouth="line"
+    return p
+
+
 def pose_run(t):
     p = math.tau / 0.60
     a = t * p
@@ -263,7 +272,8 @@ def pose_zstill(t):
 
 
 HUMAN_ACTIONS = {
-    "idle": pose_idle, "walk": pose_walk, "run": pose_run, "sneak": pose_sneak,
+    "idle": pose_idle, "walk": pose_walk, "walk_flashlight": pose_walk_flashlight,
+    "run": pose_run, "sneak": pose_sneak,
     "crouch": pose_crouch, "check": pose_check, "reach": pose_reach,
     "point": pose_point, "look": pose_look, "call": pose_call,
     "climb": pose_climb, "sit": pose_sit,
@@ -345,7 +355,7 @@ def _face_head(px, py, hr, pal, pose, art):
 
 
 
-def render_human(pal, pose: Pose, size=430.0, art="boy", op=None):
+def render_human(pal, pose: Pose, size=430.0, art="boy", op=None, held_prop=None):
     l1, l2 = size * 0.235, size * 0.225
     l3 = size * 0.33
     lu, lf = size * 0.16, size * 0.155
@@ -430,6 +440,19 @@ def render_human(pal, pose: Pose, size=430.0, art="boy", op=None):
     out.append(limb(sh_n[0], sh_n[1], elbow_n[0], elbow_n[1], coat_n, wa, o, ow))
     out.append(limb(elbow_n[0], elbow_n[1], hand_n[0], hand_n[1], pal["skin"], wa * 0.86, o, ow))
     out.append(circ(hand_n[0], hand_n[1], wa * 0.5, pal["skin"], o, ow * 0.6))
+    if held_prop == "flashlight":
+        # Handheld beam shares the near-hand joint every frame. This is not
+        # the disembodied flashlight that previously drifted across the scene.
+        out.append(g(
+            f"translate({n(hand_n[0])} {n(hand_n[1])}) rotate({n(-5.5+math.sin(t*1.5)*4.0)})",
+            path("M 38 -14 L 440 -145 L 440 175 Z",
+                 "#fff3a4",op=.17)
+            + ell(385,13,88,112,"#fff0b2",op=.07)
+            + rect(-8,-11,69,22,"#263a4d",8,
+                   stroke="#ffc96c",sw=4)
+            + rect(15,-12,7,25,"#a1bed0",3)
+            + circ(63,0,15,"#fff8c1",stroke="#f4c77b",sw=3)))
+
 
     body = "".join(out)
     if op is not None:
@@ -591,4 +614,7 @@ def render_actor(who, action, t, size=430.0, flip=False, op=None, art=None):
     if a == "zombie":
         act = {"reach": "reach_z", "idle": "still", "walk": "shamble"}.get(action, action)
     fn = HUMAN_ACTIONS.get(act) or HUMAN_ACTIONS["idle"]
-    return render_human(pal, fn(t), size=size, art=a, op=op)
+    return render_human(
+        pal, fn(t), size=size, art=a, op=op,
+        held_prop="flashlight" if act == "walk_flashlight" else None
+    )
