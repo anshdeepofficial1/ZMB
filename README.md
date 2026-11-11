@@ -1,111 +1,83 @@
-# 🧟 ZMB — Zombie Survival (Interactive Animated Instagram Channel)
+# ZMB Stories — Original 2D animated zombie survival
 
-Ek **fully-automated Instagram Reels channel** jahan **viewers comment karke story decide karte hain**.
+**Current art direction:** original **2D** characters, illustrated environments,
+and scene-by-scene animation built entirely with code. No AI image/video generation,
+no 3D, no photo-real characters, no model weights, and no GPU required.
 
-- Har reel ek cartoon scene dikhati hai — English narration ke saath, worldwide audience ke liye
-- Max (aur his dog Biscuit) + Ada, zombie apocalypse mein survive karte hue
-- Reel ka last card poochta hai: **"Comment 1 or 2"** → viewers vote karte hain
-- Majority vote ke hisaab se **agli episode apne aap generate** hoti hai
-  (script → procedural cartoon animation → voice → video → Instagram post)
-- Poora pipeline **GitHub Actions + official Instagram Graph API** par chalta hai = **$0/month**,
-  koi PC 24x7 on rakhne ki zaroorat nahi. Aur **koi AI image API nahi** — animation
-  poora tarah se khud-renders hota hai (procedural SVG → PNG → FFmpeg), isliye kabhi
-  rate-limits ya broken-image failures nahi.
+ZMB is a branching English-language zombie survival story for vertical social video.
+Max, his dog Biscuit, Ada, Otto and the zombies are custom vector character rigs:
+the same faces, costumes and poses are drawn frame by frame using Python SVG.
 
-## 🎬 Kya-dikhta hai reel mein
+## How video is actually made
 
-- **Vector cartoon animation**: human rig (walk/run/sit/crouch), dog rig (trot/bark/scared/sit),
-  zombie hordes, parallax camera push/pan/shake, fog/rain/embers effects
-- **Karaoke captions** (yellow highlight, word-timed) — har line par
-- **HUD**: HP / NOISE / FOOD / DOG trust stat pills, "SEASON 1 · DAY 4" counter
-- **Title card + vote card + ending card** — poori episode format ready
-- **Michael-style narration**: en-US Christopher voice, har shot ke saath synced
+1. The **authored story graph** in `content/scenarios.json` supplies plot and dialogue.
+2. `content/shot_directions.json` documents the physical action of each narration line.
+3. `scripts/characters.py`, `scripts/scenes.py` and `scripts/animate.py`
+   draw articulated 2D actors, props, parallax and motion into SVG frames.
+4. `resvg-py` rasterizes the original SVG frames.
+5. **eSpeak NG** synthesizes offline English narration without a neural model.
+   Captions have approximate word timing from real narration duration.
+6. **FFmpeg** creates 1080×1920 H.264/AAC videos.
+7. `scripts/verify_2d_video.py` rejects missing video, frozen scenes,
+   invalid portrait size and near-silent audio.
 
-**Season 1 "The Long Road"** (17 nodes): highway → gas station → motel 3:04AM →
-forest/bridge routes → lookout tower → broadcast… **Endings: Coast ya City** →
-Season 2 "The Metro" unlock. Scenes sab **globally-common places** hain (highway, gas
-station, motel, forest road, radio tower, coast — koi India-specific cheez nahi).
+**No AI inference, GPU, photo assets, stock-footage substitution, or paid API**
+is part of this active production path. Do not revive the obsolete 3D/ZeroGPU
+experiments: they are not the user-approved ZMB animation style.
 
-## 📁 Folder Map
+## Work status
 
-| File / Folder | Kya hai |
+The **seven-shot Day 1 story** has specifically authored physical beats:
+a car driving, engine stalling, dead ignition, flashlight exit, station reveal,
+shadow behind glass and a turning door handle. All use the procedural 2D renderer.
+
+**Later episodes are not yet fully staged in the 2D engine.** Existing
+`shot_directions.json` contains written directions, but written directions alone
+do not create appropriate vector action. The visual contract must reject
+unimplemented actions instead of substituting generic walking cartoons.
+Do not describe the whole series as finished until these actions are implemented
+and their MP4s have been reviewed.
+
+**Instagram publishing is OFF** by default: both the configuration's
+`procedural_release_approved` and `publishing_enabled` must explicitly be set
+true, and `ZMB_PUBLISH_ENABLED=1` supplied after the owner approves the actual Reel.
+A successful unit test alone is not visual approval.
+
+## Run and test
+
+On Ubuntu with FFmpeg, eSpeak NG, Python 3.12:
+
+```bash
+sudo apt-get install ffmpeg fonts-dejavu-core espeak-ng
+python -m pip install -r scripts/requirements.txt
+python -m unittest discover -s tests -v
+python scripts/preview_day1.py --stills
+python scripts/preview_day1.py --video
+python scripts/verify_2d_video.py out/reel_s1_d000.mp4
+```
+
+The `.github/workflows/validate.yml` PR workflow runs tests and renders an
+actual Day 1 MP4 artifact with technical QA. The `episode.yml` manual workflow
+is preview-only and cannot publish.
+
+**Note:** A non-neural eSpeak voice is less natural than a neural TTS voice,
+but it meets the explicit no-AI requirement. Character animation is original
+procedural 2D, rather than an AI video or 3D model.
+
+## Repository guide
+
+| Path | Purpose |
 |---|---|
-| `content/scenarios.json` | **Story graph** — S1 Road (17 nodes) + S2 Metro (7 nodes), English |
-| `scripts/engine.py` | Story engine: state machine, votes advance, episode builder |
-| `scripts/animate.py` | **Compositor** — camera, HUD, captions, title/vote/ending cards, fx |
-| `scripts/characters.py` | Human/dog/zombie rigs — positions, poses, actions |
-| `scripts/scenes.py` | 15 scene builders (highway, motel, metro, coast, forest…), parallax |
-| `scripts/svgkit.py` | SVG helper kit (vector primitives, gradients, glow, text) |
-| `scripts/svgrender.py` | resvg-py parallel frame render + FFmpeg encode (lanczos upscale) |
-| `scripts/render.py` | Full pipeline: voices (edge-tts) → timeline → mix → frames → mp4 |
-| `scripts/run_cycle.py` | **Orchestrator** — jo workflow chalata hai |
-| `scripts/votes.py` | Instagram comments tally system |
-| `scripts/publish.py` | Reels publish (Graph API) + GitHub media hosting |
-| `dashboard/` | **Control room GUI** (FastAPI + vanilla SPA) — monitor/trigger/edit |
-| `config.example.json` | Saari settings (voice, render size, hashtags, timing) |
-| `state/state.json` | Channel ki "memory" — season/day, node, stats, votes |
-| `.github/workflows/` | GitHub Actions — daily episode cycle |
-| `assets/fonts/` | Bundled fonts (Archivo Black, Barlow) — text render offline |
+| `content/scenarios.json` | Authored branching stories |
+| `content/shot_directions.json` | Scene-specific physical actions |
+| `scripts/characters.py` | 2D rigged actors and dog |
+| `scripts/scenes.py` | 2D backgrounds, weather and parallax |
+| `scripts/animate.py` | Frame composition and scene-specific beats |
+| `scripts/render.py` | Offline voice, frame rasterizer and MP4 |
+| `scripts/preview_day1.py` | Isolated seven-shot preview |
+| `scripts/verify_2d_video.py` | Video/audio/motion smoke test |
+| `scripts/run_cycle.py` | Voting/scheduling with publication disabled |
+| `tests/` | Unit and regression tests |
 
-## 🖥 Dashboard (local control room)
-
-```powershell
-python dashboard/server.py     # → http://127.0.0.1:8787
-```
-
-- **Story State**: gauges HP/NOISE/FOOD/DOG + current arc + next node + choices
-- **Pipeline**: "Render next (dry)" / "Stills only" / "Full publish run" buttons;
-  6-step stepper + live log jab tak run chalta hai
-- **Episodes**: 9:16 video player + file list (purani reels replay karo)
-- **Story Map**: cast ka whole-arc map — current node highlight hoti hai
-- **Engine Settings**: config.json edit (render size, hashtags, captions...) — save button
-- **Publish Setup**: token missing hone par setup steps ka live checklist
-- Sirf local dependencies chahiye: `pip install fastapi uvicorn`
-
-## ⚡ Ek Line Mein Kaam Kaise Karta Hai
-
-```
-GitHub Actions (har 3 ghante, free)
-   └─ 1. Pichhli reel ke COMMENTS padho (votes count)
-   └─ 2. Majority winner → story engine state advance
-   └─ 3. Nayi episode banao:
-         script (scenarios graph) → narration (edge-tts English)
-         → frames (resvg procedural cartoon, 720×1280 internal)
-         → FFmpeg (libx264, 1080×1920 lanczos upscale)
-   └─ 4. Video GitHub media branch par host (public URL)
-   └─ 5. Instagram Graph API → REELS post (AI disclosure set)
-   └─ 6. State commit — repeat forever
-```
-
-## 💰 Cost
-
-| Cheez | Tool | Cost |
-|---|---|---|
-| Scheduler/Server | GitHub Actions (public repo) | **$0** |
-| Posting | Instagram Content Publishing API | **$0** |
-| Voice | edge-tts (Microsoft Neural, English) | **$0** |
-| Animation | Procedural SVG + resvg-py (local) | **$0** |
-| Video banane | FFmpeg | **$0** |
-| Video hosting | GitHub `media` branch (raw URL) | **$0** |
-| **Total** | | **$0/month** |
-
-## 🚦 Quick Start (2-3 ghante ka one-time setup)
-
-1. `SETUP.md` → Part A: Instagram account ko **Professional** banao + Meta app banao
-2. `SETUP.md` → Part B: Access token generate karo (60-day, auto-refresh hoga)
-3. `SETUP.md` → Part C: Ye folder ek **public GitHub repo** mein daalo + Secrets set karo
-4. `SETUP.md` → Part D: `python scripts/run_cycle.py --dry-run` se pehli video locally banao
-5. Part D2: `python dashboard/server.py` kholo — control room se next run trigger karo
-6. `SETUP.md` → Part E: Workflow enable karo → channel live 🚀
-
-## ⚠️ Important Notes
-
-- Sirf **official Meta APIs** — koi unofficial bot/scraper nahi (account-ban risk nahi, engagement spam karne jaisa bhi kuch nahi).
-- Content **fiction** hai — reels par **AI-content disclosure automatically set** hota hai (`is_ai_generated=true`).
-- Pehle hafte **manual push** karna (friends/groups share) — algorithm ko initial signal chahiye. Plan `PLAN.md` mein.
-- GitHub runner par pehli val `dry_run: true` chalakar sanity-check, phir `force_publish` se live jao.
-
-
-## Local-only AI refinement
-
-The default pipeline runs a pinned Qwen2.5-1.5B-Instruct GGUF model locally on the standard GitHub Actions CPU runner using llama.cpp. It improves narration and shot instructions while the existing procedural SVG character rigs, scene layers, camera motion, FX, captions, narration, and FFmpeg renderer continue to create the Reel. It does **not** call hosted AI inference APIs or external image/video-generation APIs. Model weights are downloaded as a file and cached; prompts stay on the Actions runner. The first run can be slower due to the roughly 1.04 GiB model download and CPU inference. If local inference fails, the authored scenario and existing animation are retained and the dashboard reports a fallback status. See `AI-PIPELINE.md` for details.
+**Budget:** ₹0. No user laptop needs to stay running; use GitHub Actions
+artifacts for video previews and review before any publishing.
