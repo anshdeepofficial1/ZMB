@@ -113,6 +113,16 @@ class Pure2DTests(unittest.TestCase):
         self.assertIn("#fff9f0",driving)
         self.assertIn("#f5bd96",driving)
 
+    def test_car_door_uses_vehicle_local_hinge_not_floating_screen_overlay(self):
+        shut = animate.narrative_beat_layer({"beat": "flashlight_exit"}, 0.05)
+        open_ = animate.narrative_beat_layer({"beat": "flashlight_exit"}, 1.8)
+        for svg in (shut, open_):
+            self.assertIn('translate(-105 1552) scale(0.64)', svg)
+            self.assertIn('translate(325 -157) scale(', svg)
+            self.assertNotIn('translate(150 1436)', svg)
+        self.assertNotEqual(shut, open_)
+        self.assertIn('scale(0.3 1)', open_)
+
     def test_flashlight_is_attached_to_original_2d_max_hand(self):
         import characters
         actor = characters.render_actor("max","walk_flashlight",1.5,size=600)
