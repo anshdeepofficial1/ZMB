@@ -254,6 +254,9 @@ def actors_layer(meta, t, fx, cache):
     k = len(cast)
     for i, item in enumerate(cast):
         who, act = item[0], item[1]
+        # The flashlight is physically attached to Max's near hand.
+        if meta.get("beat") == "flashlight_exit" and who == "max":
+            act = "walk_flashlight"
         x = fx + (i - (k - 1) / 2.0) * spread
         if who == "biscuit":
             x += 52.0
@@ -389,16 +392,8 @@ def narrative_beat_layer(meta, t):
             + sk.path("M 8 -66 L 125 -66 L 133 -12 L 8 -12 Z",
                       "#152b40", "#8ba9c4", 4)
             + sk.rect(116, 11, 24, 7, "#e5c28a", 3)))
-        sweep = 6.0 * math.sin(t * 1.6) + 5.0 * min(1.0, t / 1.3)
-        flicker = 0.87 + 0.10 * math.sin(t * 3.7)
-        out.append(sk.g(f"translate(620 1194) rotate({n(sweep)})",
-            sk.path("M 0 0 L 460 -244 L 460 346 Z",
-                    "#ffedac", op=0.19 * flicker)))
-        out.append(sk.ell(1054, 1242, 135, 195, "#ffefbb",
-                          op=0.08 + 0.04 * (1.0 + math.sin(t * 1.6)) / 2.0))
-        out.append(sk.g(f"translate(620 1194) rotate({n(sweep)})",
-            sk.rect(-20, -4, 54, 24, "#343b42", 7, "#f0c575", 3)
-            + sk.circ(34, 8, 14, "#fff1ba", op=0.86)))
+        # The physical torch and cone now come from Max's articulated
+        # hand in actors_layer; no duplicate/free-floating beam here.
         out.append(sk.g("translate(0 0)",
             sk.path("M 342 1028 Q 354 1004 389 1008 L 431 1030 L 429 1154 "
                     "Q 392 1172 356 1152 Z", "#7b3f2b", "#f0c28c", 8)
