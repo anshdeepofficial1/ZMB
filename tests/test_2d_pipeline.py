@@ -98,6 +98,16 @@ class Pure2DTests(unittest.TestCase):
         self.assertLessEqual(cfg["render"]["caption_max_width"],755)
 
 
+    def test_flashlight_is_attached_to_original_2d_max_hand(self):
+        import characters
+        actor = characters.render_actor("max","walk_flashlight",1.5,size=600)
+        self.assertIn("#fff3a4",actor)
+        self.assertIn("translate(",actor)
+        self.assertIn("#fff8c1",actor)
+        plain = characters.render_actor("max","walk",1.5,size=600)
+        self.assertNotIn("#fff3a4",plain)
+
+
     def test_offline_espeak_only_and_real_voice_no_silent_fallback(self):
         calls = []
         with tempfile.TemporaryDirectory() as directory:
