@@ -85,7 +85,12 @@ jobs:
         env:
           ZMB_LOCAL_AI_ENABLED: "0"
           ZMB_NO_AI: "1"
-        run: python scripts/preview_day1.py --video
+        run: |
+          set -euo pipefail
+          python scripts/preview_day1.py --video
+          VIDEO="$(find out -maxdepth 1 -name '*.mp4' -type f -print -quit)"
+          test -s "$VIDEO" || { echo "::error::No 2D MP4 produced"; exit 1; }
+          python scripts/verify_2d_video.py "$VIDEO"
 
       - name: Upload Day 1 cinematic draft
         if: always()
@@ -97,5 +102,6 @@ jobs:
             out/caption.txt
             out/episode.json
             out/day1_visual_manifest.json
+            out/2d_qa_report.json
           if-no-files-found: error
           retention-days: 5
