@@ -43,6 +43,40 @@ class Pure2DTests(unittest.TestCase):
         self.assertNotIn("render_storyboard(", source)
         self.assertIn("procedural_2d_no_ai", source)
 
+    def test_caption_visual_safe_zone_is_fixed(self):
+        from animate import caption_layer, Texts
+        from svgrender import font_map
+        Text = Texts(font_map(ROOT))
+        chunks = [{
+            "start": 0.0, "end": 3.2,
+            "words": [
+                {"w": "Max", "start": 0.0, "end": .5},
+                {"w": "drives", "start": .6, "end": 1.0},
+                {"w": "alone.", "start": 1.1, "end": 2.2},
+            ]
+        }]
+        frame_a = caption_layer(chunks, .8, Text)
+        frame_b = caption_layer(chunks, 1.4, Text)
+        self.assertIn('x="120" y="932" width="840" height="202"', frame_a)
+        self.assertIn('x="120" y="932" width="840" height="202"', frame_b)
+        self.assertIn('y="1051"',frame_a)
+        self.assertIn('y="1051"',frame_b)
+
+    def test_no_early_highway_gas_station_and_present_hook(self):
+        from animate import opening_hook_layer, Shot
+        import scenes
+        defs, layers = scenes.highway("night", "tense", 12)
+        self.assertNotIn("OPEN 24 HOURS", "".join(x[1] for x in layers))
+        hook = opening_hook_layer(Shot("line", 0, 5, meta={"beat": "car_driving"}), .6)
+        self.assertIn("THE LAST DRIVE", hook)
+        self.assertIn("2:47 AM", hook)
+
+    def test_caption_config_keeps_all_words_visible(self):
+        cfg = json.loads((ROOT / "config.example.json").read_text())
+        self.assertLessEqual(cfg["render"]["caption_max_words"],4)
+        self.assertLessEqual(cfg["render"]["caption_max_width"],755)
+
+
     def test_offline_espeak_only_and_real_voice_no_silent_fallback(self):
         calls = []
         with tempfile.TemporaryDirectory() as directory:
