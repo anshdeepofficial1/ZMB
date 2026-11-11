@@ -324,7 +324,7 @@ def _face_head(px, py, hr, pal, pose, art):
         out.append(ell(mx,my+hr*.06,hr*.09,hr*.05,"#e8899a"))
     else:
         out.append(path(
-            f"M {n(mx-hr*.2)} {n(my)} Q {n(mx)} {n(my+hr*.08)} "
+            f"M {n(mx-hr*.2)} {n(my)} Q {n(mx)} {n(my-hr*.12)} "
             f"{n(mx+hr*.22)} {n(my-hr*.03)}",
             "none",o,hr*.095))
     if art=="zombie":
@@ -384,8 +384,18 @@ def render_human(pal, pose: Pose, size=430.0, art="boy", op=None):
     out.append(limb(hip[0], hip[1], knee_f[0], knee_f[1], pnt_f, wl, o, ow))
     out.append(limb(knee_f[0], knee_f[1], ank_f[0], ank_f[1], pnt_f, wl * 0.86, o, ow))
     out.append(limb(ank_f[0], ank_f[1], ank_f[0] + size * 0.055, ank_f[1], shade(shoe, -0.15), wl * 0.8, o, ow * 0.8))
-    # torso (patla + halka taper)
-    out.append(limb(hip[0], hip[1], neck[0], neck[1], coat_n, size * 0.162, o, ow))
+    # Structured 2D jacket silhouette (shoulders + taper + zipped front).
+    # Moves with the real articulated skeleton; not an overlay sticker.
+    out.append(path(
+        f"M {n(neck[0]-size*.066)} {n(neck[1]+size*.003)} "
+        f"Q {n(neck[0]-size*.12)} {n(neck[1]+size*.045)} "
+        f"{n(neck[0]-size*.106)} {n(neck[1]+size*.115)} "
+        f"L {n(hip[0]-size*.084)} {n(hip[1]-size*.024)} "
+        f"L {n(hip[0]+size*.076)} {n(hip[1]-size*.024)} "
+        f"L {n(neck[0]+size*.102)} {n(neck[1]+size*.113)} "
+        f"Q {n(neck[0]+size*.11)} {n(neck[1]+size*.037)} "
+        f"{n(neck[0]+size*.065)} {n(neck[1]+size*.006)} Z",
+        coat_n,o,ow*1.25))
     out.append(limb(hip[0] - size * 0.035, hip[1] + size * 0.006, hip[0] + size * 0.035, hip[1] - size * 0.004,
                     shade(pal["pants"], 0.06), size * 0.115, o, ow * 0.85))
     # Designed graphic-novel jacket: zipper, raised collar and pocket marks.
