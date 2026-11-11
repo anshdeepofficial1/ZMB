@@ -57,10 +57,11 @@ class Pure2DTests(unittest.TestCase):
         }]
         frame_a = caption_layer(chunks, .8, Text)
         frame_b = caption_layer(chunks, 1.4, Text)
-        self.assertIn('x="120" y="932" width="840" height="202"', frame_a)
-        self.assertIn('x="120" y="932" width="840" height="202"', frame_b)
-        self.assertIn('y="1051"',frame_a)
-        self.assertIn('y="1051"',frame_b)
+        self.assertIn('y="1125"',frame_a)
+        self.assertIn('y="1125"',frame_b)
+        self.assertIn('y="1195"',frame_a)
+        self.assertIn('y="1195"',frame_b)
+        self.assertNotIn('y="932" width="840"',frame_a)
 
     def test_no_early_highway_gas_station_and_present_hook(self):
         from animate import opening_hook_layer, Shot
