@@ -408,9 +408,9 @@ def narrative_beat_layer(meta, t):
         # panel opens on its hinge, then Max is already outside with Biscuit.
         # Never use a separate screen-space door that becomes a floating kite.
         swing = min(1.0, t / 1.25)
-        out.append(car_body(-105, 1552, 0.64, "#358aa0",
+        out.append(car_body(-105, 1380, 0.64, "#358aa0",
                             door_open=swing))
-        out.append(sk.ell(122, 1544, 170, 26, "#071d2c", op=.43))
+        out.append(sk.ell(122, 1372, 170, 26, "#071d2c", op=.43))
         # Handheld light + worn backpack come from Max's shared skeleton via
         # actors_layer and are not duplicated in this background illustration.
 
@@ -479,8 +479,8 @@ def narrative_beat_layer(meta, t):
 
     elif beat in ("spot_station", "door_shadow", "door_handle"):
         # The illuminated destination now takes over the composition.
-        out.append(car_body(28, 1570, 0.62, "#358aa0", broken=False))
-        out.append(puffs(515, 1455, 4, 24, 38))
+        out.append(car_body(-210, 1365, 0.62, "#358aa0", broken=False))
+        out.append(puffs(305, 1250, 4, 24, 38))
         out.append(sk.ell(820, 1000, 260, 210, "#ffca76", op=0.065))
         out.append(sk.path("M 640 770 L 1040 770", "none", "#ffdf9e", 9, op=0.85))
         out.append(sk.text(839, 730, "OPEN 24 HOURS", 29, "Barlow", "#ffe7b1",
@@ -882,7 +882,10 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
     # The two car-centric shots have their own composition/passengers; all other
     # story beats keep the normal character rig and scene parallax.
     beat = meta.get("beat") if shot.kind == "line" else None
-    if beat not in ("breakdown", "car_driving", "engine_stall", "car_interior"):
+    # Day 1 parked-car beats use a single screen-space composition for
+    # actors AND vehicle, avoiding the giant people standing on miniature cars.
+    staged = beat in ("flashlight_exit", "spot_station", "door_shadow", "door_handle")
+    if not staged and beat not in ("breakdown", "car_driving", "engine_stall", "car_interior"):
         body.append(actors_layer(meta, t, fx, cache))
 
     # Smooth deliberate fade into the Instagram-control region; no distinct
@@ -898,6 +901,20 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
         }.get(beat, -285)
         ov.append(g(f"translate(0 {n(focus_up)})",
                     narrative_beat_layer(meta, local)))
+    if staged:
+        # Feet share the parked sedan's road plane. Station shots are closer
+        # views of the characters; the car remains behind them, not underfoot.
+        for who, act in meta.get("cast", []):
+            if who == "max":
+                if beat == "flashlight_exit":
+                    act = "walk_flashlight"
+                x = 560 if beat == "flashlight_exit" else 435
+                ov.append(g(f"translate({x} 1080)",
+                            ch.render_actor(who, act, t, size=435, backpack=True)))
+            elif who == "biscuit":
+                x = 800 if beat == "flashlight_exit" else 640
+                ov.append(g(f"translate({x} 1080)",
+                            ch.render_actor(who, act, t, size=435)))
     if shot.kind == "line":
         ov.append(fx_layer(meta.get("fx", "none"), local, shot.dur, t_abs=t))
     elif shot.kind == "vote":
