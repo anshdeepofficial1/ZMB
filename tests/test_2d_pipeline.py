@@ -117,11 +117,17 @@ class Pure2DTests(unittest.TestCase):
         shut = animate.narrative_beat_layer({"beat": "flashlight_exit"}, 0.05)
         open_ = animate.narrative_beat_layer({"beat": "flashlight_exit"}, 1.8)
         for svg in (shut, open_):
-            self.assertIn('translate(-105 1380) scale(0.64)', svg)
+            self.assertIn('translate(-300 1316) scale(1)', svg)
             self.assertIn('translate(325 -157) scale(', svg)
             self.assertNotIn('translate(150 1436)', svg)
         self.assertNotEqual(shut, open_)
         self.assertIn('scale(0.3 1)', open_)
+
+    def test_station_entrance_is_grounded_and_present_before_shadow(self):
+        for beat in ("spot_station", "door_shadow", "door_handle"):
+            svg = animate.narrative_beat_layer({"beat": beat}, 1.2)
+            self.assertIn('x="720" y="820" width="204" height="545"', svg)
+            self.assertIn('translate(-650 1301) scale(1)', svg)
 
     def test_flashlight_is_attached_to_original_2d_max_hand(self):
         import characters
