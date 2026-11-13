@@ -316,14 +316,25 @@ def _face_head(px, py, hr, pal, pose, art):
         f"Q {n(px+hr*.64)} {n(py+hr*.4)} {n(px+hr*.29)} {n(py+hr*.46)}",
         "none",shade(pal["skin"],-.22),hr*.12,op=.68))
     out.append(ell(px-hr*.69,py+hr*.01,hr*.18,hr*.28,pal["skin"],o,hr*.11))
-    for ex in (px-hr*.13,px+hr*.45):
+    # Express tension proportionally to the head radius, not absolute pixels.
+    # Preserve the same iris, complexion and hair across shots.
+    tension = max(0.0, min(1.0, -pose.brow / 8.0))
+    for index, ex in enumerate((px-hr*.13,px+hr*.45)):
         ey=py-hr*.02
-        out.append(ell(ex,ey,hr*.14,hr*.145,"#fff9f0",o,hr*.07))
+        eye_h=hr*(.145+.045*tension)
+        out.append(ell(ex,ey,hr*.14,eye_h,"#fff9f0",o,hr*.07))
         out.append(ell(ex+hr*.04,ey+hr*.01,hr*.072,hr*.102,"#193d55"))
         out.append(circ(ex+hr*.065,ey-hr*.04,hr*.028,"#ffffff"))
-        out.append(line(ex-hr*.19,ey-hr*.28+pose.brow*.32,
-                        ex+hr*.15,ey-hr*.38+pose.brow*.32,
+        inner = hr*.075*tension
+        lift = hr*.055*tension
+        out.append(line(ex-hr*.19,ey-hr*.28-lift+(inner if index else -inner),
+                        ex+hr*.15,ey-hr*.38-lift+(-inner if index else inner),
                         pal["hair"],hr*.12))
+    # Small warm cheek plane keeps the expression readable in low light.
+    out.append(path(
+        f"M {n(px-hr*.38)} {n(py+hr*.24)} Q {n(px-hr*.2)} {n(py+hr*.32)} "
+        f"{n(px-hr*.03)} {n(py+hr*.28)}",
+        "none",shade(pal["skin"],.16),hr*.08,op=.45))
     out.append(path(
         f"M {n(px+hr*.55)} {n(py+hr*.13)} l {n(hr*.24)} {n(hr*.16)} "
         f"l {n(-hr*.25)} {n(hr*.035)}",

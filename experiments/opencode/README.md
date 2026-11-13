@@ -1,0 +1,9 @@
+# OpenCode faceless 2D experiment
+Reference: https://nafay3d.com/skills/faceless-shorts/faceless-shorts-skill.zip?v=7
+The archive is downloaded and inventoried in a separate job, never executed or redistributed. Its license and source require review before use. The ZMB project skill is original and uses our existing SVG/resvg/FFmpeg renderer, not the upstream templates. OpenCode edits only three animation modules in a disposable checkout, and an offline restricted container renders/tests the candidate. No secrets, no publishing, no commit by the agent. Artifacts: patch, actual MP4, logs, contact sheet, trusted verifier report. A successful candidate still needs human visual review. GLM-5.3-Flash Free is currently free but can disappear; no automatic paid fallback. A failed or empty candidate is a failed experiment, not a successful reel. The existing draft PR, main and publishing controls are unchanged.
+
+## Timeout recovery
+The first agent run hit exit 124 after 600 seconds and produced no patch. The new task targets one function, pins OpenCode 2.2.7, records the agent exit code and grants 20 minutes. A separate independent-preview job renders a small committed facial-expression improvement even if the model fails. Its artifact is explicitly not an agent candidate. The candidate container now has separate writable work/output mounts. Neither job publishes.
+
+## Regression gate recovery
+Run 43396657610 generated a real agent patch, but both render paths were stopped by the same four inherited tests. Mock local-model tests now explicitly enable the mocked provider within their context, leaving actual render mode offline. Two scene tests now verify the current vehicle-local hinge, physically attached flashlight/backpack, knob rotation and station door geometry, including motion comparisons. All tests remain enabled. The workflow does not cancel an in-progress experimental run when a new commit lands. No publishing.
