@@ -408,9 +408,9 @@ def narrative_beat_layer(meta, t):
         # panel opens on its hinge, then Max is already outside with Biscuit.
         # Never use a separate screen-space door that becomes a floating kite.
         swing = min(1.0, t / 1.25)
-        out.append(car_body(-105, 1380, 0.64, "#358aa0",
+        out.append(car_body(-620, 1303, 1.20, "#358aa0",
                             door_open=swing))
-        out.append(sk.ell(122, 1372, 170, 26, "#071d2c", op=.43))
+        out.append(sk.ell(122, 1372, 240, 26, "#071d2c", op=.43))
         # Handheld light + worn backpack come from Max's shared skeleton via
         # actors_layer and are not duplicated in this background illustration.
 
@@ -479,19 +479,22 @@ def narrative_beat_layer(meta, t):
 
     elif beat in ("spot_station", "door_shadow", "door_handle"):
         # The illuminated destination now takes over the composition.
-        out.append(car_body(-210, 1365, 0.62, "#358aa0", broken=False))
+        out.append(car_body(-820, 1288, 1.20, "#358aa0", broken=False))
         out.append(puffs(305, 1250, 4, 24, 38))
         out.append(sk.ell(820, 1000, 260, 210, "#ffca76", op=0.065))
         out.append(sk.path("M 640 770 L 1040 770", "none", "#ffdf9e", 9, op=0.85))
         out.append(sk.text(839, 730, "OPEN 24 HOURS", 29, "Barlow", "#ffe7b1",
                            anchor="middle", weight="bold", ls=2, op=0.94))
+        if beat == "spot_station":
+            out.append(sk.rect(720, 820, 204, 545, "#101b28", 9, stroke="#cbb184", sw=7, op=0.84))
+            out.append(sk.rect(734, 835, 176, 515, "#192637", 5, op=0.96))
         if beat in ("door_shadow", "door_handle"):
             # The shadow moves behind the lit shop door rather than remaining a vague glow.
             sx = 812.0 + math.sin(t * 1.65) * 24.0
             shadow_op = 0.78 + 0.12 * math.sin(t * 2.4)
-            out.append(sk.rect(738, 894, 168, 270, "#101b28", 9,
+            out.append(sk.rect(720, 820, 204, 545, "#101b28", 9,
                                stroke="#cbb184", sw=7, op=0.84))
-            out.append(sk.rect(752, 909, 140, 242, "#192637", 5, op=0.96))
+            out.append(sk.rect(734, 835, 176, 515, "#192637", 5, op=0.96))
             out.append(sk.ell(sx, 972, 31, 39, "#05090f", op=shadow_op))
             out.append(sk.path(
                 f"M {n(sx - 26)} 1008 Q {n(sx)} 991 {n(sx + 26)} 1008 "
@@ -510,7 +513,7 @@ def narrative_beat_layer(meta, t):
                 out.append(sk.circ(884, 1044, 11, "#f2d89f", stroke="#5f492d", sw=3))
                 out.append(sk.g(f"translate(884 1044) rotate({n(62.0 * turn)})",
                                 sk.rect(-3, -4, 31, 8, "#d6b678", 4)))
-                out.append(sk.path("M 738 895 L 906 895 L 906 1164",
+                out.append(sk.path("M 720 820 L 924 820 L 924 1365",
                                    "none", "#e5c99b", 5,
                                    op=0.5 + 0.3 * abs(math.sin(t * 11.0))))
 
