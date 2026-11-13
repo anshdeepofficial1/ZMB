@@ -8,7 +8,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 
 from common import IST
 from run_cycle import _publish_target, _parse_ist_timestamp
-from animate import narrative_beat_layer, chunk_words
+from animate import narrative_beat_layer, actors_layer, chunk_words
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -85,12 +85,24 @@ class NarrativeVisualBeatTests(unittest.TestCase):
     def test_flashlight_and_turning_door_handle_are_visible(self):
         flashlight = narrative_beat_layer({"beat": "flashlight_exit"}, 1.25)
         handle = narrative_beat_layer({"beat": "door_handle"}, 1.25)
-        self.assertIn("translate(-105 1380) scale(0.64)", flashlight)
+        # Current vehicle staging uses a larger car and a vehicle-local hinge.
+        self.assertIn("translate(-300 1316) scale(1)", flashlight)
         self.assertIn("translate(325 -157) scale(", flashlight)
         self.assertNotIn("translate(150 1436)", flashlight)
         self.assertNotIn("translate(620 1194)", flashlight)
-        self.assertIn("rotate(", handle)
-        self.assertIn("M 738 895", handle)
+        self.assertNotEqual(flashlight, narrative_beat_layer({"beat": "flashlight_exit"}, 0.05))
+        # The flashlight and backpack are now attached to Max's articulated rig.
+        meta = {"beat": "flashlight_exit", "time": "night", "cast": [["max", "walk"]]}
+        actor = actors_layer(meta, 1.25, 540, {})
+        self.assertIn("#fff3a4", actor)
+        self.assertIn("#fff8c1", actor)
+        self.assertIn("#965533", actor)
+        self.assertNotEqual(actor, actors_layer(meta, 0.25, 540, {}))
+        # The new lever turns around the actual knob on the station door.
+        self.assertIn('cx="884" cy="1044"', handle)
+        self.assertIn("translate(884 1044) rotate(", handle)
+        self.assertIn("M 720 820 L 924 820 L 924 1365", handle)
+        self.assertNotEqual(handle, narrative_beat_layer({"beat": "door_handle"}, 0.15))
 
     def test_interior_scene_is_a_real_cabin_composition(self):
         svg = narrative_beat_layer({"beat": "car_interior"}, 2.0)
@@ -135,9 +147,11 @@ class NarrativeVisualBeatTests(unittest.TestCase):
 
     def test_station_door_has_a_moving_shadow_and_visible_door_frame(self):
         svg = narrative_beat_layer({"beat": "door_shadow"}, 1.4)
-        self.assertIn('x="738" y="894"', svg)
+        self.assertIn('x="720" y="820" width="204" height="545"', svg)
+        self.assertIn('x="734" y="835" width="176" height="515"', svg)
         self.assertIn("#05090f", svg)
-        self.assertIn("flicker", svg.lower()) if "flicker" in svg.lower() else self.assertIn("OPEN 24 HOURS", svg)
+        self.assertIn("OPEN 24 HOURS", svg)
+        self.assertNotEqual(svg, narrative_beat_layer({"beat": "door_shadow"}, 0.15))
 
     def test_intro_narration_has_matching_visual_beats(self):
         scenarios = json.loads((ROOT / "content" / "scenarios.json").read_text(encoding="utf-8"))

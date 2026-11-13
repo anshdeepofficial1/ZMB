@@ -7,6 +7,7 @@ on:
       - ".github/workflows/opencode-faceless-2d.yml"
       - ".opencode/skills/zmb-faceless-2d/**"
       - "experiments/opencode/**"
+      - "tests/**"
   workflow_dispatch:
 
 permissions:
@@ -14,7 +15,7 @@ permissions:
 
 concurrency:
   group: zmb-opencode-faceless-experiment
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   upstream-audit:
@@ -139,7 +140,7 @@ jobs:
           PYTHONHASHSEED: "0"
         run: |
           set -euo pipefail
-          python -m unittest discover -s tests -v
+          python -m unittest discover -s tests -v 2>&1 | tee "$RUNNER_TEMP/zmb-independent-tests.log"
           python scripts/preview_day1.py --video
           VIDEO="$(find out -maxdepth 1 -name '*.mp4' -type f -print -quit)"
           test -s "$VIDEO"
@@ -155,5 +156,6 @@ jobs:
             out/*.json
             out/contact-sheet.jpg
             out/caption.txt
+            ${{ runner.temp }}/zmb-independent-tests.log
           if-no-files-found: error
           retention-days: 5

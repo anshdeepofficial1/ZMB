@@ -37,7 +37,7 @@ class LocalAIProviderTests(TestCase):
         fake_llm = Mock()
         fake_llm.create_chat_completion.return_value = {"choices": [{"message": {"content": json.dumps(generated)}}]}
         fake_module = SimpleNamespace(Llama=Mock(return_value=fake_llm))
-        with patch.dict(sys.modules, {"llama_cpp": fake_module}), patch.object(ai_providers, "_model_path", return_value=Path("/tmp/model.gguf")):
+        with patch.dict("os.environ", {"ZMB_LOCAL_AI_ENABLED": "1"}), patch.dict(sys.modules, {"llama_cpp": fake_module}), patch.object(ai_providers, "_model_path", return_value=Path("/tmp/model.gguf")):
             result = ai_providers.rewrite_episode(self.episode, lambda *_: None)
         self.assertEqual(len(result["lines"]), 2)
         self.assertEqual(result["choices"], self.episode["choices"])
@@ -48,7 +48,7 @@ class LocalAIProviderTests(TestCase):
         self.assertEqual(result["ai_story"]["status"], "success")
 
     def test_local_model_failure_is_marked_and_keeps_authored_lines(self):
-        with patch.dict(sys.modules, {"llama_cpp": SimpleNamespace(Llama=Mock(side_effect=RuntimeError("no model")))}), patch.object(ai_providers, "_model_path", return_value=Path("/tmp/model.gguf")):
+        with patch.dict("os.environ", {"ZMB_LOCAL_AI_ENABLED": "1"}), patch.dict(sys.modules, {"llama_cpp": SimpleNamespace(Llama=Mock(side_effect=RuntimeError("no model")))}), patch.object(ai_providers, "_model_path", return_value=Path("/tmp/model.gguf")):
             result = ai_providers.rewrite_episode(self.episode, lambda *_: None)
         self.assertEqual(result["lines"], self.episode["lines"])
         self.assertEqual(result["ai_story"]["status"], "fallback")
