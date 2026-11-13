@@ -408,7 +408,7 @@ def narrative_beat_layer(meta, t):
         # panel opens on its hinge, then Max is already outside with Biscuit.
         # Never use a separate screen-space door that becomes a floating kite.
         swing = min(1.0, t / 1.25)
-        out.append(car_body(-620, 1303, 1.20, "#358aa0",
+        out.append(car_body(-300, 1316, 1.0, "#358aa0",
                             door_open=swing))
         out.append(sk.ell(122, 1372, 240, 26, "#071d2c", op=.43))
         # Handheld light + worn backpack come from Max's shared skeleton via
@@ -479,7 +479,7 @@ def narrative_beat_layer(meta, t):
 
     elif beat in ("spot_station", "door_shadow", "door_handle"):
         # The illuminated destination now takes over the composition.
-        out.append(car_body(-820, 1288, 1.20, "#358aa0", broken=False))
+        out.append(car_body(-650, 1301, 1.0, "#358aa0", broken=False))
         out.append(puffs(305, 1250, 4, 24, 38))
         out.append(sk.ell(820, 1000, 260, 210, "#ffca76", op=0.065))
         out.append(sk.path("M 640 770 L 1040 770", "none", "#ffdf9e", 9, op=0.85))
@@ -911,11 +911,11 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
             if who == "max":
                 if beat == "flashlight_exit":
                     act = "walk_flashlight"
-                x = 560 if beat == "flashlight_exit" else 435
+                x = 675 if beat == "flashlight_exit" else 435
                 ov.append(g(f"translate({x} 1080)",
                             ch.render_actor(who, act, t, size=435, backpack=True)))
             elif who == "biscuit":
-                x = 800 if beat == "flashlight_exit" else 640
+                x = 870 if beat == "flashlight_exit" else 640
                 ov.append(g(f"translate({x} 1080)",
                             ch.render_actor(who, act, t, size=435)))
     if shot.kind == "line":
