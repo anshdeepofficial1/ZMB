@@ -57,10 +57,10 @@ def head(t, fear=0, facing=1):
 def max_actor(t, action="walk",fear=0,pack=True,light=False):
     walk=action=="walk"
     stride=wave(t,1.05)*42 if walk else 0
-    bob=abs(wave(t,1.05))*9 if walk else 0
+    bob=abs(wave(t,1.05))*9 if walk else wave(t,.34)*4
     # The limbs share explicit endpoints; flashlight follows the right wrist.
     right=(104+stride*.2,-213) if not light else (146,-298+wave(t,.7)*9)
-    if action=="point": right=(203,-340)
+    if action=="point": right=(203+wave(t,.4)*6,-340+wave(t,.6)*9)
     if action=="freeze": right=(108,-277)
     left=(-105-stride*.38,-194)
     if action=="grab": left=(-147,-278)
@@ -88,7 +88,7 @@ def max_actor(t, action="walk",fear=0,pack=True,light=False):
             g(0,-427-bob, .73,head(t,fear))]
     if light:
         x,y=right
-        out += [poly([(x+20,y-10),(x+300,y-100),(x+335,y+90),(x+20,y+10)],"#ffeab2","none",0),
+        out += [s.g("translate(0 0)",poly([(x+20,y-10),(x+300,y-100),(x+335,y+90),(x+20,y+10)],"#ffeab2","none",0),op=.28),
                 s.rect(x-5,y-13,49,26,"#33485b",5,INK,5),
                 s.rect(x+29,y-18,19,36,"#ffefab",4,INK,4)]
     return "".join(out)
@@ -212,7 +212,10 @@ def scene(beat,t,pct):
         stop=smooth(pct/.59)
         travel=1-(1-stop)**2
         lamp=1 if pct<.12 else (.95 if int(t*11)%3==0 else .08) if pct<.58 else .05
-        car=sedan(t*(1-stop),1,lamp)
+        phase=min(pct/.59,1.0)
+        stop_time=t/max(pct,.001)*.59
+        wheel_time=stop_time*(phase-phase**2/2)
+        car=sedan(wheel_time,1,lamp)
         out=landscape(t,travel*550)+g(85+95*travel,885+wave(t,5)*7*(1-stop),.9,car)
         for i in range(5):
             out+=s.ell(895+i*12,710-i*28-wave(t+i*.2,.3)*12,25+i*8,14+i*7,"#e6c8a4",op=.20)
@@ -248,11 +251,10 @@ def frame_svg(ep,cfg,shots,t,Texts,cache,seed=1):
         cache["grain"]="".join(s.circ(rng.randrange(W),rng.randrange(1060),rng.choice([1,1,2,3]),"#f6dfbd",op=.12) for _ in range(700))
     body+=s.rect(0,0,W,1060,"url(#hatch)",op=.33)+cache["grain"]
     # Designed editorial lower panel; captions never obscure the acting.
-    body+=s.rect(0,1060,W,860,"#243a50")+s.rect(0,1060,W,7,"#e69a62")
+    body+=s.rect(0,1020,W,900,"url(#fade)")
     idx=next(i for i,a in enumerate(shots) if a is shot)+1
-    body+=text(70,1327,"ZMB STORIES",36,"#f4d1a1")+text(70,1380,"THE LAST LIGHT",47,PAPER)
-    body+=text(70,1442,f"CHAPTER 01   /   SCENE {idx:02d}",23,"#86b6b4")
-    body+=s.rect(70,1481,754,4,"#587586")+s.rect(70,1481,754*((idx-1+pct)/len(shots)),4,RUST)
+    body+=text(70,1390,"ZMB  /  THE LAST LIGHT",29,"#f4d1a1")
+    body+=s.rect(70,1420,754,4,"#587586")+s.rect(70,1420,754*((idx-1+pct)/len(shots)),4,RUST)
     # Reuse the validated caption timing only, not the old visuals or HUD.
     key=("graphic-novel-captions",id(shot))
     if key not in cache:
@@ -265,6 +267,6 @@ def frame_svg(ep,cfg,shots,t,Texts,cache,seed=1):
         for wd in words:
             value=str(wd["w"])
             color=AMBER if wd["start"]<=local<=wd["end"]+.12 else PAPER
-            body+=s.text(x,1196,value,59,"Barlow",color,weight="bold",stroke="#18293d",sw=5)
+            body+=s.text(x,1196,value,59,"Barlow",color,anchor="start",weight="bold",stroke="#18293d",sw=5)
             x+=Texts.w(value+" ",59)
     return f'<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1920" viewBox="0 0 1080 1920"><defs>{DEFS}</defs>{body}</svg>'
