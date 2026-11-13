@@ -39,7 +39,7 @@ jobs:
 
   candidate:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
         with:
@@ -63,11 +63,18 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          npm install -g @opencode/cli
+          npm install -g @opencode/cli@2.2.7
           opencode --version
           cd "$RUNNER_TEMP/zmb-candidate"
           unset OPENCODE_API_KEY OPENAI_API_KEY ANTHROPIC_API_KEY
-          timeout 600 opencode run --model opencode/glm-5.3-flash-free "Load the zmb-faceless-2d skill. Implement a genuine Day 1 2D animation quality improvement in the allowed files. Read the cast and shot contract first. Make actual edits, not just a plan. Never modify any other files. No publishing." 2>&1 | tee "$RUNNER_TEMP/zmb-result/opencode.log"
+          # Allow a bounded model run, then let the trusted diff gate decide.
+          # A timed-out but real patch can still be tested; no patch is a failure.
+          set +e
+          timeout --kill-after=30s 1200 opencode run --model opencode/glm-5.3-flash-free "Load zmb-faceless-2d. FIRST read scripts/characters.py lines 287-358 only. Edit that function immediately: improve fearful facial acting with expressive brows and mouth shape, keeping the identity and exact existing palette colors. Only edit scripts/characters.py. Do not read other files, run tests, inspect git history, or make plans. CI runs tests. Finish after one real edit." 2>&1 | tee "$RUNNER_TEMP/zmb-result/opencode.log"
+          code=${PIPESTATUS[0]}
+          set -e
+          printf '{"agent_exit_code":%s,"paid_fallback":false}\n' "$code" > "$RUNNER_TEMP/zmb-result/agent-status.json"
+          if [ "$code" -ne 0 ] && [ "$code" -ne 124 ]; then exit "$code"; fi
       - name: Verify candidate changes are confined to three animation files
         shell: bash
         run: |
@@ -75,7 +82,7 @@ jobs:
           cd "$RUNNER_TEMP/zmb-candidate"
           git diff --check
           git diff --binary > "$RUNNER_TEMP/zmb-result/candidate.patch"
-          test -s "$RUNNER_TEMP/zmb-result/candidate.patch"
+          test -s "$RUNNER_TEMP/zmb-result/candidate.patch" || { echo "::error::OpenCode produced no edits; see agent-status.json"; exit 1; }
           git diff --name-only | while IFS= read -r file; do
             case "$file" in
               scripts/characters.py|scripts/scenes.py|scripts/animate.py) test -f "$file" && test ! -L "$file";;
@@ -88,8 +95,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/zmb-result/render"
-          docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --pids-limit 256 --memory 5g --cpus 2 --user "$(id -u):$(id -g)" --tmpfs /tmp:rw,nosuid,nodev,size=2g -e HOME=/tmp -e PYTHONDONTWRITEBYTECODE=1 -e ZMB_NO_AI=1 -e ZMB_LOCAL_AI_ENABLED=0 -v "$RUNNER_TEMP/zmb-candidate:/app:ro" -v "$RUNNER_TEMP/zmb-result/render:/app/out:rw" -w /app zmb-preview:lab sh -ec 'python -m unittest discover -s tests -v && python scripts/preview_day1.py --video'
+          mkdir -p "$RUNNER_TEMP/zmb-result/render" "$RUNNER_TEMP/zmb-candidate/work" "$RUNNER_TEMP/zmb-candidate/out" "$RUNNER_TEMP/zmb-work"
+          docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --pids-limit 256 --memory 5g --cpus 4 --user "$(id -u):$(id -g)" --tmpfs /tmp:rw,nosuid,nodev,size=2g -e HOME=/tmp -e PYTHONDONTWRITEBYTECODE=1 -e ZMB_NO_AI=1 -e ZMB_LOCAL_AI_ENABLED=0 -v "$RUNNER_TEMP/zmb-candidate:/app:ro" -v "$RUNNER_TEMP/zmb-result/render:/app/out:rw" -v "$RUNNER_TEMP/zmb-work:/app/work:rw" -w /app zmb-preview:lab sh -ec 'python -m unittest discover -s tests -v && python scripts/preview_day1.py --video'
       - name: Verify actual exported MP4 with unchanged trusted verifier
         shell: bash
         run: |
@@ -106,4 +113,47 @@ jobs:
           name: zmb-opencode-candidate
           path: ${{ runner.temp }}/zmb-result/
           if-no-files-found: warn
+          retention-days: 5
+
+  independent-preview:
+    # Produce a real review reel without relying on the model responding.
+    # This is the committed ZMB renderer, NOT an OpenCode-generated candidate.
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+      - name: Install CPU render dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core espeak-ng
+          pip install --prefer-binary -r scripts/requirements.txt
+      - name: Render committed 2D improvement (no AI or Instagram)
+        env:
+          ZMB_NO_AI: "1"
+          ZMB_LOCAL_AI_ENABLED: "0"
+          PYTHONHASHSEED: "0"
+        run: |
+          set -euo pipefail
+          python -m unittest discover -s tests -v
+          python scripts/preview_day1.py --video
+          VIDEO="$(find out -maxdepth 1 -name '*.mp4' -type f -print -quit)"
+          test -s "$VIDEO"
+          python scripts/verify_2d_video.py "$VIDEO"
+          ffmpeg -v error -i "$VIDEO" -vf 'fps=1/2,scale=216:384,tile=5x4' -frames:v 1 out/contact-sheet.jpg
+          printf '{"source":"committed ZMB renderer","opencode_generated":false,"publishing_authorized":false}\n' > out/provenance.json
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: zmb-independent-2d-preview
+          path: |
+            out/*.mp4
+            out/*.json
+            out/contact-sheet.jpg
+            out/caption.txt
+          if-no-files-found: error
           retention-days: 5
