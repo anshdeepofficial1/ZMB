@@ -1,0 +1,109 @@
+name: OpenCode faceless 2D experiment (no publishing)
+
+on:
+  push:
+    branches: [experiment/opencode-faceless-2d]
+    paths:
+      - ".github/workflows/opencode-faceless-2d.yml"
+      - ".opencode/skills/zmb-faceless-2d/**"
+      - "experiments/opencode/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: zmb-opencode-faceless-experiment
+  cancel-in-progress: true
+
+jobs:
+  upstream-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Inspect official Faceless Shorts ZIP without executing it
+        run: |
+          mkdir -p audit
+          curl --fail --silent --show-error --location --proto '=https' --max-time 90 --max-filesize 30000000 'https://nafay3d.com/skills/faceless-shorts/faceless-shorts-skill.zip?v=7' -o "$RUNNER_TEMP/faceless-shorts.zip"
+          python experiments/opencode/audit_zip.py "$RUNNER_TEMP/faceless-shorts.zip" > audit/upstream.json
+          cat audit/upstream.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: upstream-skill-inventory
+          path: audit/upstream.json
+          if-no-files-found: error
+          retention-days: 5
+
+  candidate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+      - name: Prepare clean candidate and trusted offline render image
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/zmb-candidate" "$RUNNER_TEMP/zmb-result"
+          git archive HEAD | tar -x -C "$RUNNER_TEMP/zmb-candidate"
+          cp experiments/opencode/agent-config.json "$RUNNER_TEMP/zmb-candidate/opencode.json"
+          cd "$RUNNER_TEMP/zmb-candidate"
+          git init -q
+          git add -A
+          git -c user.name=ZMB -c user.email=zmb@example.invalid commit -qm baseline
+          docker build -t zmb-preview:lab -f "$GITHUB_WORKSPACE/experiments/opencode/Dockerfile" "$GITHUB_WORKSPACE"
+      - name: Install OpenCode and run free model only
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm install -g @opencode/cli
+          opencode --version
+          cd "$RUNNER_TEMP/zmb-candidate"
+          unset OPENCODE_API_KEY OPENAI_API_KEY ANTHROPIC_API_KEY
+          timeout 600 opencode run --model opencode/glm-5.3-flash-free "Load the zmb-faceless-2d skill. Implement a genuine Day 1 2D animation quality improvement in the allowed files. Read the cast and shot contract first. Make actual edits, not just a plan. Never modify any other files. No publishing." 2>&1 | tee "$RUNNER_TEMP/zmb-result/opencode.log"
+      - name: Verify candidate changes are confined to three animation files
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP/zmb-candidate"
+          git diff --check
+          git diff --binary > "$RUNNER_TEMP/zmb-result/candidate.patch"
+          test -s "$RUNNER_TEMP/zmb-result/candidate.patch"
+          git diff --name-only | while IFS= read -r file; do
+            case "$file" in
+              scripts/characters.py|scripts/scenes.py|scripts/animate.py) test -f "$file" && test ! -L "$file";;
+              *) echo "::error::Forbidden edit $file"; exit 1;;
+            esac
+          done
+          test -z "$(git ls-files --others --exclude-standard)"
+          test "$(wc -c < "$RUNNER_TEMP/zmb-result/candidate.patch")" -lt 500000
+      - name: Render and test candidate in restricted offline container
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/zmb-result/render"
+          docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --read-only --pids-limit 256 --memory 5g --cpus 2 --user "$(id -u):$(id -g)" --tmpfs /tmp:rw,nosuid,nodev,size=2g -e HOME=/tmp -e PYTHONDONTWRITEBYTECODE=1 -e ZMB_NO_AI=1 -e ZMB_LOCAL_AI_ENABLED=0 -v "$RUNNER_TEMP/zmb-candidate:/app:ro" -v "$RUNNER_TEMP/zmb-result/render:/app/out:rw" -w /app zmb-preview:lab sh -ec 'python -m unittest discover -s tests -v && python scripts/preview_day1.py --video'
+      - name: Verify actual exported MP4 with unchanged trusted verifier
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          VIDEO="$(find "$RUNNER_TEMP/zmb-result/render" -maxdepth 1 -name '*.mp4' -type f -print -quit)"
+          test -s "$VIDEO"
+          python scripts/verify_2d_video.py "$VIDEO" --report "$RUNNER_TEMP/zmb-result/qa.json"
+          ffmpeg -v error -i "$VIDEO" -vf 'fps=1/2,scale=216:384,tile=5x4' -frames:v 1 "$RUNNER_TEMP/zmb-result/contact-sheet.jpg"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: zmb-opencode-candidate
+          path: ${{ runner.temp }}/zmb-result/
+          if-no-files-found: warn
+          retention-days: 5

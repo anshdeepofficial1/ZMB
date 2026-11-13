@@ -1,0 +1,45 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permissions": [
+    {
+      "action": "*",
+      "resource": "*",
+      "effect": "deny"
+    },
+    {
+      "action": "read",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "glob",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "grep",
+      "resource": "*",
+      "effect": "allow"
+    },
+    {
+      "action": "skill",
+      "resource": "zmb-faceless-2d",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "scripts/characters.py",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "scripts/scenes.py",
+      "effect": "allow"
+    },
+    {
+      "action": "edit",
+      "resource": "scripts/animate.py",
+      "effect": "allow"
+    }
+  ]
+}
