@@ -254,6 +254,9 @@ def actors_layer(meta, t, fx, cache):
     k = len(cast)
     for i, item in enumerate(cast):
         who, act = item[0], item[1]
+        # The flashlight is physically attached to Max's near hand.
+        if meta.get("beat") == "flashlight_exit" and who == "max":
+            act = "walk_flashlight"
         x = fx + (i - (k - 1) / 2.0) * spread
         if who == "biscuit":
             x += 52.0
@@ -261,7 +264,12 @@ def actors_layer(meta, t, fx, cache):
                          ch.render_actor(who, act, t * 1.0 + 0.2, size=size)))
         else:
             out.append(g(f"translate({n(x)} {n(GROUND)})",
-                         ch.render_actor(who, act, t, size=size)))
+                         ch.render_actor(
+                             who, act, t, size=size,
+                             backpack=(who=="max" and meta.get("beat") in {
+                                 "flashlight_exit","spot_station",
+                                 "door_shadow","door_handle","backpack_exit"
+                             }))))
     return "".join(out)
 
 
@@ -293,7 +301,8 @@ def narrative_beat_layer(meta, t):
                                 rotate=math.sin(t + i) * 24.0))
         return "".join(items)
 
-    def car_body(x=70.0, y=1505.0, scale=1.0, color="#56677b", broken=False):
+    def car_body(x=70.0, y=1505.0, scale=1.0, color="#3e8d9f",
+                 broken=False, driver=False, door_open=None):
         # side view, nose/engine on the right; wheels and glass remain distinct
         body = (
             sk.path("M 0 0 L 24 -105 Q 34 -142 88 -150 L 315 -150 "
@@ -314,17 +323,102 @@ def narrative_beat_layer(meta, t):
             + sk.circ(733, 5, 28, "#738195", "#182332", 7)
             + sk.ell(867, -90, 18, 12, "#ffda8a", op=0.95)
         )
+        if driver:
+            # Visible, illustrated Max in the driver's window. His identity
+            # is tied to the 2D palette, not a generic empty car silhouette.
+            body += sk.path("M 551 -163 L 552 -183 Q 568 -211 601 -201 "
+                            "Q 623 -194 630 -164 Z", "#147f96", "#162b41", 5)
+            body += ch._face_head(
+                590, -207, 28, ch.PALETTES["boy"],
+                ch.pose_idle(0), "boy")
+            body += sk.path("M 612 -180 L 655 -164", "none", "#ffc966", 5)
+            # Re-outline the windshield panes over the seated figure.
+            body += sk.path("M 504 -244 L 625 -244 L 707 -161 L 504 -161 Z",
+                            "none", "#a4e3ec", 5)
+        if door_open is not None:
+            # The door is in the vehicle's LOCAL coordinate system, not an
+            # independent screen-space rectangle. The apparent perspective
+            # compresses as the door swings toward the viewer, keeping hinges,
+            # trim and handle in continuous physical alignment with the car.
+            p = ease(max(0.0, min(1.0, door_open)))
+            # Dark opening behind the moving door.
+            body += sk.path("M 324 -157 L 481 -157 L 480 -16 L 325 -16 Z",
+                            "#182c3f", "#a0becc", 5)
+            body += sk.g(
+                f"translate(325 -157) scale({n(1-.70*p)} 1)",
+                sk.path("M 0 0 L 157 0 L 158 138 L 0 140 Z",
+                        "#39889b", "#b5d4df", 7)
+                + sk.path("M 9 11 L 140 11 L 140 63 L 9 63 Z",
+                          "#1b465e", "#a3dfed", 4)
+                + sk.rect(119,85,25,8,"#ffe0a1",4)
+                + sk.path("M 10 74 L 145 74", "none", "#7ac6d9", 4,op=.72))
+            # Warm cabin light visible through the swung door.
+            body += sk.ell(334, -63, 19+37*p, 70, "#ffe2a4", op=.04+.10*p)
         if broken:
             body += sk.path("M 698 -145 L 770 -294 L 844 -275 L 771 -131 Z",
                             "#7b8a9b", "#172230", 10)
             body += sk.path("M 697 -147 L 771 -294", "none", "#d5e0eb", 5)
         return sk.g(f"translate({n(x)} {n(y)}) scale({n(scale)})", body)
 
+    if beat == "car_driving":
+        # Story physics: wheels rotate, lane markers move backwards, and the
+        # headlight beam illuminates the road. The car is clearly IN MOTION.
+        rate = min(1.0, max(0.0, t / 0.42))
+        offset = (t * 340.0) % 250.0
+        out.append(sk.rect(0, 1440, W, 320, "#070d16", op=0.65))
+        for i in range(-2, 9):
+            x = i * 250.0 - offset
+            out.append(sk.rect(x, 1572, 145, 12, "#f6edc5", 5, op=0.8))
+        bob = 5.0 * math.sin(t * 15.0)
+        out.append(sk.ell(535, 1504, 450, 31, "#02050a", op=0.62))
+        out.append(sk.path(
+            "M 826 1405 L 1080 1255 L 1080 1575 L 826 1495 Z",
+            "#ffe5a0", op=0.19 * rate))
+        out.append(sk.g(f"translate(0 {n(bob)})",
+                        car_body(65, 1500, 0.99, "#358aa0", driver=True)))
+        # Rotating hub markers make the moving wheels distinguishable.
+        for cx in (250.0, 792.0):
+            cy = 1505.0 + bob
+            ang = t * 12.0
+            out.append(sk.line(cx - math.sin(ang) * 22, cy - math.cos(ang) * 22,
+                               cx + math.sin(ang) * 22, cy + math.cos(ang) * 22,
+                               "#d9e0e8", 6))
+        out.append(sk.text(540, 1080, "HIGHWAY  ·  2:47 AM", 25,
+                           "Barlow", "#d7e5f3", weight="bold", ls=3, op=0.90))
+        out.append(puffs(100, 1476, 3, 32, 28))
+
+    elif beat == "engine_stall":
+        # The first 1.8 s show the vehicle losing momentum, then parked.
+        braking = max(0.0, 1.0 - t / 1.8)
+        jitter = math.sin(t * 32.0) * 8.0 * braking
+        out.append(sk.ell(535, 1509, 455, 40, "#000307", op=0.58))
+        out.append(sk.g(f"translate({n(jitter)} 0)",
+                        car_body(66, 1502, 1.0, "#358aa0", driver=True)))
+        out.append(sk.path("M 838 1410 L 1080 1260 L 1080 1595 L 838 1495 Z",
+                           "#ffe1a0", op=0.11 if int(t * 3.0) % 2 else 0.28))
+        out.append(puffs(826, 1224, 8, 46, 74))
+        for i in range(-1, 8):
+            x = i * 225.0 - ((1.8 * 340 * (1.0 - braking)) % 225.0)
+            out.append(sk.rect(x, 1581, 130, 10, "#e4dfc4", 4, op=0.55))
+        out.append(sk.text(540, 1100, "ENGINE STALLED", 26, "Barlow",
+                           "#ffd593", weight="bold", ls=3, op=min(0.96, max(0.0, t - 0.4))))
+
+    elif beat == "flashlight_exit":
+        # Shot physics: car remains in its parking position, a real side
+        # panel opens on its hinge, then Max is already outside with Biscuit.
+        # Never use a separate screen-space door that becomes a floating kite.
+        swing = min(1.0, t / 1.25)
+        out.append(car_body(-300, 1316, 1.0, "#358aa0",
+                            door_open=swing))
+        out.append(sk.ell(122, 1372, 240, 26, "#071d2c", op=.43))
+        # Handheld light + worn backpack come from Max's shared skeleton via
+        # actors_layer and are not duplicated in this background illustration.
+
     if beat == "breakdown":
         out.append(sk.rect(0, 970, W, 640, "#05080f", op=0.15))
         out.append(sk.ell(520, 1508, 470, 42, "#02050a", op=0.58))
         # large, readable car foreground and driver visible through the side window
-        out.append(car_body(72, 1515, 1.05, "#596b80", broken=True))
+        out.append(car_body(72, 1515, 1.05, "#358aa0", broken=True))
         out.append('<defs><clipPath id="zmb-break-window" clipPathUnits="userSpaceOnUse">'
                    '<path d="M 420 1351 L 505 1265 L 584 1265 L 584 1350 Z '
                    'M 597 1265 L 720 1265 L 797 1350 L 597 1350 Z"/></clipPath></defs>')
@@ -354,15 +448,13 @@ def narrative_beat_layer(meta, t):
         out.append(sk.rect(188, 365, 704, 740, "#0d1d31", 24))
         out.append(sk.circ(780, 530, 47, "#fff0c3", op=0.85))
         out.append(sk.ell(780, 530, 112, 100, "#f2c779", op=0.105))
-        # distant road, lane markings, and the one still-lit station
+        # The gas station has NOT appeared yet: road and extinguished engine only.
         out.append(sk.path("M 236 1100 L 450 820 L 630 820 L 845 1100 Z", "#202c3c"))
         out.append(sk.path("M 535 1090 L 535 970 M 535 920 L 535 872",
                            "none", "#d9d5c5", 9, op=0.72))
-        out.append(sk.rect(650, 700, 160, 12, "#f6d99a", 7, op=0.95))
-        out.append(sk.rect(665, 712, 9, 96, "#b1a28a", 5))
-        out.append(sk.rect(785, 712, 9, 96, "#b1a28a", 5))
-        out.append(sk.rect(687, 744, 32, 29, "#ffe7b0", op=0.92))
-        out.append(sk.rect(733, 744, 32, 29, "#ffe7b0", op=0.76))
+        # Ignition fails in view: amber dashboard pulses off as Max turns the key.
+        dashboard_glow = 0.06 + (0.34 if t < 0.55 else 0.0)
+        out.append(sk.ell(310, 1347, 200, 65, "#f4bf74", op=dashboard_glow))
         # seat backs and passengers, held inside the cabin silhouette
         out.append(sk.path("M 112 1290 L 112 1100 Q 112 1040 176 1025 L 255 1060 L 255 1455 L 112 1455 Z",
                            "#172536", "#30445a", 13))
@@ -385,21 +477,24 @@ def narrative_beat_layer(meta, t):
         out.append(sk.text(540, 1700, "STALLED  ·  2:47 AM", 27, "Barlow", "#ffd58d",
                            anchor="middle", weight="bold", ls=2, op=0.95))
 
-    elif beat in ("spot_station", "door_shadow"):
+    elif beat in ("spot_station", "door_shadow", "door_handle"):
         # The illuminated destination now takes over the composition.
-        out.append(car_body(28, 1570, 0.62, "#42546a", broken=False))
-        out.append(puffs(515, 1455, 4, 24, 38))
+        out.append(car_body(-650, 1301, 1.0, "#358aa0", broken=False))
+        out.append(puffs(305, 1250, 4, 24, 38))
         out.append(sk.ell(820, 1000, 260, 210, "#ffca76", op=0.065))
         out.append(sk.path("M 640 770 L 1040 770", "none", "#ffdf9e", 9, op=0.85))
         out.append(sk.text(839, 730, "OPEN 24 HOURS", 29, "Barlow", "#ffe7b1",
                            anchor="middle", weight="bold", ls=2, op=0.94))
-        if beat == "door_shadow":
+        if beat == "spot_station":
+            out.append(sk.rect(720, 820, 204, 545, "#101b28", 9, stroke="#cbb184", sw=7, op=0.84))
+            out.append(sk.rect(734, 835, 176, 515, "#192637", 5, op=0.96))
+        if beat in ("door_shadow", "door_handle"):
             # The shadow moves behind the lit shop door rather than remaining a vague glow.
             sx = 812.0 + math.sin(t * 1.65) * 24.0
             shadow_op = 0.78 + 0.12 * math.sin(t * 2.4)
-            out.append(sk.rect(738, 894, 168, 270, "#101b28", 9,
+            out.append(sk.rect(720, 820, 204, 545, "#101b28", 9,
                                stroke="#cbb184", sw=7, op=0.84))
-            out.append(sk.rect(752, 909, 140, 242, "#192637", 5, op=0.96))
+            out.append(sk.rect(734, 835, 176, 515, "#192637", 5, op=0.96))
             out.append(sk.ell(sx, 972, 31, 39, "#05090f", op=shadow_op))
             out.append(sk.path(
                 f"M {n(sx - 26)} 1008 Q {n(sx)} 991 {n(sx + 26)} 1008 "
@@ -411,10 +506,20 @@ def narrative_beat_layer(meta, t):
                 "none", "#05090f", 18, op=shadow_op))
             out.append(sk.circ(sx - 10, 969, 4, "#f7b96d", op=0.75 + 0.15 * math.sin(t * 3.0)))
             out.append(sk.circ(sx + 10, 969, 4, "#f7b96d", op=0.75 + 0.15 * math.sin(t * 3.0 + 0.4)))
+            if beat == "door_handle":
+                # A physically turning knob and vibrating door follow the last
+                # spoken action; never substitute unrelated walk-cycle footage.
+                turn = min(1.0, t / 1.4)
+                out.append(sk.circ(884, 1044, 11, "#f2d89f", stroke="#5f492d", sw=3))
+                out.append(sk.g(f"translate(884 1044) rotate({n(62.0 * turn)})",
+                                sk.rect(-3, -4, 31, 8, "#d6b678", 4)))
+                out.append(sk.path("M 720 820 L 924 820 L 924 1365",
+                                   "none", "#e5c99b", 5,
+                                   op=0.5 + 0.3 * abs(math.sin(t * 11.0))))
 
     elif beat == "backpack_exit":
         # A visible, strapped pack placed against Max's upper back + parked car.
-        out.append(car_body(6, 1580, 0.52, "#344456", broken=False))
+        out.append(car_body(6, 1580, 0.52, "#358aa0", broken=False))
         out.append(sk.ell(245, 1420, 210, 28, "#02050a", op=0.46))
         out.append(sk.g("translate(0 0)",
             sk.path("M 342 1028 Q 354 1004 389 1008 L 431 1030 L 429 1154 "
@@ -451,37 +556,39 @@ def narrative_beat_layer(meta, t):
 
 
 def hud_layer(stats, labels, meta, t, ep):
-    x, y = 46.0, 92.0
-    out = []
-    for i, key in enumerate(["hp", "noise", "food", "dog"]):
-        if key not in stats:
-            continue
-        val = max(0, min(100, stats.get(key, 0)))
-        col = HUD_COLORS[key]
-        yy = y + i * 62
-        slide = ease_out(min(1.0, t / 0.5 + i * 0.06))
-        ox = -60 * (1 - slide)
-        op = 0.55 + 0.45 * slide
-        out.append(g(f"translate({n(ox)} 0)",
-                     rect(x, yy, 316, 48, "#080c14", 24, op=0.52 * op)
-                     + rect(x + 16, yy + 15, 18, 18, col, 9, op=op)
-                     + text(x + 46, yy + 34, labels.get(key, key.upper()), 26, "Barlow",
-                            "#e8eef6", anchor="start", weight="bold", op=op)
-                     + rect(x + 150, yy + 17, 150, 14, "#1b2330", 7, op=0.75 * op)
-                     + rect(x + 150, yy + 17, max(4.0, 150 * val / 100.0), 14,
-                            col, 7, op=0.95 * op)
-                     + text(x + 306, yy + 34, str(int(val)), 24, "Barlow", "#ffffff",
-                            anchor="end", weight="bold", op=op)))
-    # top-right: season / day / place
-    tag = f"S{ep.get('season', 1)}  DAY {ep.get('day', 1)}"
-    place = PLACE_NAME.get(meta.get("place", ""), "")
-    out.append(g("translate(0 0)",
-                 text(W - 46, 122, tag, 30, "Barlow", "#f2d16b", anchor="end",
-                      weight="bold", ls=1.5)
-                 + text(W - 46, 162, place, 26, "Barlow", "#9fb2c6", anchor="end", weight="bold")
-                 + text(W - 46, 196, meta.get("subtitle", ""), 22, "Barlow", "#6f8296",
-                        anchor="end")))
-    return "".join(out)
+    """Minimal premium series bug inside the Instagram-safe top region.
+
+    Never stack tiny HP bars over the actor or clutter the first frame.
+    """
+    day=int(ep.get("day", 1))
+    place=PLACE_NAME.get(meta.get("place", ""), "UNKNOWN")
+    left=(rect(84,300,285,62,"#081b32",20,stroke="#75dbed",sw=2,op=.88)
+          +text(106,340,"ZMB",29,"Archivo Black","#ffdb81",
+                anchor="start",weight="bold",ls=2)
+          +text(205,338,f"DAY {day:02d}",26,"Barlow","#edf9ff",
+                anchor="start",weight="bold"))
+    right=(rect(688,300,304,62,"#081b32",20,stroke="#75dbed",sw=2,op=.86)
+           +text(840,340,place,21,"Barlow","#d9f9ff",weight="bold",ls=1))
+    # Only important meter. Intrusive RPG dashboard removed from every scene.
+    if "hp" in stats:
+        health=int(max(0,min(100,stats["hp"])))
+        left+=rect(85,378,186,9,"#18354c",4,op=.8)
+        left+=rect(85,378,186*health/100.0,9,"#ff7773",4,op=.94)
+    return left+right
+
+
+def opening_hook_layer(shot, t):
+    """Clear scrolling-feed hook visible from frame zero, no opening title card."""
+    if shot.kind != "line" or shot.meta.get("beat") != "car_driving":
+        return ""
+    p=.78+.22*ease_out(min(1.0,max(0.0,t/.35)))
+    fade=min(1.0,max(0.0,(2.8-t)/.55))
+    opacity=p*fade
+    return g(f"translate(0 {n(17*(1-p))})",
+        text(W/2,500,"2:47 AM",104,"Archivo Black","#fff8de",
+             stroke="#173b55",sw=9,weight="bold",op=opacity)
+        +text(W/2,560,"THE LAST DRIVE",38,"Barlow","#ffd46e",
+             weight="bold",ls=4,op=opacity))
 
 
 # --------------------------------------------------------------- captions ----
@@ -561,52 +668,61 @@ def chunk_words(words, Texts, size, max_w=1020.0, max_words=7, source_text=""):
     return out
 
 
-def caption_layer(chunks, t, Texts, size=54.0, max_w=1020.0):
+def caption_layer(chunks, t, Texts, size=51.0, max_w=690.0):
+    """Small adaptive, CENTER-ANCHORED capsule, never a character-covering slab.
+
+    All text stays in the safe y<1248 area and left of right-side Reels UI.
+    The baseline is stable within each one/two-line variant.
+    """
     if not chunks:
         return ""
-    active = None
-    for idx, c in enumerate(chunks):
-        if c["start"] - 0.06 <= t <= c["end"]:
-            active = (idx, c)
-            break
+    active = next((c for c in chunks if c["start"]-.06 <= t <= c["end"]),None)
     if active is None:
-        for idx, c in enumerate(chunks):
-            if t < c["start"]:
-                active = (idx, c)
-                break
+        active = next((c for c in chunks if t < c["start"]),None)
     if active is None:
         return ""
-    idx, c = active
-    words = c["words"]
-    # do line mein todo agar zaroorat ho
-    lines, cur = [], []
-    for wd in words:
-        trial = cur + [wd]
-        wid = sum(Texts.w(x["w"] + " ", size) for x in trial)
-        if cur and wid > max_w:
-            lines.append(cur)
-            cur = [wd]
+    width=min(680.0,float(max_w))
+    lines,current=[],[]
+    for wd in active["words"]:
+        trial=current+[wd]
+        length=sum(Texts.w(str(w["w"])+" ",size) for w in trial)
+        if current and (length>width or len(trial)>4):
+            lines.append(current)
+            current=[wd]
         else:
-            cur = trial
-    if cur:
-        lines.append(cur)
-    out = [rect(0, 1435, W, H - 1435, "url(#cap_scrim)")]
-    # Keep subtitles above the bottom safe area; anchor the last line consistently.
-    base_y = 1540 - (len(lines) - 1) * 80
-    for li, ln in enumerate(lines):
-        wid = sum(Texts.w(x["w"] + " ", size) for x in ln) - Texts.w(" ", size)
-        x = (W - wid) / 2.0
-        y = base_y + li * 74
-        for wd in ln:
-            spoken = t >= wd["start"]
-            is_now = wd["start"] <= t <= wd["end"] + 0.16
-            col = "#ffe08a" if is_now else ("#ffffff" if spoken else "#c8d4e0")
-            op = 1.0 if (spoken or is_now) else 0.72
-            out.append(path(f"M {n(x)} {n(y - size * 0.72)} L {n(x + Texts.w(wd['w'], size))} {n(y - size * 0.72)}",
-                            "none", "#080c14", 26, op=0.0))
-            out.append(text(x, y, wd["w"], size, "Barlow", col, anchor="start",
-                            weight="bold", stroke="#05070c", sw=11, op=op))
-            x += Texts.w(wd["w"] + " ", size)
+            current=trial
+    if current:
+        lines.append(current)
+    # Source chunker caps 4 words. Never throw away a spoken caption silently.
+    if len(lines)>2:
+        raise ValueError("Caption overflow: too many words for 2-line safe-zone")
+    lines_widths=[
+        sum(Texts.w(str(w["w"])+" ",size) for w in line)-Texts.w(" ",size)
+        for line in lines
+    ]
+    widest=max(lines_widths)
+    pill_width=min(735.0,max(210.0,widest+88.0))
+    center_x=488.0
+    top=1125.0 if len(lines)==1 else 1057.0
+    height=104.0 if len(lines)==1 else 174.0
+    out=[
+        rect(center_x-pill_width/2,top,pill_width,height,
+             "#061827",25,stroke="#72d9e8",sw=1.8,op=.89),
+        rect(center_x-pill_width/2+15,top+19,5,height-38,
+             "#ffd36b",3,op=.93)
+    ]
+    for li,line in enumerate(lines):
+        baseline=1195.0 if len(lines)==1 else 1121.0+li*71.0
+        x=center_x-lines_widths[li]/2
+        for wd in line:
+            word=str(wd["w"])
+            now=wd["start"]<=t<=wd["end"]+.13
+            read=t>=wd["start"]
+            color="#ffd46c" if now else ("#ffffff" if read else "#e1eefa")
+            out.append(text(x,baseline,word,size,"Barlow",color,
+                            anchor="start",weight="bold",
+                            stroke="#04111d",sw=7,op=1))
+            x+=Texts.w(word+" ",size)
     return "".join(out)
 
 
@@ -750,12 +866,18 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
     scroll += loco * local
     prev = shots[call_idx - 1] if call_idx > 0 else None
     fx, fy, z = cam_at(shot, p, t, loco > 0, prev_shot=prev, place=place)
+    # Story subjects occupy the center of 9:16; no giant empty top half.
+    fy += 260.0
 
     defs, layers = _scene_cached(cache, place, tname, mood, seed)
     vw, vh = W / z, H / z
     vx, vy = fx - vw / 2.0, fy - vh / 2.0
 
-    body = []
+    # The camera reframes higher than the original 1920px scene canvas.
+    # Fill the exposed lower world in the scene palette instead of a black
+    # letterbox band, including during camera moves and on every aspect ratio.
+    body = [rect(vx-50,vy-50,vw+100,vh+100,
+                 shade(sc.TIME[tname]["near"],-.10))]
     for k, content in layers:
         dx = (fx - W / 2.0) * (1.0 - k) - scroll * (0.25 + 0.75 * k)
         dy = (fy - H / 2.0) * (1.0 - k) * 0.4
@@ -763,12 +885,39 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
     # The two car-centric shots have their own composition/passengers; all other
     # story beats keep the normal character rig and scene parallax.
     beat = meta.get("beat") if shot.kind == "line" else None
-    if beat not in ("breakdown", "car_interior"):
+    # Day 1 parked-car beats use a single screen-space composition for
+    # actors AND vehicle, avoiding the giant people standing on miniature cars.
+    staged = beat in ("flashlight_exit", "spot_station", "door_shadow", "door_handle")
+    if not staged and beat not in ("breakdown", "car_driving", "engine_stall", "car_interior"):
         body.append(actors_layer(meta, t, fx, cache))
 
-    ov = []  # screen space
+    # Smooth deliberate fade into the Instagram-control region; no distinct
+    # horizontal letterbox stripes or abrupt cut-off below the scenery.
+    ov = [rect(0,1280,W,640,"url(#footfade)")]  # screen space
     if shot.kind == "line" and beat:
-        ov.append(narrative_beat_layer(meta, local))
+        # Bring illustrated events into the visual center, separate from
+        # caption and app controls. The world camera remains continuous.
+        # Car close-ups sit above captions so Max's face is never obscured.
+        focus_up = {
+            "car_driving": -411, "engine_stall": -411,
+            "car_interior": -365, "flashlight_exit": -300
+        }.get(beat, -285)
+        ov.append(g(f"translate(0 {n(focus_up)})",
+                    narrative_beat_layer(meta, local)))
+    if staged:
+        # Feet share the parked sedan's road plane. Station shots are closer
+        # views of the characters; the car remains behind them, not underfoot.
+        for who, act in meta.get("cast", []):
+            if who == "max":
+                if beat == "flashlight_exit":
+                    act = "walk_flashlight"
+                x = 675 if beat == "flashlight_exit" else 435
+                ov.append(g(f"translate({x} 1080)",
+                            ch.render_actor(who, act, t, size=435, backpack=True)))
+            elif who == "biscuit":
+                x = 870 if beat == "flashlight_exit" else 640
+                ov.append(g(f"translate({x} 1080)",
+                            ch.render_actor(who, act, t, size=435)))
     if shot.kind == "line":
         ov.append(fx_layer(meta.get("fx", "none"), local, shot.dur, t_abs=t))
     elif shot.kind == "vote":
@@ -791,6 +940,8 @@ def frame_svg(ep, cfg, shots, t, Texts, cache, seed=1):
             float(render_cfg.get("caption_size", 54)),
             float(render_cfg.get("caption_max_width", 930)),
         ))
+    if shot.kind == "line":
+        ov.append(opening_hook_layer(shot, local))
     if shot.kind != "title":
         ov.append(hud_layer(ep.get("stats", {}), ep.get("stats_labels", {}),
                             dict(meta, subtitle=ep.get("subtitle", "")), t, ep))
@@ -832,6 +983,9 @@ def _fake_words(shot, Texts, size):
 
 def _ui_defs():
     return (
-        sk.lin_grad("cap_scrim", [(0, "#05070d", 0.0), (30, "#05070d", 0.62), (100, "#05070d", 0.94)])
+        sk.lin_grad("footfade", [(0, "#102b42", 0.0),
+                                 (23, "#0b243a", 0.65),
+                                 (100, "#081a2b", 1.0)])
+        + sk.lin_grad("cap_scrim", [(0, "#05070d", 0.0), (30, "#05070d", 0.62), (100, "#05070d", 0.94)])
         + sk.lin_grad("vig_top", [(0, "#05070d", 0.85), (100, "#05070d", 0.0)])
     )

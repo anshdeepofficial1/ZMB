@@ -73,12 +73,27 @@ class PublishScheduleTests(unittest.TestCase):
 
 
 class NarrativeVisualBeatTests(unittest.TestCase):
-    def test_breakdown_scene_has_car_driver_and_engine_smoke(self):
-        svg = narrative_beat_layer({"beat": "breakdown"}, 1.25)
-        self.assertIn("ENGINE FAILURE", svg)
-        self.assertIn("zmb-break-window", svg)
-        self.assertIn("M 788 1257", svg)
-        self.assertIn("translate(72 1515)", svg)
+    def test_vehicle_moves_then_stalls_in_distinct_illustrated_shots(self):
+        driving = narrative_beat_layer({"beat": "car_driving"}, 1.25)
+        stopped = narrative_beat_layer({"beat": "engine_stall"}, 2.25)
+        self.assertIn("HIGHWAY", driving)
+        self.assertIn("ENGINE STALLED", stopped)
+        self.assertIn("M 826 1405", driving)
+        self.assertIn("M 838 1410", stopped)
+        self.assertNotEqual(driving, stopped)
+
+    def test_flashlight_and_turning_door_handle_are_visible(self):
+        flashlight = narrative_beat_layer({"beat": "flashlight_exit"}, 1.25)
+        handle = narrative_beat_layer({"beat": "door_handle"}, 1.25)
+        self.assertIn("translate(-300 1316) scale(1)", flashlight)
+        self.assertNotEqual(flashlight, narrative_beat_layer({"beat": "flashlight_exit"}, 0.25))
+        self.assertIn("translate(325 -157) scale(", flashlight)
+        self.assertNotIn("translate(150 1436)", flashlight)
+        self.assertNotIn("translate(620 1194)", flashlight)
+        self.assertIn("rotate(", handle)
+        self.assertIn("M 720 820 L 924 820 L 924 1365", handle)
+        self.assertIn("translate(884 1044) rotate(", handle)
+        self.assertNotEqual(handle, narrative_beat_layer({"beat": "door_handle"}, 0.25))
 
     def test_interior_scene_is_a_real_cabin_composition(self):
         svg = narrative_beat_layer({"beat": "car_interior"}, 2.0)
@@ -123,7 +138,9 @@ class NarrativeVisualBeatTests(unittest.TestCase):
 
     def test_station_door_has_a_moving_shadow_and_visible_door_frame(self):
         svg = narrative_beat_layer({"beat": "door_shadow"}, 1.4)
-        self.assertIn('x="738" y="894"', svg)
+        self.assertIn('x="720" y="820" width="204" height="545"', svg)
+        self.assertIn('x="734" y="835" width="176" height="515"', svg)
+        self.assertNotEqual(svg, narrative_beat_layer({"beat": "door_shadow"}, 0.25))
         self.assertIn("#05090f", svg)
         self.assertIn("flicker", svg.lower()) if "flicker" in svg.lower() else self.assertIn("OPEN 24 HOURS", svg)
 
@@ -133,9 +150,10 @@ class NarrativeVisualBeatTests(unittest.TestCase):
         beats = [line.get("shot", {}).get("beat") for line in lines]
         self.assertEqual(
             beats,
-            ["breakdown", "car_interior", "spot_station", "backpack_exit", "door_shadow", "choice_teaser"],
+            ["car_driving", "engine_stall", "car_interior", "flashlight_exit", "spot_station", "door_shadow", "door_handle"],
         )
-        self.assertIn("engine", lines[0]["text"].lower())
+        self.assertIn("drives", lines[0]["text"].lower())
+        self.assertIn("engine", lines[1]["text"].lower())
         self.assertIn("backpack", lines[3]["text"].lower())
 
 

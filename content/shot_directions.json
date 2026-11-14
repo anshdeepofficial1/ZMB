@@ -1,0 +1,1345 @@
+{
+  "schema": 1,
+  "description": "Grounded physical camera directions for every narration line. Reviewed remains false until a human checks the generated clips.",
+  "arcs": {
+    "road": {
+      "intro": [
+        {
+          "action": "A fixed smoky-blue sedan drives along a foggy highway at 2:47 AM; lane markings slide backward, headlights illuminate the wet asphalt, wheels rotate",
+          "props": [
+            "sedan",
+            "headlights",
+            "road",
+            "fog"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "The sedan engine coughs; headlights pulse, tires decelerate and the vehicle shudders to a complete stop on the shoulder",
+          "props": [
+            "sedan",
+            "headlights",
+            "road",
+            "engine smoke"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Camera inside same sedan: Max twists ignition key; dashboard illumination dies; Biscuit trembles on passenger seat",
+          "props": [
+            "ignition key",
+            "steering wheel",
+            "dashboard",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max takes his backpack, opens the same car door, exits onto deserted highway and turns on a handheld flashlight; Biscuit follows",
+          "props": [
+            "sedan",
+            "backpack",
+            "car door",
+            "flashlight",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Over Max's flashlight shoulder the distant gas station alone remains brightly lit through haze",
+          "props": [
+            "flashlight",
+            "gas station",
+            "road",
+            "fog"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max holds his flashlight toward station glass door as human-like shadow slides behind it; Biscuit recoils",
+          "props": [
+            "station",
+            "glass door",
+            "shadow",
+            "flashlight",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Close view of locked station glass door vibrating with three knocks, door handle slowly turning on its spindle with nobody outside",
+          "props": [
+            "glass door",
+            "handle",
+            "shadow"
+          ],
+          "reviewed": false
+        }
+      ],
+      "store_sound": [
+        {
+          "action": "Max and Biscuit walk cautiously from station forecourt inside the quiet store after knocks stop",
+          "props": [
+            "station entrance",
+            "glass door",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Tracking aisle shot of Max scanning real stocked food cans water bottles and batteries while Biscuit sniffs shelves",
+          "props": [
+            "food cans",
+            "water bottles",
+            "batteries",
+            "shelves",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "The locked STAFF ONLY door behind the counter shudders and heavy dragging movement casts a shadow along the floor; Max turns",
+          "props": [
+            "staff door",
+            "door handle",
+            "dragging shadow"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max crouches beside piled canned food; Biscuit freezes; the stockroom's unseen threat presses against the door",
+          "props": [
+            "food crates",
+            "storeroom door",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Split tactical view of Max facing exit route and dark stockroom door while both choices remain physically visible",
+          "props": [
+            "shop exit",
+            "staff door",
+            "food supplies"
+          ],
+          "reviewed": false
+        }
+      ],
+      "run_away": [
+        {
+          "action": "Max moves slowly backward from the supply shelves as Biscuit shadows his legs, careful not to knock any cans",
+          "props": [
+            "shelves",
+            "food cans",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Staff door handle twists; Max grabs Biscuit and sprints out the actual glass front entrance",
+          "props": [
+            "staff door",
+            "handle",
+            "glass entrance",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max enters the same blue-grey sedan, turns the key twice; dashboard and headlights come on, the car pulls away",
+          "props": [
+            "sedan",
+            "ignition key",
+            "headlights"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "From the driver's road perspective Ada waves frantically in roadside fog holding a radio; Max sees her and brakes",
+          "props": [
+            "Ada",
+            "radio",
+            "sedan",
+            "fog"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada opens passenger door and climbs into sedan; the vehicle drives past a glowing roadside motel sign at sunrise",
+          "props": [
+            "Ada",
+            "car door",
+            "sedan",
+            "motel sign"
+          ],
+          "reviewed": false
+        }
+      ],
+      "check_back": [
+        {
+          "action": "Max grips a metal tire iron while Biscuit stays back; his shaking hand reaches for staff door",
+          "props": [
+            "tire iron",
+            "staff door",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Inside cramped storeroom Ada crouches behind stacked wooden crates clutching a visible box cutter, Max entering frame",
+          "props": [
+            "Ada",
+            "crates",
+            "box cutter"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada points the box cutter toward Max and speaks; both are frozen as shadows loom beyond the store window",
+          "props": [
+            "Ada",
+            "box cutter",
+            "store window"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Close action: Max drops tire iron to tile floor, Ada lowers the cutter and looks at vehicle keys in Max's palm",
+          "props": [
+            "tire iron",
+            "box cutter",
+            "car keys"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada shows Max her shortwave radio inside open utility bag; food crates behind them establish supplies",
+          "props": [
+            "Ada",
+            "shortwave radio",
+            "utility bag",
+            "food crates"
+          ],
+          "reviewed": false
+        }
+      ],
+      "motel_arrive": [
+        {
+          "action": "Blue sedan and companions arrive at roadside motel; wide reveal of exactly twelve doors and one rusted truck in parking lot",
+          "props": [
+            "sedan",
+            "motel rooms",
+            "rusted truck"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max notices flickering VACANCY neon sign reflected in his eyes as the deserted motel stretches behind him",
+          "props": [
+            "vacancy sign",
+            "motel"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max Ada and Biscuit enter motel room number six; Max shuts lock and Ada draws curtains in continuous action",
+          "props": [
+            "Ada",
+            "room six",
+            "door lock",
+            "curtains",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Biscuit curls against room door with ears pricked while Max and Ada rest on nearby beds",
+          "props": [
+            "Biscuit",
+            "bed",
+            "door"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Wall clock advances to 3:04 AM; outside room six a long dark shadow passes beneath the door",
+          "props": [
+            "clock",
+            "door",
+            "shadow"
+          ],
+          "reviewed": false
+        }
+      ],
+      "motel_door": [
+        {
+          "action": "Close-up of motel room six wooden door as deep scratch marks visibly appear while Biscuit raises his head",
+          "props": [
+            "wooden door",
+            "scratch marks",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "A vulnerable unseen person whispers from the other side; door's chain vibrates as Max approaches but stays shut",
+          "props": [
+            "door",
+            "chain",
+            "Max"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max peers through visibly damaged peephole, cannot see beyond; subtle silhouette crosses hallway",
+          "props": [
+            "peephole",
+            "door",
+            "shadow"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada visibly grips box cutter while Biscuit bares teeth toward the locked door",
+          "props": [
+            "Ada",
+            "box cutter",
+            "Biscuit",
+            "door"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max's hand hovers beside deadbolt; alternate view shows dark barricade and waiting dog",
+          "props": [
+            "deadbolt",
+            "door",
+            "Biscuit"
+          ],
+          "reviewed": false
+        }
+      ],
+      "open_door": [
+        {
+          "action": "Max unlocks motel door and pulls soaked older trucker Otto into room; rain droplets trail off his heavy jacket",
+          "props": [
+            "Max",
+            "Otto",
+            "door",
+            "rain jacket"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Otto shows weathered mountain road map on table; Max listens while Ada watches",
+          "props": [
+            "Otto",
+            "mountain map",
+            "table",
+            "Ada"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Close-up of dark bite-mark bruise on Otto's arm as he pulls jacket sleeve over it; Max notices",
+          "props": [
+            "Otto",
+            "arm bruise",
+            "jacket sleeve"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max drives the same blue-grey sedan through night road with Otto asleep and Max glancing at rearview mirror",
+          "props": [
+            "sedan",
+            "Otto",
+            "car mirror",
+            "night road"
+          ],
+          "reviewed": false
+        }
+      ],
+      "stay_quiet": [
+        {
+          "action": "Max Ada and Biscuit crouch motionless in motel room; outside scratching changes to heavy knocking on the wooden door",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "wooden door"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max braces against wooden dresser and pushes it physically across floor to barricade the motel door",
+          "props": [
+            "dresser",
+            "door",
+            "Max"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "At sunrise Max opens barricade a crack and sees deserted corridor; deep gouges and distinct handprint mark the door",
+          "props": [
+            "corridor",
+            "scratch marks",
+            "handprint"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max Ada and Biscuit leave motel parking lot quickly past office refrigerator door, choosing not to retrieve food",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "motel office",
+            "food fridge"
+          ],
+          "reviewed": false
+        }
+      ],
+      "route_pick": [
+        {
+          "action": "Max points to a printed road map with radio tower 90 km north; two contrasting routes are traced",
+          "props": [
+            "road map",
+            "radio tower"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Forest shortcut reveal: blue sedan at edge of narrow fogbound dirt road beneath dense branches, broken signal display",
+          "props": [
+            "sedan",
+            "forest road",
+            "phone signal"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Open highway detour reveal: overturned evacuated cars and abandoned town visible on distant road",
+          "props": [
+            "highway",
+            "abandoned cars",
+            "town"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "From road fork Max and Ada face physical signs FOREST and HIGHWAY as Biscuit waits",
+          "props": [
+            "signposts",
+            "road fork",
+            "Ada",
+            "Biscuit"
+          ],
+          "reviewed": false
+        }
+      ],
+      "forest_road": [
+        {
+          "action": "Ada drives blue-grey sedan into narrow forest road; windshield wipers clear fog and Max sits in passenger seat",
+          "props": [
+            "Ada",
+            "sedan",
+            "wipers",
+            "forest road"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Headlights reveal silhouettes of standing infected figures in heavy roadside fog, arms drooping",
+          "props": [
+            "headlights",
+            "zombie silhouettes",
+            "fog"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Biscuit growls low in back seat; Max strokes his head and signals quiet while Ada grips steering wheel",
+          "props": [
+            "Biscuit",
+            "Max",
+            "Ada",
+            "steering wheel"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Sedan crawls past unmoving figures; one zombie's head turns toward passing headlights while the wheels roll",
+          "props": [
+            "sedan",
+            "zombie",
+            "headlights"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Rear view of moving vehicle receding into fog as roadside zombie silhouettes fade behind it",
+          "props": [
+            "sedan",
+            "fog",
+            "zombies"
+          ],
+          "reviewed": false
+        }
+      ],
+      "highway_road": [
+        {
+          "action": "Max drives the sedan along unnervingly empty highway; lane signs and poles glide past moving windows",
+          "props": [
+            "sedan",
+            "highway",
+            "road sign"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Car stops before bridge completely blocked by abandoned vehicles bumper-to-bumper; companions exit",
+          "props": [
+            "bridge",
+            "abandoned cars",
+            "sedan"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max Ada and Biscuit weave between stopped cars; one car alarm flashes and sounds violently",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "parked cars",
+            "alarm"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Across bridge dozens of zombies surge toward flashing car alarm and turn in their direction",
+          "props": [
+            "bridge",
+            "zombies",
+            "flashing alarm"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max Ada and Biscuit sprint beyond last vehicle as horde follows into highway distance",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "zombies",
+            "highway"
+          ],
+          "reviewed": false
+        }
+      ],
+      "tower_arrive": [
+        {
+          "action": "At dusk the survivors approach isolated elevated lookout tower standing in sparse wilderness",
+          "props": [
+            "lookout tower",
+            "Ada",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max touches steel chain wrapped through door handles at tower base; Ada points out chain fastened from inside",
+          "props": [
+            "tower door",
+            "chain",
+            "Ada"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Small lantern glides behind high tower window as radio crackles and characters look up",
+          "props": [
+            "tower window",
+            "lantern",
+            "radio"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max looks between calling toward tower window and climbing a narrow exposed exterior ladder",
+          "props": [
+            "tower",
+            "ladder",
+            "window"
+          ],
+          "reviewed": false
+        }
+      ],
+      "call_out": [
+        {
+          "action": "Max cups hands toward lookout tower and shouts; Biscuit barks as his echo rolls through night forest",
+          "props": [
+            "Max",
+            "Biscuit",
+            "tower"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Silent tower window glows as a real lantern crosses it from inside",
+          "props": [
+            "tower window",
+            "lantern"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "From lit upper window woman Mara directs Max and Ada toward entrance; both lower weapon and approach light",
+          "props": [
+            "Mara",
+            "Ada",
+            "tower window",
+            "weapon"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Inside tower radio room Mara unfolds detailed forest map in front of Max and Ada, meeting her visibly",
+          "props": [
+            "Mara",
+            "forest map",
+            "Ada",
+            "radio room"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Mara tunes a tabletop radio; signal voice announces eastbound convoy and a lit coast route on map",
+          "props": [
+            "Mara",
+            "radio",
+            "map"
+          ],
+          "reviewed": false
+        }
+      ],
+      "climb_up": [
+        {
+          "action": "Max climbs narrow rusty ladder rung by rung while camera tracks upward and wind shakes metal structure",
+          "props": [
+            "Max",
+            "ladder",
+            "tower"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Inside tower top room an empty chair stands beside cold coffee mug under lone electrical lamp",
+          "props": [
+            "chair",
+            "coffee mug",
+            "lamp"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max freezes as shadow creeps behind his back while a low hungry growl rises",
+          "props": [
+            "Max",
+            "shadow"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Infected ranger in recognizable forest ranger vest staggers out of shadows reaching toward Max",
+          "props": [
+            "zombie",
+            "ranger vest"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max swings brown backpack against infected ranger then snatches handheld radio and canned beans from desk",
+          "props": [
+            "Max",
+            "backpack",
+            "radio",
+            "food cans"
+          ],
+          "reviewed": false
+        }
+      ],
+      "broadcast": [
+        {
+          "action": "Max turns actual radio tuning dials and hears static transform into two distinct voices",
+          "props": [
+            "radio",
+            "dials"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Radio speaker crackles as map highlights convoy route east to the sea beside model boat",
+          "props": [
+            "radio",
+            "route map",
+            "coast"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada points to distant illuminated dead city on map while a different voice warns about outbreak origin",
+          "props": [
+            "Ada",
+            "radio",
+            "city map"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max faces map marking COAST and CITY; corresponding distant scenery visible through tower window",
+          "props": [
+            "map",
+            "city",
+            "coast"
+          ],
+          "reviewed": false
+        }
+      ],
+      "end_coast": [
+        {
+          "action": "Wide coastal survivor convoy: exactly four trucks, one boat and a crowd gather as Max Ada Biscuit arrive",
+          "props": [
+            "trucks",
+            "boat",
+            "survivors",
+            "Ada",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Children laugh as Biscuit's tan ears flop; portable generator powers warm food stall in safe camp",
+          "props": [
+            "Biscuit",
+            "children",
+            "generator",
+            "food"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max sleeps in sheltered tent beside Biscuit at dusk, body finally relaxed",
+          "props": [
+            "Max",
+            "Biscuit",
+            "tent"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Coastal portable radio crackles with voice saying Max's name, camera slowly moves into radio speaker",
+          "props": [
+            "radio",
+            "coast"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max silhouettes against sunset beside boat while distant city radio tower blinks across water",
+          "props": [
+            "Max",
+            "boat",
+            "city lights"
+          ],
+          "reviewed": false
+        }
+      ],
+      "end_city": [
+        {
+          "action": "Max steers blue-grey sedan east while Ada watches horizon and Biscuit sits safely on passenger seat",
+          "props": [
+            "sedan",
+            "Ada",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Camera from advancing car reveals ruined city towers and a single lit window",
+          "props": [
+            "sedan",
+            "city skyline",
+            "lit window"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Survivors park outside research laboratory where front entry door hangs visibly open",
+          "props": [
+            "lab entrance",
+            "door",
+            "sedan"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Inside lab Max and Ada see note-covered walls, empty animal cages and an active tape recorder",
+          "props": [
+            "Ada",
+            "notes",
+            "cages",
+            "tape recorder"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max stares at running laboratory recorder as city light flickers through broken window",
+          "props": [
+            "Max",
+            "recorder",
+            "lab window"
+          ],
+          "reviewed": false
+        }
+      ]
+    },
+    "city": {
+      "intro": [
+        {
+          "action": "Max Ada and Biscuit walk carefully through abandoned city street with wind blowing loose papers",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "city street",
+            "paper"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Camera follows beam from radio tower on tall brick building beyond collapsed roadway full of cars",
+          "props": [
+            "brick building",
+            "radio antenna",
+            "broken cars"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada unfolds detailed city map on car hood and points to metro tunnel and surface street routes",
+          "props": [
+            "Ada",
+            "map",
+            "car hood"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Biscuit sniffs dust-laden air then recoils at unseen threat while Max crouches beside him",
+          "props": [
+            "Biscuit",
+            "Max"
+          ],
+          "reviewed": false
+        }
+      ],
+      "pick": [
+        {
+          "action": "View down long empty metro tunnel with tracks leading toward research lab and darkness beyond",
+          "props": [
+            "metro tracks",
+            "lab"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Street-level camera reveals open intersections without hiding places and distant infected figures",
+          "props": [
+            "city streets",
+            "shadows"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max stands at subway stairs facing one route and exposed street sign pointing other route",
+          "props": [
+            "subway entrance",
+            "street sign",
+            "Max"
+          ],
+          "reviewed": false
+        }
+      ],
+      "metro_run": [
+        {
+          "action": "Max Ada Biscuit creep into metro tunnel; paw nails and footfalls echo along rails",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "metro tunnel",
+            "tracks"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Dark infected silhouettes shuffle through tunnel lights far ahead as Max hides behind pillar",
+          "props": [
+            "zombies",
+            "pillar",
+            "metro tunnel"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada pushes a rusty metal service door open; hinges visibly scrape and vibrate",
+          "props": [
+            "Ada",
+            "service door"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Group slips through and shuts metal door as one loud impact dents it from the far side",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "metal door",
+            "dent"
+          ],
+          "reviewed": false
+        }
+      ],
+      "street_run": [
+        {
+          "action": "Survivors step gingerly around broken glass scattered across silent wide city street",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "broken glass",
+            "street"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "An unattended shopping cart rolls across pavement and twelve infected figures simultaneously turn toward it",
+          "props": [
+            "shopping cart",
+            "zombies"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max Ada and Biscuit break into full sprint with dog pulling ahead around street wreckage",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "car wreckage"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada physically kicks research laboratory entry door inward then slams it behind group",
+          "props": [
+            "Ada",
+            "lab door"
+          ],
+          "reviewed": false
+        }
+      ],
+      "lab_inside": [
+        {
+          "action": "Max Ada enter cold lab with empty cages and note-covered walls while radio plays from table",
+          "props": [
+            "Ada",
+            "lab cages",
+            "notes",
+            "radio"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Lab wall speaker hisses with inviting voice as a locked upper-floor door clicks",
+          "props": [
+            "speaker",
+            "locked door"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada whispers and raises finger toward stairs; Biscuit stares at upper level in fear",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "stairs"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max examines stairwell and nearby can of flammable lamp oil while weighing visible alternatives",
+          "props": [
+            "stairs",
+            "lamp oil"
+          ],
+          "reviewed": false
+        }
+      ],
+      "end_truth": [
+        {
+          "action": "Max and Ada reach upstairs room and find Dr Wren surrounded by maps showing outbreak spread",
+          "props": [
+            "Ada",
+            "Dr Wren",
+            "maps"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Dr Wren opens secured sample cabinet and gestures to labelled vials from day zero",
+          "props": [
+            "Dr Wren",
+            "sample vials",
+            "cabinet"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Dr Wren points at outbreak warning map as emergency laboratory lights flash",
+          "props": [
+            "Dr Wren",
+            "map",
+            "warning lights"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max looks toward Ada and Biscuit; they clasp hands then face lab doorway together",
+          "props": [
+            "Max",
+            "Ada",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Silhouettes of three survivors stand before sunrise outside laboratory, camera pulls back",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "laboratory"
+          ],
+          "reviewed": false
+        }
+      ],
+      "end_burn": [
+        {
+          "action": "Max pours lamp oil along laboratory staircase and ignites trail; flames climb wooden stairs as group withdraws safely",
+          "props": [
+            "Max",
+            "lamp oil",
+            "flames",
+            "stairs"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max Ada Biscuit walk away from smoke tower rising over deserted city rooftops",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "smoke",
+            "city"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada and Max speak quietly while walking along abandoned farmland at city edge",
+          "props": [
+            "Ada",
+            "Max",
+            "farmland"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Group discovers farmhouse beside river; porch, working well, and empty paddock are all visible",
+          "props": [
+            "farmhouse",
+            "river",
+            "porch",
+            "well"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max and Biscuit sit on wooden porch watching dawn as smoke disappears beyond tree line",
+          "props": [
+            "Max",
+            "Biscuit",
+            "porch"
+          ],
+          "reviewed": false
+        }
+      ]
+    },
+    "river": {
+      "arrival": [
+        {
+          "action": "Max Ada and Biscuit approach fenced riverside settlement as sunrise begins behind water",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "river",
+            "fence"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Radio crackles inside barn; Ada hears her name, looks toward farmhouse window and draws nearer",
+          "props": [
+            "Ada",
+            "radio",
+            "window"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max kneels beside open wooden gate to inspect two clear trails of muddy footprints leading apart",
+          "props": [
+            "gate",
+            "footprints",
+            "mud"
+          ],
+          "reviewed": false
+        }
+      ],
+      "gate": [
+        {
+          "action": "Porch bulb flickers exactly twice over weathered farmhouse then turns completely off",
+          "props": [
+            "porch lamp",
+            "farmhouse"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Biscuit growls at fence while Max inspects fresh muddy footprints beside rusted gate",
+          "props": [
+            "Biscuit",
+            "footprints",
+            "fence"
+          ],
+          "reviewed": false
+        }
+      ],
+      "porch": [
+        {
+          "action": "Stranger woman opens porch door only a narrow crack with security chain still hooked in place",
+          "props": [
+            "woman",
+            "door",
+            "chain"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Female stranger denies recognizing group while radio nearby audibly repeats their names",
+          "props": [
+            "woman",
+            "radio",
+            "Max"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Close-up of radio dial indicating old bridge watchtower as exterior road map transitions to bridge scenery",
+          "props": [
+            "radio",
+            "map",
+            "bridge"
+          ],
+          "reviewed": false
+        }
+      ],
+      "tracks": [
+        {
+          "action": "Max examines dark muddy trail with visible oil stain, scattered straw and tread marks",
+          "props": [
+            "Max",
+            "mud",
+            "oil",
+            "straw"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Across river Ada spots blinking signal light attached to bridge railing and points it out",
+          "props": [
+            "Ada",
+            "bridge",
+            "signal light"
+          ],
+          "reviewed": false
+        }
+      ],
+      "barn": [
+        {
+          "action": "Max reads warning scratched into wooden barn plank spelling DO NOT TRUST THE RADIO",
+          "props": [
+            "Max",
+            "barn",
+            "warning inscription"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Biscuit sniffs abandoned blanket and half-eaten meal beside still-warm campfire",
+          "props": [
+            "Biscuit",
+            "blanket",
+            "meal"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada lifts blanket to uncover paper map with one safe highway route marked in red",
+          "props": [
+            "Ada",
+            "blanket",
+            "map",
+            "road"
+          ],
+          "reviewed": false
+        }
+      ],
+      "bridge_watch": [
+        {
+          "action": "Survivors cross deserted bridge toward unattended walkie-talkie broadcasting from concrete railing",
+          "props": [
+            "Ada",
+            "bridge",
+            "radio"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Close-up of radio display showing tomorrow's date, a precise blue-grey sedan description and repeating message",
+          "props": [
+            "radio",
+            "display",
+            "sedan"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max looks along highway where distant survivor silhouettes stand beside abandoned cars at sunset",
+          "props": [
+            "Max",
+            "highway",
+            "cars",
+            "survivors"
+          ],
+          "reviewed": false
+        }
+      ],
+      "radio": [
+        {
+          "action": "Radio in cabin clears from static to human voice as Ada and Max stop tuning",
+          "props": [
+            "Ada",
+            "radio"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Tower beacon suddenly turns on despite visible broken power line as Biscuit reacts",
+          "props": [
+            "tower light",
+            "broken power line",
+            "Biscuit"
+          ],
+          "reviewed": false
+        }
+      ],
+      "signal": [
+        {
+          "action": "Max deliberately radios false location; receiver clicks off before sentence finishes",
+          "props": [
+            "Max",
+            "radio",
+            "frequency dial"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "On highway one car honks then three more abandoned cars flash their headlights and horns",
+          "props": [
+            "cars",
+            "horns",
+            "headlights"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "From settlement hill Ada and Max see approaching lights; two escape roads split beneath them",
+          "props": [
+            "Ada",
+            "Max",
+            "vehicle lights",
+            "roads"
+          ],
+          "reviewed": false
+        }
+      ],
+      "tower_watch": [
+        {
+          "action": "Max and Ada inspect transmitter attached to old car battery by exposed power leads",
+          "props": [
+            "Ada",
+            "transmitter",
+            "car battery"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Ada opens worn logbook showing identical handwritten KEEP MOVING messages on many dated pages",
+          "props": [
+            "Ada",
+            "logbook"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Over river Max sights two divergent roads each marked by different distant beacon lights",
+          "props": [
+            "Max",
+            "river",
+            "road fork",
+            "lights"
+          ],
+          "reviewed": false
+        }
+      ],
+      "leader": [
+        {
+          "action": "Ada folds map beside same parked blue-grey sedan while Biscuit sits alert by front wheel",
+          "props": [
+            "Ada",
+            "map",
+            "sedan",
+            "Biscuit"
+          ],
+          "reviewed": false
+        },
+        {
+          "action": "Max Ada and Biscuit see zombie horde advancing toward river as radio points to dangerous city route",
+          "props": [
+            "Ada",
+            "Biscuit",
+            "zombies",
+            "river",
+            "radio"
+          ],
+          "reviewed": false
+        }
+      ]
+    }
+  }
+}

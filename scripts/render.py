@@ -25,8 +25,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 import animate as an  # noqa: E402
-from ai_storyboard import render_storyboard  # noqa: E402
-from ai_video import render_ai_video  # noqa: E402
 import characters as ch  # noqa: E402
 import engine  # noqa: E402
 import scenes as sc  # noqa: E402
@@ -80,39 +78,39 @@ def _estimate_words(text: str, dur: float) -> list[dict]:
 
 
 def synthesize_voices(cfg: dict, ep: dict, work: Path, Log=log) -> list[dict]:
-    voice = cfg.get("voice", "en-US-ChristopherNeural")
-    rate = cfg.get("voice_rate", "-4%")
+    """Non-AI speech: eSpeak NG + ffmpeg. No model/API inference or silent audio.
+
+    Word timings are proportional estimates for the open-source speech engine;
+    narration duration is measured from the real emitted WAV.
+    """
+    rate = int(cfg.get("narration_words_per_minute", 155))
+    if not 110 <= rate <= 210:
+        raise ValueError("Narration speed must be 110..210 words/minute")
     gap = float(cfg.get("render", cfg).get("gap_seconds", 0.45))
     a_dir = work / "audio"
     a_dir.mkdir(parents=True, exist_ok=True)
     out = []
     for i, line in enumerate(ep["lines"]):
-        text = line["text"]
-        mp3 = a_dir / f"l{i:02d}.mp3"
+        text = str(line["text"]).strip()
+        if not text:
+            raise ValueError(f"Empty authored narration at line {i}")
+        speech = a_dir / f"l{i:02d}_speech.wav"
         wav = a_dir / f"l{i:02d}.wav"
-        words: list[dict] = []
-        got = False
-        for attempt in range(3):
-            try:
-                words = asyncio.run(_tts_line(text, voice, rate, mp3))
-                got = True
-                break
-            except Exception as exc:  # noqa: BLE001
-                Log(f"    tts retry {attempt + 1} for line {i}: {exc}")
-                time.sleep(1.2 + attempt)
-        if not got:
-            Log(f"    tts FAILED line {i} — silent fallback")
-            run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "lavfi",
-                 "-i", f"anullsrc=r=24000:cl=mono", "-t", "3.0", "-c:a", "pcm_s16le", str(mp3)])
-        raw = _probe_dur(mp3)
-        run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", str(mp3),
+        # Deterministic, classical formant voice. Not neural, LLM, or remote TTS.
+        run(["espeak-ng", "-v", "en-us", "-s", str(rate),
+             "-p", "42", "-a", "170", "-w", str(speech), text])
+        raw = _probe_dur(speech)
+        if raw < 0.1 or not speech.is_file() or speech.stat().st_size < 1000:
+            raise RuntimeError(f"No audible non-AI narration for line {i}")
+        run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-i", str(speech),
              "-af", f"apad=pad_dur={gap}", "-ar", "24000", "-ac", "1",
              "-c:a", "pcm_s16le", str(wav)])
         dur = _probe_dur(wav)
-        if not words:
-            words = _estimate_words(text, dur)
+        if dur < raw or dur <= 0:
+            raise RuntimeError(f"Invalid narration duration for line {i}")
+        words = _estimate_words(text, raw)
         out.append({"text": text, "shot": line.get("shot", {}), "words": words,
-                    "dur": dur, "wav": wav, "raw": raw})
+                    "dur": dur, "wav": wav, "raw": raw, "timings": "estimated"})
     return out
 
 
@@ -123,7 +121,7 @@ def _silence(seconds: float, path: Path) -> Path:
     return path
 
 
-def build_master_audio(voices, lead, outro, work: Path, total=None, cfg=None) -> Path:
+def build_master_audio(voices, lead, outro, work: Path, total=None, cfg=None, shots=None) -> Path:
     a_dir = work / "audio"
     parts: list[Path] = []
     if lead > 0.02:
@@ -139,8 +137,24 @@ def build_master_audio(voices, lead, outro, work: Path, total=None, cfg=None) ->
     run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error", "-f", "concat", "-safe", "0",
          "-i", str(lst), "-ar", "24000", "-ac", "1", "-c:a", "pcm_s16le", str(master)])
 
-    # optional music bed (assets/music/*.mp3) — low volume neeche narration ke
     cfg = cfg or {}
+    # All physical sound cues are original procedural waveforms; no AI model
+    # or third-party music is involved. Narration always remains dominant.
+    if bool(cfg.get("sound_design_enabled", True)) and shots and total:
+        from sound_design import synthesize
+        background = a_dir / "original_2d_soundscape.wav"
+        synthesize(shots, total, background)
+        scored = a_dir / "soundscaped.wav"
+        run(["ffmpeg", "-y", "-hide_banner", "-loglevel", "error",
+             "-i", str(master), "-i", str(background),
+             "-filter_complex",
+             "[0:a]volume=1.0[voice];[1:a]volume=0.72[amb];"
+             "[voice][amb]amix=inputs=2:duration=first:dropout_transition=0,"
+             "alimiter=limit=0.95[out]",
+             "-map", "[out]", "-ar", "24000", "-ac", "1",
+             "-c:a", "pcm_s16le", str(scored)])
+        master = scored
+    # Optional OWNER-OWNED background music is off by default.
     vol = float(cfg.get("music_volume", 0.0) or 0.0)
     music_dir = ROOT / "assets" / "music"
     tracks = sorted(music_dir.glob("*.mp3")) if music_dir.exists() else []
@@ -182,18 +196,21 @@ def render_episode(cfg: dict, ep: dict, *, jobs=None, scale=None, crf=None,
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     t0 = time.time()
-    Log(f"[render] voice: {len(ep['lines'])} lines (voice={cfg.get('voice')})")
+    Log(f"[render] non-AI eSpeak NG narration: {len(ep['lines'])} authored lines")
     voices = synthesize_voices(cfg, ep, work, Log)
     shots, total, lead = an.build_timeline(ep, cfg, voices)
     outro = max(0.0, total - lead - sum(v["dur"] for v in voices))
     Log(f"[render] timeline: {len(shots)} shots, {total:.1f}s "
         f"({len(shots) + 1} cards incl.), fps={fps}, {iw}x{ih} -> {ow}x{oh}, jobs={jobs}")
-    audio = build_master_audio(voices, lead, outro, work, total, cfg)
+    audio = build_master_audio(voices, lead, outro, work, total, cfg, shots=shots)
 
     visual_mode = str(cfg.get("visual_mode", "procedural")).strip().lower()
-    if visual_mode in {"ai_storyboard", "ai_video"}:
-        Log(f"[render] remote visual mode '{visual_mode}' disabled; retaining the local procedural animation engine")
-    ep["visual_mode_used"] = "procedural_local_ai" if ep.get("ai_story", {}).get("status") == "success" else "procedural"
+    if visual_mode != "procedural":
+        raise ValueError("ZMB 2D-only pipeline: AI/3D/video asset modes are disabled")
+    if bool(cfg.get("enforce_visual_contract", True)):
+        from visual_manifest import build_manifest
+        build_manifest(ep, allow_unimplemented=False)
+    ep["visual_mode_used"] = "procedural_2d_no_ai"
 
     Texts = an.Texts(svgrender.font_map(ROOT))
     cache: dict = {}

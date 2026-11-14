@@ -24,28 +24,34 @@ G_NEAR = 1520.0
 
 TIME = {
     "night": dict(
-        sky=[(0, "#060a16", 1), (40, "#101731", 1), (72, "#232c4b", 1), (100, "#3a3350", 1)],
-        ground="#0b1020", far="#131a30", mid="#19203c", near="#0e1428",
-        glowc="#ffd98a", warm="#ffbf5e", stars=1, celestial="moon"),
+        # Sapphire-to-teal illustrated nocturne. Brighter horizon and stronger
+        # silhouettes read well on real mobile OLED screens.
+        sky=[(0, "#081c3a", 1), (40, "#164267", 1),
+             (76, "#236889", 1), (100, "#377a8c", 1)],
+        ground="#173d52", far="#174967", mid="#22617a", near="#13354a",
+        glowc="#ffe6a1", warm="#ffd06a", stars=1, celestial="moon"),
     "dusk": dict(
-        sky=[(0, "#171b38", 1), (38, "#3a3355", 1), (68, "#8a4b5a", 1), (100, "#e08a52", 1)],
-        ground="#16162c", far="#222244", mid="#2a2a52", near="#191a34",
-        glowc="#ffc078", warm="#ff9a4a", stars=0, celestial="sun"),
+        sky=[(0, "#233a67", 1), (40, "#73526b", 1),
+             (73, "#ce7468", 1), (100, "#ffc181", 1)],
+        ground="#394357", far="#444e64", mid="#586476", near="#2b4555",
+        glowc="#ffe1ae", warm="#ffb66b", stars=0, celestial="sun"),
     "dawn": dict(
-        sky=[(0, "#101c3d", 1), (38, "#37456e", 1), (68, "#bb7a6b", 1), (100, "#f0c98a", 1)],
-        ground="#19203a", far="#242b4c", mid="#2c3358", near="#1b2240",
-        glowc="#ffd9a0", warm="#ffb86a", stars=0, celestial="sun"),
+        sky=[(0, "#19486c", 1), (40, "#517c98", 1),
+             (73, "#daa17f", 1), (100, "#ffe5a5", 1)],
+        ground="#355169", far="#46677c", mid="#627e8b", near="#31546a",
+        glowc="#ffe3a9", warm="#ffc77b", stars=0, celestial="sun"),
     "day": dict(
-        sky=[(0, "#46597a", 1), (42, "#6d829c", 1), (78, "#9cadbb", 1), (100, "#c6c1ac", 1)],
-        ground="#2a3226", far="#39432f", mid="#434d36", near="#2a3226",
-        glowc="#fff3cf", warm="#ffe0a0", stars=0, celestial="none"),
+        sky=[(0, "#487fa3", 1), (40, "#6daac2", 1),
+             (80, "#afd4d4", 1), (100, "#f0e5c6", 1)],
+        ground="#3a6a64", far="#4d776e", mid="#628878", near="#38585d",
+        glowc="#fff2c0", warm="#ffdb8d", stars=0, celestial="none"),
 }
 
 MOOD = {
-    "calm": dict(tint="#1d3a5c", ta=0.10, dark=0.0),
-    "tense": dict(tint="#123048", ta=0.16, dark=0.06),
-    "danger": dict(tint="#4a1020", ta=0.20, dark=0.16),
-    "hope": dict(tint="#5c3a12", ta=0.10, dark=0.0),
+    "calm": dict(tint="#123c64", ta=0.035, dark=0.0),
+    "tense": dict(tint="#124865", ta=0.045, dark=0.0),
+    "danger": dict(tint="#651d3d", ta=0.10, dark=0.03),
+    "hope": dict(tint="#99552c", ta=0.045, dark=0.0),
 }
 DEFAULT_MOOD = MOOD["calm"]
 
@@ -173,9 +179,9 @@ def highway(tname, mood="calm", seed=1):
     L = []
     sky = rect(WORLD_X0, 0, WORLD_W, HORIZON + 90, "url(#hw_sky)")
     if T["stars"]:
-        sky += stars(seed, 130, 900)
+        sky += stars(seed, 75, 900)
     if T["celestial"] == "moon":
-        sky += circ(880, 320, 74, "#f7f1d8", op=0.95) + circ(906, 300, 66, "#0e1530", op=0.55)
+        sky += circ(880, 320, 64, "#fff1cd", op=0.95) + circ(901, 300, 61, "#163c5d", op=0.75)
         sky += circ(880, 320, 210, "url(#hw_glow)", op=0.55)
     elif T["celestial"] == "sun":
         sky += circ(830, 1020, 92, T["warm"], op=0.9) + circ(830, 1020, 320, "url(#hw_warm)", op=0.75)
@@ -190,18 +196,8 @@ def highway(tname, mood="calm", seed=1):
         x = WORLD_X0 + 40 + i * 84 + rnd.uniform(-20, 20)
         far += pine(x, HORIZON + 46, rnd.uniform(60, 128), T["far"])
     far += rect(WORLD_X0, HORIZON + 40, WORLD_W, 200, T["far"])
-    # kahani ka landmark: us door ki roshni wali gas station jo Max dekhta hai
-    gsx = 812.0
-    far += rect(gsx, HORIZON - 44, 196, 13, shade(T["far"], 0.28))       # canopy
-    far += rect(gsx - 4, HORIZON - 31, 204, 8, shade(T["far"], -0.1))
-    for px in (gsx + 22, gsx + 162):
-        far += rect(px, HORIZON - 23, 8, 66, shade(T["far"], -0.30))     # pillars
-    far += rect(gsx + 232, HORIZON - 14, 122, 82, shade(T["far"], -0.22)) # store
-    far += rect(gsx + 244, HORIZON - 2, 40, 26, "#ffd98a", op=0.85)       # lit window
-    far += rect(gsx + 292, HORIZON - 2, 40, 26, "#ffd98a", op=0.6)
-    far += rect(gsx + 206, HORIZON - 52, 10, 120, shade(T["far"], -0.3))  # sign pole
-    far += rect(gsx + 196, HORIZON - 66, 30, 44, mix(T["glowc"], "#ffffff", 0.25), op=0.75)
-    far += circ(gsx + 98, HORIZON + 44, 118, "url(#hw_warm)", op=0.42)    # warm glow
+    # This is the EMPTY highway. The gas station is revealed only in
+    # spot_station/door_shadow/door_handle story beats, not before.
     L.append((0.28, far))
 
     mid = ""
@@ -210,8 +206,7 @@ def highway(tname, mood="calm", seed=1):
         x = WORLD_X0 + 90 + i * 176 + rnd.uniform(-30, 30)
         mid += pole(x, GROUND + 40, 300, shade(T["mid"], -0.35), arm=1)
         mid += line(x, GROUND + 40 - 292, x + 150, GROUND + 40 - 306, shade(T["mid"], -0.5), 3)
-    for cd in ((210, 1), (1160, 0), (1860, 1)):
-        mid += car(cd[0], GROUND + 66, 150, shade(T["mid"], -0.15), flip=bool(cd[1]))
+    # No unexplained background traffic: Max is alone on this highway.
     L.append((0.58, mid))
 
     road = rect(WORLD_X0, GROUND - 4, WORLD_W, 108, T["near"])
@@ -220,13 +215,8 @@ def highway(tname, mood="calm", seed=1):
         road += rect(WORLD_X0 + 20 + i * 80, GROUND + 44, 44, 7, "#d9d2b4", op=0.55)
     road += rect(WORLD_X0, GROUND + 104, WORLD_W, 12, shade(T["near"], -0.35))
     road += rect(WORLD_X0, GROUND + 116, WORLD_W, 1920 - (GROUND + 116), shade(T["near"], -0.5))
-    # Max ki gaadi — kahani yahi shuru hoti hai; actors ke bagal mein parked:
-    hero = car(40, GROUND + 4, 240, "#8b97a6")
-    hero += line(227, 1218, 268, 1148, "#3d434c", 9)       # khula bonnet
-    hero += ell(300, 1172, 62, 22, "#aeb8c2", op=0.30)     # engine smoke
-    hero += ell(366, 1120, 88, 28, "#aeb8c2", op=0.22)
-    hero += ell(448, 1064, 116, 34, "#aeb8c2", op=0.15)
-    road += hero
+    # Do not permanently paint a stalled hero car into every highway scene.
+    # The shot director is responsible for moving/parked cars per event.
     road += grass_tufts(seed + 11, WORLD_X0, WORLD_X0 + WORLD_W, GROUND + 130, 1760, 90,
                         shade(T["ground"], 0.1), 1.5)
     L.append((0.86, road))

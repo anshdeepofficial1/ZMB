@@ -1,4 +1,4 @@
-name: Episode Cycle
+name: ZMB 2D code-drawn episode preview (no AI)
 
 on:
   workflow_dispatch:
@@ -23,7 +23,8 @@ jobs:
       IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
       IG_USER_ID: ${{ secrets.IG_USER_ID }}
       IG_USERNAME: ${{ secrets.IG_USERNAME }}
-      ZMB_LOCAL_AI_ENABLED: "1"
+      ZMB_LOCAL_AI_ENABLED: "0"
+      ZMB_NO_AI: "1"
       ZMB_PUBLISH_ENABLED: "0"
       PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
       GITHUB_REPOSITORY: ${{ github.repository }}
@@ -46,13 +47,7 @@ jobs:
           cache-dependency-path: scripts/requirements.txt
 
       - name: Install dependencies
-        run: pip install --prefer-binary --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu -r scripts/requirements.txt
-
-      - name: Restore local model cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/huggingface/hub
-          key: zmb-qwen-1-5b-q4km-91cad51170dc346986eccefdc2dd33a9da36ead9
+        run: pip install --prefer-binary -r scripts/requirements.txt
 
       - name: System deps (ffmpeg + fonts)
         timeout-minutes: 5
@@ -67,7 +62,7 @@ jobs:
             fi
             sleep 5
           done
-          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core
+          sudo apt-get install -y -qq ffmpeg fonts-dejavu-core espeak-ng
           ffmpeg -version | head -n 1
           ffprobe -version | head -n 1
 
@@ -78,8 +73,13 @@ jobs:
           python -m compileall -q scripts
           python scripts/engine.py --selftest
 
-      - name: Render preview only (never publish)
-        run: python scripts/run_cycle.py --dry-run
+      - name: Render cinematic Day 1 draft only (never publish)
+        run: |
+          set -euo pipefail
+          python scripts/preview_day1.py --video
+          VIDEO="$(find out -maxdepth 1 -name '*.mp4' -type f -print -quit)"
+          test -s "$VIDEO" || { echo "::error::No 2D MP4 produced"; exit 1; }
+          python scripts/verify_2d_video.py "$VIDEO"
 
       - name: Upload reel artifact (debug)
         if: always()
@@ -90,5 +90,8 @@ jobs:
             out/*.mp4
             out/caption.txt
             out/episode.json
+            out/day1_visual_manifest.json
+            out/2d_qa_report.json
+            out/stills/*.png
           if-no-files-found: ignore
           retention-days: 5
