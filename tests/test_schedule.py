@@ -85,12 +85,15 @@ class NarrativeVisualBeatTests(unittest.TestCase):
     def test_flashlight_and_turning_door_handle_are_visible(self):
         flashlight = narrative_beat_layer({"beat": "flashlight_exit"}, 1.25)
         handle = narrative_beat_layer({"beat": "door_handle"}, 1.25)
-        self.assertIn("translate(-105 1380) scale(0.64)", flashlight)
+        self.assertIn("translate(-300 1316) scale(1)", flashlight)
+        self.assertNotEqual(flashlight, narrative_beat_layer({"beat": "flashlight_exit"}, 0.25))
         self.assertIn("translate(325 -157) scale(", flashlight)
         self.assertNotIn("translate(150 1436)", flashlight)
         self.assertNotIn("translate(620 1194)", flashlight)
         self.assertIn("rotate(", handle)
-        self.assertIn("M 738 895", handle)
+        self.assertIn("M 720 820 L 924 820 L 924 1365", handle)
+        self.assertIn("translate(884 1044) rotate(", handle)
+        self.assertNotEqual(handle, narrative_beat_layer({"beat": "door_handle"}, 0.25))
 
     def test_interior_scene_is_a_real_cabin_composition(self):
         svg = narrative_beat_layer({"beat": "car_interior"}, 2.0)
@@ -135,7 +138,9 @@ class NarrativeVisualBeatTests(unittest.TestCase):
 
     def test_station_door_has_a_moving_shadow_and_visible_door_frame(self):
         svg = narrative_beat_layer({"beat": "door_shadow"}, 1.4)
-        self.assertIn('x="738" y="894"', svg)
+        self.assertIn('x="720" y="820" width="204" height="545"', svg)
+        self.assertIn('x="734" y="835" width="176" height="515"', svg)
+        self.assertNotEqual(svg, narrative_beat_layer({"beat": "door_shadow"}, 0.25))
         self.assertIn("#05090f", svg)
         self.assertIn("flicker", svg.lower()) if "flicker" in svg.lower() else self.assertIn("OPEN 24 HOURS", svg)
 
