@@ -109,3 +109,7 @@ GitHub Actions (har 3 ghante, free)
 ## Local-only AI refinement
 
 The default pipeline runs a pinned Qwen2.5-1.5B-Instruct GGUF model locally on the standard GitHub Actions CPU runner using llama.cpp. It improves narration and shot instructions while the existing procedural SVG character rigs, scene layers, camera motion, FX, captions, narration, and FFmpeg renderer continue to create the Reel. It does **not** call hosted AI inference APIs or external image/video-generation APIs. Model weights are downloaded as a file and cached; prompts stay on the Actions runner. The first run can be slower due to the roughly 1.04 GiB model download and CPU inference. If local inference fails, the authored scenario and existing animation are retained and the dashboard reports a fallback status. See `AI-PIPELINE.md` for details.
+
+---
+
+**Developer profile:** This repository is part of the public project portfolio of [Anshdeep Singh](https://github.com/anshdeepofficial1). [Official portfolio](https://anshdeepofficial1.vercel.app/about) · [Public project directory](https://anshdeepofficial1.vercel.app/work).
