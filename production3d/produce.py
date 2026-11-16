@@ -41,5 +41,22 @@ info=json.loads(subprocess.check_output(["ffprobe","-v","error","-show_streams",
 v=next(s for s in info["streams"] if s["codec_type"]=="video");a=next(s for s in info["streams"] if s["codec_type"]=="audio")
 assert (v["width"],v["height"],v["codec_name"])==(1080,1920,"h264") and a["codec_name"]=="aac"
 assert abs(float(info["format"]["duration"])-timing["duration"])<.4
-(OUT/"qa.json").write_text(json.dumps({"decoded":True,"voice":story["voice"],"duration":timing["duration"],"scene_count":len(new),"publish_approved":False,"sha256":hashlib.sha256(dest.read_bytes()).hexdigest()},indent=2))
+# Fail closed on silent or static shots, and export evidence from the final encoded video.
+import re
+def metric(*args):
+    return subprocess.run(["ffmpeg","-hide_banner","-nostats",*map(str,args),"-f","null","-"],capture_output=True,text=True,check=True).stderr
+shot_qa=[]
+for i, shot in enumerate(new):
+    start=shot["start"]; duration=shot["end"]-start
+    log=metric("-ss",start,"-t",duration,"-i",dest,"-an","-vf","fps=5,scale=180:320,tblend=all_mode=difference,signalstats,metadata=print:key=lavfi.signalstats.YAVG")
+    values=[float(x) for x in re.findall(r"lavfi.signalstats.YAVG=([0-9.]+)",log)]
+    if not values or max(values)<0.35:
+        raise RuntimeError(f"Static or unmeasurable shot {i+1}: {values}")
+    audio_log=metric("-ss",start,"-t",duration,"-i",OUT/"voice.wav","-vn","-af","volumedetect")
+    m=re.search(r"mean_volume: (-?[0-9.]+) dB",audio_log)
+    if not m or float(m.group(1)) < -45:
+        raise RuntimeError(f"Silent narration in shot {i+1}")
+    run("ffmpeg","-y","-v","error","-ss",start+duration*.5,"-i",dest,"-frames:v","1","-vf","scale=360:640",OUT/f"preview_final_{i+1:02d}.jpg")
+    shot_qa.append({"scene":i+1,"line":shot["line"],"start":start,"end":shot["end"],"motion_mean":sum(values)/len(values),"motion_peak":max(values),"voice_mean_db":float(m.group(1))})
+(OUT/"qa.json").write_text(json.dumps({"decoded":True,"shots":shot_qa,"voice":story["voice"],"duration":timing["duration"],"scene_count":len(new),"publish_approved":False,"sha256":hashlib.sha256(dest.read_bytes()).hexdigest()},indent=2))
 print("Verified rendered MP4:",dest)
