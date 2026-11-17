@@ -1,7 +1,7 @@
 name: ZMB 3D neural hourglass preview
 on:
-  push:
-    branches: [rebuild/roblox-3d-production]
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths: ['production3d/**', '.github/workflows/roblox-3d-preview.yml']
   workflow_dispatch:
 permissions:
@@ -11,6 +11,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   render:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'rebuild/roblox-3d-production'
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -43,8 +44,9 @@ jobs:
           path: |
             production3d/out/hourglass_guardian_neural.mp4
             production3d/out/voice.wav
+            production3d/out/sound.wav
             production3d/out/timing.json
             production3d/out/preview*.jpg
             production3d/out/qa.json
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 7
