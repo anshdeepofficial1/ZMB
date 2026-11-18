@@ -33,7 +33,7 @@ run("ffmpeg","-y","-v","error","-i",OUT/"sound_base.wav","-filter_complex",";".j
 # Retain exact render geometry, caption timing and scene action. Only output resolution is upscaled.
 run(sys.executable,OUT/"render.py","--preview")
 run(sys.executable,OUT/"render.py")
-mix="[1:a]highpass=f=70,acompressor=threshold=0.125:ratio=2:attack=10:release=100,volume=1.15[v];[2:a]volume=0.65[s];[v][s]amix=inputs=2:duration=longest:normalize=0,alimiter=limit=0.92[a]"
+mix="[1:a]highpass=f=70,acompressor=threshold=0.125:ratio=2:attack=10:release=100,volume=2.3[v];[2:a]volume=0.65[s];[v][s]amix=inputs=2:duration=longest:normalize=0,alimiter=limit=0.92:level=0[a]"
 dest=OUT/"hourglass_guardian_neural.mp4"
 run("ffmpeg","-y","-v","error","-i",OUT/"visual.mp4","-i",OUT/"voice.wav","-i",OUT/"sound.wav","-filter_complex",mix,"-map","0:v","-map","[a]","-vf","scale=1080:1920:flags=lanczos,fps=30","-c:v","libx264","-preset","veryfast","-crf","19","-pix_fmt","yuv420p","-c:a","aac","-b:a","192k","-movflags","+faststart","-shortest",dest)
 run("ffmpeg","-v","error","-i",dest,"-f","null","-")
