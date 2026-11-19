@@ -52,11 +52,19 @@ for i, shot in enumerate(new):
     values=[float(x) for x in re.findall(r"lavfi.signalstats.YAVG=([0-9.]+)",log)]
     if not values or max(values)<0.35:
         raise RuntimeError(f"Static or unmeasurable shot {i+1}: {values}")
+    # Measure the upper 65% separately: changing lower captions must not pass as scene motion.
+    action_log=metric("-ss",start,"-t",duration,"-i",dest,"-an","-vf","fps=5,crop=iw:ih*0.65:0:0,scale=180:208,tblend=all_mode=difference,signalstats,metadata=print:key=lavfi.signalstats.YAVG")
+    action_values=[float(x) for x in re.findall(r"lavfi.signalstats.YAVG=([0-9.]+)",action_log)]
+    if not action_values or max(action_values)<0.35:
+        raise RuntimeError(f"No measurable upper-frame action in shot {i+1}")
+    action_mean=sum(action_values)/len(action_values)
+    # Low motion is a review flag, not proof of missing physical action.
+    action_review=action_mean<1.0
     audio_log=metric("-ss",start,"-t",duration,"-i",OUT/"voice.wav","-vn","-af","volumedetect")
     m=re.search(r"mean_volume: (-?[0-9.]+) dB",audio_log)
     if not m or float(m.group(1)) < -45:
         raise RuntimeError(f"Silent narration in shot {i+1}")
     run("ffmpeg","-y","-v","error","-ss",start+duration*.5,"-i",dest,"-frames:v","1","-vf","scale=360:640",OUT/f"preview_final_{i+1:02d}.jpg")
-    shot_qa.append({"scene":i+1,"line":shot["line"],"start":start,"end":shot["end"],"motion_mean":sum(values)/len(values),"motion_peak":max(values),"voice_mean_db":float(m.group(1))})
+    shot_qa.append({"scene":i+1,"line":shot["line"],"start":start,"end":shot["end"],"motion_mean":sum(values)/len(values),"motion_peak":max(values),"upper_action_mean":action_mean,"upper_action_peak":max(action_values),"low_action_review":action_review,"voice_mean_db":float(m.group(1))})
 (OUT/"qa.json").write_text(json.dumps({"decoded":True,"shots":shot_qa,"voice":story["voice"],"duration":timing["duration"],"scene_count":len(new),"publish_approved":False,"sha256":hashlib.sha256(dest.read_bytes()).hexdigest()},indent=2))
 print("Verified rendered MP4:",dest)
