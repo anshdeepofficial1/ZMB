@@ -60,11 +60,18 @@ for i, shot in enumerate(new):
     action_mean=sum(action_values)/len(action_values)
     # Low motion is a review flag, not proof of missing physical action.
     action_review=action_mean<1.0
+    # A single camera cut cannot substitute for sustained on-screen action.
+    sustained_action_fraction=sum(v>=0.35 for v in action_values)/len(action_values)
+    if sustained_action_fraction<0.25:
+        action_review=True
     audio_log=metric("-ss",start,"-t",duration,"-i",OUT/"voice.wav","-vn","-af","volumedetect")
     m=re.search(r"mean_volume: (-?[0-9.]+) dB",audio_log)
     if not m or float(m.group(1)) < -45:
         raise RuntimeError(f"Silent narration in shot {i+1}")
     run("ffmpeg","-y","-v","error","-ss",start+duration*.5,"-i",dest,"-frames:v","1","-vf","scale=360:640",OUT/f"preview_final_{i+1:02d}.jpg")
-    shot_qa.append({"scene":i+1,"line":shot["line"],"start":start,"end":shot["end"],"motion_mean":sum(values)/len(values),"motion_peak":max(values),"upper_action_mean":action_mean,"upper_action_peak":max(action_values),"low_action_review":action_review,"voice_mean_db":float(m.group(1))})
-(OUT/"qa.json").write_text(json.dumps({"decoded":True,"shots":shot_qa,"voice":story["voice"],"duration":timing["duration"],"scene_count":len(new),"publish_approved":False,"sha256":hashlib.sha256(dest.read_bytes()).hexdigest()},indent=2))
+    shot_qa.append({"scene":i+1,"line":shot["line"],"start":start,"end":shot["end"],"motion_mean":sum(values)/len(values),"motion_peak":max(values),"upper_action_mean":action_mean,"upper_action_peak":max(action_values),"low_action_review":action_review,"sustained_action_fraction":sustained_action_fraction,"voice_mean_db":float(m.group(1))})
+review_blockers=[f"Scene {shot['scene']}: insufficient sustained upper-frame motion" for shot in shot_qa if shot["low_action_review"]]
+# These metrics cannot establish correct physical action, glass transparency, or voice quality.
+review_blockers.extend(["Human review required: sand/glass physics, story-to-action continuity, captions, narration and soundtrack", "Owner approval and exact target account/caption missing"])
+(OUT/"qa.json").write_text(json.dumps({"release_ready":False,"review_blockers":review_blockers,"decoded":True,"shots":shot_qa,"voice":story["voice"],"duration":timing["duration"],"scene_count":len(new),"publish_approved":False,"sha256":hashlib.sha256(dest.read_bytes()).hexdigest()},indent=2))
 print("Verified rendered MP4:",dest)
