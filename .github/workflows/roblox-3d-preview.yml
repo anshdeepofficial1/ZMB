@@ -1,0 +1,52 @@
+name: ZMB 3D neural hourglass preview
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths: ['production3d/**', '.github/workflows/roblox-3d-preview.yml']
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: zmb-3d-preview
+  cancel-in-progress: true
+jobs:
+  render:
+    if: github.event_name == 'workflow_dispatch' || github.head_ref == 'rebuild/roblox-3d-production'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      HF_HUB_DISABLE_TELEMETRY: "1"
+      LP_NUM_THREADS: "4"
+      ZMB_PUBLISH_ENABLED: "0"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: System dependencies
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg espeak-ng fonts-lato libegl1 libgl1 libgl1-mesa-dri libosmesa6
+      - name: Cache model weights
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/huggingface/hub
+          key: zmb-kokoro-82m-v1
+      - name: CPU-only neural voice and renderer
+        run: |
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install kokoro==0.9.4 soundfile numpy scipy Pillow vtk==9.6.2
+      - name: Render and verify full video
+        run: python production3d/produce.py
+      - name: Review artifacts (no automatic upload to Instagram)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: zmb-hourglass-neural-review
+          path: |
+            production3d/out/hourglass_guardian_neural.mp4
+            production3d/out/voice.wav
+            production3d/out/sound.wav
+            production3d/out/timing.json
+            production3d/out/preview*.jpg
+            production3d/out/qa.json
+          if-no-files-found: error
+          retention-days: 7

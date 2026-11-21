@@ -1,0 +1,62 @@
+{
+  "title": "In This Town — The Hourglass Guardian",
+  "voice": "am_michael",
+  "speed": 1.08,
+  "scenes": [
+    {
+      "line": "In this town, we live inside a giant hourglass.",
+      "start": 0,
+      "end": 4.05
+    },
+    {
+      "line": "My whole family and everyone in town live inside.",
+      "start": 4.05,
+      "end": 8.555
+    },
+    {
+      "line": "Every twenty-four hours, our hourglass flips.",
+      "start": 8.555,
+      "end": 12.525
+    },
+    {
+      "line": "At the warning bell, we run to stone shelters.",
+      "start": 12.525,
+      "end": 16.1
+    },
+    {
+      "line": "Outside, a giant dragon guards us every day.",
+      "start": 16.1,
+      "end": 20.07
+    },
+    {
+      "line": "But one day, I dropped my bag and ran back.",
+      "start": 20.07,
+      "end": 23.645
+    },
+    {
+      "line": "The glass began to turn. I was trapped!",
+      "start": 23.645,
+      "end": 27.025
+    },
+    {
+      "line": "Sand poured down, and my family screamed.",
+      "start": 27.025,
+      "end": 30.595
+    },
+    {
+      "line": "The dragon cracked the glass and reached inside.",
+      "start": 30.595,
+      "end": 34.015
+    },
+    {
+      "line": "He lifted me out, just before the square disappeared.",
+      "start": 34.015,
+      "end": 38.05
+    },
+    {
+      "line": "He was never guarding the glass. He was guarding us.",
+      "start": 38.05,
+      "end": 42.245
+    }
+  ]
+}
