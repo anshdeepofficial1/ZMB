@@ -18,6 +18,25 @@ run(sys.executable,OUT/"sound.py")
 run(sys.executable,ROOT/"neural_voice.py","--story",STORY,"--out",OUT)
 timing=json.loads((OUT/"timing.json").read_text()); new=timing["scenes"]
 assert len(new)==len(base)==11
+# Fail closed when neural token timestamps cannot drive a single coherent caption track.
+# This checks the real Kokoro timing output before rendering any caption frames.
+words=timing.get("words", [])
+if not words:
+    raise RuntimeError("Missing neural word timestamps for captions")
+last_start=-1.0
+for index, token in enumerate(words):
+    start=float(token["start"]); end=float(token["end"])
+    if not token.get("word") or not (0 <= start < end <= timing["duration"] + 0.05):
+        raise RuntimeError(f"Invalid caption token {index}: {token}")
+    if start < last_start - 0.02:
+        raise RuntimeError(f"Out-of-order caption token {index}: {token}")
+    if not any(shot["start"] - 0.05 <= start < shot["end"] + 0.05
+               and end <= shot["end"] + 0.15 for shot in new):
+        raise RuntimeError(f"Caption token outside narration scene {index}: {token}")
+    last_start=start
+for index, shot in enumerate(new):
+    if not any(shot["start"] - 0.05 <= float(w["start"]) < shot["end"] + 0.05 for w in words):
+        raise RuntimeError(f"Scene {index+1} has no timed caption words")
 # Stretch each music/foley segment to its matching spoken shot, keeping pitch.
 filters=[]
 for i,(a,b) in enumerate(zip(base,new)):
